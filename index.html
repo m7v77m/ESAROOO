@@ -2916,7 +2916,43 @@ input[type="date"] { pointer-events: none !important; }   /* 不再叫出系統�
                         </div>
                     </div>
                 </div>
-   
+                   <!-- 🐻 無尾熊的 6 國國際時間看盤列（完美置中貼合選單下方） 🐻 -->
+                <div style="grid-column: 1 / -1; width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 13px !important; border-radius: var(--radius-md) !important; box-shadow: 0 2px 8px var(--shadow-color) !important; box-sizing: border-box;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; text-align: center; align-items: center;">
+                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); text-align: left; white-space: nowrap;"><i class="fa-solid fa-globe" style="color: var(--primary);"></i> 國際理財時間：</span>
+                        <!-- 台北 -->
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇹🇼 台北</span>
+                            <span id="clock-taipei" style="font-size: 0.95rem; font-weight: 800; color: #6e8268; font-family: monospace;">00:00:00</span>
+                        </div>
+                        <!-- 東京 -->
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇯🇵 東京</span>
+                            <span id="clock-tokyo" style="font-size: 0.95rem; font-weight: 800; color: var(--expense-color); font-family: monospace;">00:00:00</span>
+                        </div>
+                        <!-- 雪梨 -->
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇦🇺 雪梨</span>
+                            <span id="clock-sydney" style="font-size: 0.95rem; font-weight: 800; color: #8A6D4B; font-family: monospace;">00:00:00</span>
+                        </div>
+                        <!-- 倫敦 -->
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇬🇧 倫敦</span>
+                            <span id="clock-london" style="font-size: 0.95rem; font-weight: 800; color: var(--primary); font-family: monospace;">00:00:00</span>
+                        </div>
+                        <!-- 伊斯坦堡 -->
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇹🇷 伊</span>
+                            <span id="clock-istanbul" style="font-size: 0.95rem; font-weight: 800; color: #7C9A92; font-family: monospace;">00:00:00</span>
+                        </div>
+                        <!-- 加州 -->
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇺🇸 加州</span>
+                            <span id="clock-california" style="font-size: 0.95rem; font-weight: 800; color: var(--primary-dark); font-family: monospace;">00:00:00</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="stats-bar">
     <!-- 💡 幫無尾熊把「今日收支框」縮扁扁的專屬控制樣式 -->
     <style>
@@ -3275,21 +3311,6 @@ input[type="date"] { pointer-events: none !important; }   /* 不再叫出系統�
 
                         <!-- 第七個 Sheet：帳戶金額 + 金流歷史明細 -->
                         <div id="tab-account-ledger" class="tab-content">
-                        <!-- 🐻 無尾熊的 6 國國際時間超級看板 🐻 -->
-<div class="card" style="margin-bottom: 14px; padding: 13px !important; border-radius: var(--radius-md) !important; background: var(--bg-card) !important; border: 1px solid var(--border-color) !important; box-shadow: 0 2px 8px var(--shadow-color) !important;">
-    <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed var(--border-color); display: flex; align-items: center; gap: 6px;">
-        <i class="fa-solid fa-globe" style="color: var(--primary);"></i> 國際外匯理財時間
-    </h3>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; text-align: center;">
-        <div style="background: var(--bg-input); border: 1.5px solid #E8D5B0; padding: 8px 4px; border-radius: 14px;"><div style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px;">🇹🇼 台北</div><div id="clock-taipei" style="font-size: 1.15rem; font-weight: 800; color: #6e8268; font-family: monospace;">00:00:00</div></div>
-        <div style="background: var(--bg-input); border: 1.5px solid #E8D5B0; padding: 8px 4px; border-radius: 14px;"><div style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px;">🇯🇵 東京</div><div id="clock-tokyo" style="font-size: 1.15rem; font-weight: 800; color: var(--expense-color); font-family: monospace;">00:00:00</div></div>
-        <div style="background: var(--bg-input); border: 1.5px solid #E8D5B0; padding: 8px 4px; border-radius: 14px;"><div style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px;">🇦🇺 雪梨</div><div id="clock-sydney" style="font-size: 1.15rem; font-weight: 800; color: #8A6D4B; font-family: monospace;">00:00:00</div></div>
-        <div style="background: var(--bg-input); border: 1.5px solid #E8D5B0; padding: 8px 4px; border-radius: 14px;"><div style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px;">🇬🇧 倫敦</div><div id="clock-london" style="font-size: 1.15rem; font-weight: 800; color: var(--primary); font-family: monospace;">00:00:00</div></div>
-        <div style="background: var(--bg-input); border: 1.5px solid #E8D5B0; padding: 8px 4px; border-radius: 14px;"><div style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px;">🇹🇷 伊斯坦堡</div><div id="clock-istanbul" style="font-size: 1.15rem; font-weight: 800; color: #7C9A92; font-family: monospace;">00:00:00</div></div>
-        <div style="background: var(--bg-input); border: 1.5px solid #E8D5B0; padding: 8px 4px; border-radius: 14px;"><div style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 2px;">🇺🇸 加州</div><div id="clock-california" style="font-size: 1.15rem; font-weight: 800; color: var(--primary-dark); font-family: monospace;">00:00:00</div></div>
-    </div>
-</div>
-
                             <div class="card" id="accountBalanceCard">
                                 <h3><i class="fa-solid fa-credit-card"></i> 帳戶金額</h3>
                                 <div id="accountBalanceList" style="display:flex;flex-direction:column;gap:4px;"></div>

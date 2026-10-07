@@ -2916,42 +2916,77 @@ input[type="date"] { pointer-events: none !important; }   /* 不再叫出系統�
                         </div>
                     </div>
                 </div>
-                   <!-- 🐻 無尾熊的 6 國國際時間看盤列（完美置中貼合選單下方） 🐻 -->
-                <div style="grid-column: 1 / -1; width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); padding: 8px 13px !important; border-radius: var(--radius-md) !important; box-shadow: 0 2px 8px var(--shadow-color) !important; box-sizing: border-box;">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; text-align: center; align-items: center;">
-                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); text-align: left; white-space: nowrap;"><i class="fa-solid fa-globe" style="color: var(--primary);"></i> 國際理財時間：</span>
+                   <!-- 🐻 無尾熊的 7 欄完美對稱世界時鐘看板（上下間距拉高 0.1cm 舒適護眼版） 🐻 -->
+                <!-- 💡 調皮熊把上下的 padding 從 8px 拉高到 12px（加寬 4px 剛好是 0.1cm），消除擠壓感 -->
+                <div style="grid-column: 1 / -1; width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 13px !important; border-radius: var(--radius-md) !important; box-shadow: 0 2px 8px var(--shadow-color) !important; box-sizing: border-box; margin-bottom: 4px;">
+                    <!-- 桌機一排 7 格完美切齊，手機會貼心自動變換排版 -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 8px; text-align: center; align-items: center;">
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); text-align: left; white-space: nowrap;"><i class="fa-solid fa-globe" style="color: var(--primary);"></i> 國際理財時間：</span>
                         <!-- 台北 -->
-                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇹🇼 台北</span>
-                            <span id="clock-taipei" style="font-size: 0.95rem; font-weight: 800; color: #6e8268; font-family: monospace;">00:00:00</span>
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 5px 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">🇹🇼 台北</span>
+                            <span id="clock-taipei" style="font-size: 0.95rem; font-weight: 800; color: #6e8268; font-family: monospace;">--:--:--</span>
                         </div>
                         <!-- 東京 -->
-                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇯🇵 東京</span>
-                            <span id="clock-tokyo" style="font-size: 0.95rem; font-weight: 800; color: var(--expense-color); font-family: monospace;">00:00:00</span>
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 5px 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">🇯🇵 東京</span>
+                            <span id="clock-tokyo" style="font-size: 0.95rem; font-weight: 800; color: var(--expense-color); font-family: monospace;">--:--:--</span>
+                        </div>
+                        <!-- 首爾 -->
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 5px 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">🇰🇷 首爾</span>
+                            <span id="clock-seoul" style="font-size: 0.95rem; font-weight: 800; color: var(--primary-dark); font-family: monospace;">--:--:--</span>
                         </div>
                         <!-- 雪梨 -->
-                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇦🇺 雪梨</span>
-                            <span id="clock-sydney" style="font-size: 0.95rem; font-weight: 800; color: #8A6D4B; font-family: monospace;">00:00:00</span>
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 5px 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">🇦🇺 雪梨</span>
+                            <span id="clock-sydney" style="font-size: 0.95rem; font-weight: 800; color: #8A6D4B; font-family: monospace;">--:--:--</span>
                         </div>
                         <!-- 倫敦 -->
-                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇬🇧 倫敦</span>
-                            <span id="clock-london" style="font-size: 0.95rem; font-weight: 800; color: var(--primary); font-family: monospace;">00:00:00</span>
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 5px 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">🇬🇧 倫敦</span>
+                            <span id="clock-london" style="font-size: 0.95rem; font-weight: 800; color: var(--primary); font-family: monospace;">--:--:--</span>
                         </div>
                         <!-- 伊斯坦堡 -->
-                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇹🇷 伊</span>
-                            <span id="clock-istanbul" style="font-size: 0.95rem; font-weight: 800; color: #7C9A92; font-family: monospace;">00:00:00</span>
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 5px 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">🇹🇷 伊斯坦堡</span>
+                            <span id="clock-istanbul" style="font-size: 0.95rem; font-weight: 800; color: #7C9A92; font-family: monospace;">--:--:--</span>
                         </div>
                         <!-- 加州 -->
-                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 4px 6px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary);">🇺🇸 加州</span>
-                            <span id="clock-california" style="font-size: 0.95rem; font-weight: 800; color: var(--primary-dark); font-family: monospace;">00:00:00</span>
+                        <div style="background: var(--bg-input); border: 1px dashed #D4B896; padding: 5px 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">🇺🇸 加州</span>
+                            <span id="clock-california" style="font-size: 0.95rem; font-weight: 800; color: var(--primary-dark); font-family: monospace;">--:--:--</span>
                         </div>
                     </div>
                 </div>
+
+                <!-- 🔮 時間自動跳秒法術 🔮 -->
+                <script>
+                (function() {
+                    function startLoop() {
+                        const f = d => String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ':' + String(d.getSeconds()).padStart(2, '0');
+                        const now = new Date();
+                        
+                        const tpe = document.getElementById('clock-taipei');
+                        const tky = document.getElementById('clock-tokyo');
+                        const sel = document.getElementById('clock-seoul');
+                        const syd = document.getElementById('clock-sydney');
+                        const lon = document.getElementById('clock-london');
+                        const ist = document.getElementById('clock-istanbul');
+                        const cal = document.getElementById('clock-california');
+                        
+                        if (tpe) tpe.textContent = f(new Date(now.toLocaleString("en-US", {timeZone: "Asia/Taipei"})));
+                        if (tky) tky.textContent = f(new Date(now.toLocaleString("en-US", {timeZone: "Asia/Tokyo"})));
+                        if (sel) sel.textContent = f(new Date(now.toLocaleString("en-US", {timeZone: "Asia/Seoul"})));
+                        if (syd) syd.textContent = f(new Date(now.toLocaleString("en-US", {timeZone: "Asia/Sydney"})));
+                        if (lon) lon.textContent = f(new Date(now.toLocaleString("en-US", {timeZone: "Europe/London"})));
+                        if (ist) ist.textContent = f(new Date(now.toLocaleString("en-US", {timeZone: "Europe/Istanbul"})));
+                        if (cal) cal.textContent = f(new Date(now.toLocaleString("en-US", {timeZone: "America/Los_Angeles"})));
+                    }
+                    setInterval(startLoop, 1000);
+                    setTimeout(startLoop, 100);
+                })();
+                </script>
 
                 <div class="stats-bar">
     <!-- 💡 幫無尾熊把「今日收支框」縮扁扁的專屬控制樣式 -->

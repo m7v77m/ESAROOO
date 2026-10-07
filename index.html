@@ -2919,7 +2919,7 @@ input[type="date"] { pointer-events: none !important; }   /* 不再叫出系統�
                    <!-- 🐻 無尾熊的 7 欄完美對稱世界時鐘看板（時區修復＋伊堡簡稱版） 🐻 -->
                 <div style="grid-column: 1 / -1; width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px 13px !important; border-radius: var(--radius-md) !important; box-shadow: 0 2px 8px var(--shadow-color) !important; box-sizing: border-box; margin-bottom: 4px;">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 8px; text-align: center; align-items: center;">
-                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); text-align: left; white-space: nowrap;"><i class="fa-solid fa-globe" style="color: var(--primary);"></i> 常用國際時間一覽</span>
+                        <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); text-align: left; white-space: nowrap;"><i class="fa-solid fa-globe" style="color: var(--primary);"></i> 常用國際時間一覽表</span>
                         <!-- 台北 -->
                         <div style="background: var(--bg-input); border: 1.5px dashed #D4B896; padding: 5px 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
                             <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">🇹🇼 台北</span>
@@ -2932,8 +2932,8 @@ input[type="date"] { pointer-events: none !important; }   /* 不再叫出系統�
                         </div>
                         <!-- 首爾 -->
                         <div style="background: var(--bg-input); border: 1.5px dashed #D4B896; padding: 5px 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">🇰🇷 首爾</span>
-                            <span id="clock-seoul" style="font-size: 0.95rem; font-weight: 800; color: var(--primary-dark); font-family: monospace;">--:--:--</span>
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); white-space: nowrap;">🇰🇷 羅馬</span>
+                            <span id="clock-rome" style="font-size: 0.95rem; font-weight: 800; color: var(--primary-dark); font-family: monospace;">--:--:--</span>
                         </div>
                         <!-- 雪梨 -->
                         <div style="background: var(--bg-input); border: 1.5px dashed #D4B896; padding: 5px 8px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 4px;">
@@ -2973,8 +2973,8 @@ input[type="date"] { pointer-events: none !important; }   /* 不再叫出系統�
                             const tky = document.getElementById('clock-tokyo');
                             if (tky) tky.textContent = f(new Date(now.toLocaleString("en-US", {timeZone: "Asia/Tokyo"})));
                             
-                            const sel = document.getElementById('clock-seoul');
-                            if (sel) sel.textContent = f(new Date(now.toLocaleString("en-US", {timeZone: "Asia/Seoul"})));
+                            const sel = document.getElementById('clock-rome');
+                            if (sel) sel.textContent = f(new Date(now.toLocaleString("en-US", {timeZone: "Europe/Rome"})));
                             
                             const syd = document.getElementById('clock-sydney');
                             if (syd) syd.textContent = f(new Date(now.toLocaleString("en-US", {timeZone: "Australia/Sydney"})));

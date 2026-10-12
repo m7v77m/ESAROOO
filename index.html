@@ -60,7 +60,7 @@ body{
 .place .flag{font-size:30px;line-height:1}
 .place .nm{font-size:17px;font-weight:700;color:var(--primary-dark);line-height:1.25}
 .place .sub{font-size:12px;color:var(--text-secondary)}
-.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:1.5px dashed var(--primary);border-radius:18px;padding:4px 20px}
+.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:1.5px dashed var(--primary);border-radius:18px;padding:4px 25px}
 .clock .t{font-size:19px;font-weight:700;color:var(--primary-dark);font-variant-numeric:tabular-nums;white-space:nowrap}
 .clock .dn{font-size:15px;line-height:1}
 .date{text-align:center;font-size:14px;color:var(--text-primary);font-weight:600}
@@ -176,7 +176,7 @@ const LAT_TOP = 84, LAT_BOT = -58;   // 地圖顯示的緯度範圍
 
 /* 常用城市：名稱、緯度、經度、國碼 */
 const CITIES = [
- ['台北',25.04,121.56,'TW'],['高雄',22.63,120.30,'TW'],['東京',35.68,139.69,'JP'],['大阪',34.69,135.50,'JP'],['札幌',43.06,141.35,'JP'],['首爾',37.57,126.98,'KR'],
+ ['台北',25.04,121.56,'TW'],['東京',35.68,139.69,'JP'],['大阪',34.69,135.50,'JP'],['札幌',43.06,141.35,'JP'],['首爾',37.57,126.98,'KR'],
  ['北京',39.90,116.40,'CN'],['上海',31.23,121.47,'CN'],['香港',22.32,114.17,'HK'],['澳門',22.20,113.54,'MO'],['新加坡',1.35,103.82,'SG'],['曼谷',13.76,100.50,'TH'],
  ['河內',21.03,105.85,'VN'],['胡志明市',10.82,106.63,'VN'],['馬尼拉',14.60,120.98,'PH'],['雅加達',-6.21,106.85,'ID'],['峇里島',-8.65,115.22,'ID'],['吉隆坡',3.14,101.69,'MY'],
  ['新德里',28.61,77.21,'IN'],['孟買',19.08,72.88,'IN'],['可倫坡',6.93,79.86,'LK'],['加德滿都',27.72,85.32,'NP'],['達卡',23.81,90.41,'BD'],['喀拉蚩',24.86,67.01,'PK'],
@@ -193,7 +193,7 @@ const CITIES = [
  ['聖保羅',-23.55,-46.63,'BR'],['里約熱內盧',-22.91,-43.17,'BR'],['雪梨',-33.87,151.21,'AU'],['墨爾本',-37.81,144.96,'AU'],['伯斯',-31.95,115.86,'AU'],['布里斯本',-27.47,153.03,'AU'],
  ['奧克蘭',-36.85,174.76,'NZ'],['蘇瓦',-18.14,178.44,'FJ'],['關島',13.44,144.79,'GU'],['大溪地',-17.54,-149.57,'PF']
 ];
-const CHIPS = ['舊金山','東京','杜拜','台北','倫敦','奧克蘭','巴黎','羅馬','雪梨','柏林','洛杉磯','伯斯','愛丁堡','哥本哈根','開普敦'];
+const CHIPS = ['舊金山','東京','杜拜','台北','倫敦','奧克蘭','巴黎','羅馬','雪梨','柏林','洛杉磯','伯斯','愛丁堡','開普敦','海參崴','哥本哈根'];
 
 /* WMO 天氣代碼 → 中文與圖示 */
 function wmo(code, isDay){

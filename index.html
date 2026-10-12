@@ -60,7 +60,7 @@ body{
 .place .flag{font-size:30px;line-height:1}
 .place .nm{font-size:17px;font-weight:700;color:var(--primary-dark);line-height:1.25}
 .place .sub{font-size:12px;color:var(--text-secondary)}
-.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:1.5px dashed var(--primary);border-radius:17px;padding:4px 28px}
+.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:1.5px dashed var(--primary);border-radius:16px;padding:4px 28px}
 .clock .t{font-size:19px;font-weight:700;color:var(--primary-dark);font-variant-numeric:tabular-nums;white-space:nowrap}
 .clock .dn{font-size:15px;line-height:1}
 .date{text-align:center;font-size:14px;color:var(--text-primary);font-weight:600}
@@ -119,7 +119,7 @@ footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2p
             <div class="map-msg" id="mapMsg"></div>
         </div>
         <div class="legend">
-            <span>&nbsp;<i></i>&nbsp;國際換日線</span>
+            <span>&nbsp;&nbsp;<i></i>&nbsp;國際換日線</span>
             <span><i class="m"></i>&nbsp;此刻的午夜線</span>
             <span><b></b>&nbsp;此刻的夜晚</span>
         </div>
@@ -691,9 +691,9 @@ async function loadSpots(p, my){
 }
 
 /* =====================================================================
-   起動
+   起動'舊金山','東京','杜拜','雅加達','倫敦','奧克蘭','巴黎','羅馬','雪梨','柏林','洛杉磯','伯斯','愛丁堡','開普敦','海參崴','哥本哈根'
    ===================================================================== */
-const CHIP_TZ = {'台北':'Asia/Taipei','東京':'Asia/Tokyo','首爾':'Asia/Seoul','新加坡':'Asia/Singapore','杜拜':'Asia/Dubai','倫敦':'Europe/London','巴黎':'Europe/Paris','紐約':'America/New_York','洛杉磯':'America/Los_Angeles','檀香山':'Pacific/Honolulu','雪梨':'Australia/Sydney','奧克蘭':'Pacific/Auckland'};
+const CHIP_TZ = {'舊金山':'America/Los_Angeles','東京':'Asia/Tokyo','雪梨':'Australia/Sydney','開普敦':'Africa/Johannesburg','杜拜':'Asia/Dubai','倫敦':'Europe/London','巴黎':'Europe/Paris','紐約':'America/New_York','哥本哈根':'Europe/Copenhagen','檀香山':'Pacific/Honolulu','雪梨':'Australia/Sydney','奧克蘭':'Pacific/Auckland'};
 const chipFmt = {};
 function chipTime(z, d){
     try { const f = chipFmt[z] || (chipFmt[z] = new Intl.DateTimeFormat('en-GB', {timeZone:z, hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23'})); return f.format(d); }

@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#D7C4A5">
 <title>全球時光機</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2280%22>🕰️</text></svg>">
 <style>
@@ -101,13 +102,59 @@ body{
 footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2px 6px 4px}
 /* 深色字改抹茶綠（卡片標題、小字、備註維持原色） */
 .place .nm,.clock .t,.date,.row .v,.cell .r,.now .tp,.news .tt,.spot .tt,.chip{color:#617553}
+
+/* ===== v5：深淺模式、航線、匯率、盲盒 ===== */
+:root{--accent-text:#617553}
+.tbtn{margin-left:auto;border:1.5px dashed var(--border-color);background:var(--bg-input);color:var(--text-secondary);border-radius:15px;padding:3px 10px;font-size:12px;font-family:inherit;cursor:pointer}
+.roll{display:block;width:100%;margin-top:10px;border:1.5px dashed var(--matcha);background:var(--bg-input);color:var(--accent-text);border-radius:15px;padding:8px 10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
+.roll:active{background:var(--bg-hover)}
+.roll .dice{display:inline-block}
+.roll.rolling .dice{animation:dicespin .7s ease-out}
+@keyframes dicespin{to{transform:rotate(720deg)}}
+.route{fill:none;stroke:#A67C52;stroke-width:1.8;stroke-dasharray:6 5;stroke-linecap:round;vector-effect:non-scaling-stroke;pointer-events:none}
+.plane{fill:#A67C52;stroke:#FFF8EB;stroke-width:1;vector-effect:non-scaling-stroke}
+.bh{font-size:13px;font-weight:600;color:var(--text-secondary);margin:12px 0 6px}
+.bhead{font-size:17px;font-weight:700;color:var(--accent-text);text-align:center;line-height:1.4}
+.bhead .bf{font-size:34px;display:block;line-height:1.2}
+.btxt{font-size:13px;color:var(--text-primary);line-height:1.6}
+.fx-cv{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.fx-cv label{display:block;font-size:12px;color:var(--text-secondary);margin-bottom:4px;text-align:center}
+.fx-cv input{width:100%;font-size:16px;font-family:inherit;font-weight:700;color:var(--accent-text);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:15px;padding:8px 10px;outline:none;text-align:center}
+.fx-cv input:focus{border-color:var(--matcha)}
+body,.app,.card,.row,.cell,.clock,.news a,.spot a,.map-wrap,.tbtn,.roll,.zoom button,.fx-cv input{transition:background-color .5s,color .5s,border-color .5s}
+.chip{transition:transform .12s,box-shadow .12s,background-color .5s,color .5s,border-color .5s}
+.country{transition:fill .5s}
+
+/* 夜晚的城市 → 咖啡深色 */
+html[data-theme="dark"]{
+    color-scheme:dark;
+    --bg-body:#2A211B; --bg-container:#352A22; --bg-card:#41342A; --bg-input:#382D24; --bg-hover:#54443A;
+    --primary:#C9A27A; --primary-hover:#DDB890; --primary-light:#382D24; --primary-dark:#E3D0B2;
+    --matcha-dark:#B5C8A8; --matcha-pale:#3B463A; --expense-color:#C9DDB8;
+    --text-primary:#EADBC3; --text-secondary:#CDB89C; --text-muted:#A39080; --border-color:#7A6450;
+    --accent-text:#A9BD9B;
+}
+html[data-theme="dark"] .card{box-shadow:0 2px 8px rgba(0,0,0,.35)}
+html[data-theme="dark"] .map-wrap{border-color:#8C7355;background:#2E3A35}
+html[data-theme="dark"] .country{fill:#5E4E3F;stroke:#7A6450}
+html[data-theme="dark"] .country.sel{fill:#6F8463}
+html[data-theme="dark"] #night{fill:rgba(0,0,0,.40)}
+html[data-theme="dark"] .city{fill:#D9B98C;stroke:#41342A}
+html[data-theme="dark"] .map-msg{background:rgba(65,52,42,.92)}
+html[data-theme="dark"] .legend b{background:rgba(0,0,0,.40);border:1px solid #7A6450}
+html[data-theme="dark"] .route{stroke:#D9B98C}
+html[data-theme="dark"] .plane{fill:#D9B98C;stroke:#41342A}
+html[data-theme="dark"] .chip,html[data-theme="dark"] .row,html[data-theme="dark"] .cell{border-color:#8C7355}
+html[data-theme="dark"] .place .nm,html[data-theme="dark"] .clock .t,html[data-theme="dark"] .date,html[data-theme="dark"] .row .v,html[data-theme="dark"] .cell .r,html[data-theme="dark"] .now .tp,html[data-theme="dark"] .news .tt,html[data-theme="dark"] .spot .tt,html[data-theme="dark"] .chip{color:#A9BD9B}
+html[data-theme="dark"] .row .v.big{color:#C9DDB8}
+html[data-theme="dark"] .chip.on{color:#fff}
 </style>
 </head>
 <body>
 <div class="app">
 
     <div class="card">
-        <h2>🗺️ 世界地圖</h2>
+        <h2>🗺️ 世界地圖<button id="themeBtn" class="tbtn" type="button">🌗 自動</button></h2>
         <div class="map-wrap" id="mapWrap">
             <svg id="map" xmlns="http://www.w3.org/2000/svg" aria-label="世界地圖"></svg>
             <div class="zoom">
@@ -122,8 +169,14 @@ footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2p
             <span><i class="m"></i>&nbsp;此刻午夜線</span>&nbsp;
             <span><b></b>&nbsp;此刻的夜晚</span>
         </div>
+        <button id="rollBtn" class="roll" type="button"><span class="dice">🎲</span> 隨機傳送，帶我去地球的某個角落</button>
         <div class="chips" id="chips"></div>
         <div class="chip-tip">👆 長按城市可拖曳排序，左右滑動看更多</div>
+    </div>
+
+    <div class="card hidden" id="boxCard">
+        <h2>🎁 盲盒揭曉</h2>
+        <div id="boxBody"></div>
     </div>
 
     <div class="card" id="timeCard">
@@ -153,6 +206,11 @@ footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2p
         <div id="wxBody"><div class="state">點地圖選一個地方吧</div></div>
     </div>
 
+    <div class="card" id="fxCard">
+        <h2>💱 即時匯率</h2>
+        <div id="fxBody"><div class="state">點地圖選一個地方吧</div></div>
+    </div>
+
     <div class="card" id="newsCard">
         <h2>📰 重要新聞</h2>
         <div id="newsBody"><div class="state">點地圖選一個地方吧</div></div>
@@ -163,7 +221,7 @@ footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2p
         <div id="spotBody"><div class="state">點地圖選一個地方吧</div></div>
     </div>
 
-    <footer>資料來源：Open-Meteo（天氣）、BigDataCloud（地名）、維基百科（景點）、Google 新聞（新聞）。換日線以東西經 180° 簡化繪製。</footer>
+    <footer>資料來源：Open-Meteo（天氣）、BigDataCloud（地名）、維基百科（景點與國家介紹）、Google 新聞（新聞）、ExchangeRate-API 與 currency-api（匯率）、Nager.Date（公共假日）。換日線以東西經 180° 簡化繪製。</footer>
 </div>
 
 <script>
@@ -219,6 +277,18 @@ const regionZh = cc => { try { return new Intl.DisplayNames(['zh-TW'], {type:'re
 const save = (k,v) => { try{ localStorage.setItem(k,v);}catch(e){} };
 const load = k => { try{ return localStorage.getItem(k);}catch(e){ return null; } };
 
+/* 主題：白天的城市亮色、夜晚的城市深色（可手動切換） */
+let themeMode = load('timemachine_theme'); if (!['auto','light','dark'].includes(themeMode)) themeMode = 'auto';
+let curDayFlag = 1;
+function applyTheme(){
+    const eff = themeMode === 'auto' ? (curDayFlag ? 'light' : 'dark') : themeMode;
+    document.documentElement.dataset.theme = eff;
+    const m = document.querySelector('meta[name=theme-color]'); if (m) m.content = eff === 'dark' ? '#2A211B' : '#D7C4A5';
+    const b = document.getElementById('themeBtn'); if (b) b.textContent = {auto:'🌗 自動', light:'☀️ 白天', dark:'🌙 夜晚'}[themeMode];
+}
+document.getElementById('themeBtn').onclick = () => { themeMode = {auto:'light', light:'dark', dark:'auto'}[themeMode]; save('timemachine_theme', themeMode); applyTheme(); };
+applyTheme();
+
 /* =====================================================================
    地圖：米勒投影（反推公式簡單，點哪裡都能換回經緯度）
    ===================================================================== */
@@ -247,11 +317,15 @@ const idlL = el('line', {class:'dl', x1:1, y1:0, x2:1, y2:H}, gLines);
 const idlR = el('line', {class:'dl', x1:W-1, y1:0, x2:W-1, y2:H}, gLines);
 const midLine = el('line', {class:'ml', x1:0, y1:0, x2:0, y2:H}, gLines);
 const midLine2 = el('line', {class:'ml', x1:0, y1:0, x2:0, y2:H}, gLines);
+const gRoute = el('g', {}, svg);
 const gCities = el('g', {}, svg);
+let tweenId = 0;
 const gPin = el('g', {}, svg);
 
 /* ---- 解 TopoJSON（world-atlas 格式） ---- */
+const landList = [];
 function topoToCountries(topo){
+    landList.length = 0;
     const tf = topo.transform || {scale:[1,1], translate:[0,0]};
     const arcs = topo.arcs.map(a => { let x = 0, y = 0; return a.map(p => { x += p[0]; y += p[1]; return [x*tf.scale[0] + tf.translate[0], y*tf.scale[1] + tf.translate[1]]; }); });
     const ringPts = idxs => { const pts = []; idxs.forEach(i => { let a = i < 0 ? arcs[~i].slice().reverse() : arcs[i]; if (pts.length) a = a.slice(1); for (const p of a) pts.push(p); }); return pts; };
@@ -261,13 +335,20 @@ function topoToCountries(topo){
         const name = (g.properties && g.properties.name) || '';
         if (name === 'Antarctica') continue;
         const polys = g.type === 'Polygon' ? [g.arcs] : g.type === 'MultiPolygon' ? g.arcs : [];
-        let d = '';
+        let d = '', best = null;
         for (const poly of polys) for (const ring of poly) {
             const pts = ringPts(ring);
             if (pts.length < 3) continue;
+            if (ring === poly[0]) {
+                const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+                const bb = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+                const a = (bb[2] - bb[0]) * (bb[3] - bb[1]);
+                if (!best || a > best.a) best = {a, pts, bb};
+            }
             d += 'M' + pts.map(p => px(p[0]).toFixed(1) + ' ' + py(p[1]).toFixed(1)).join('L') + 'Z';
         }
         if (d) out.push({name, d});
+        if (best) landList.push({name, ring:best.pts, bb:best.bb});
     }
     return out;
 }
@@ -288,6 +369,8 @@ function scaleMarkers(){
     const k = vb.w / W;   // 放大後圓點縮小，才不會糊成一團
     gCities.querySelectorAll('circle').forEach(c => c.setAttribute('r', (3.2 * Math.max(0.35, Math.min(1, k * 1.3))).toFixed(2)));
     gPin.querySelectorAll('.pin-dot').forEach(c => c.setAttribute('r', (6 * Math.max(0.5, k)).toFixed(2)));
+    const upx = vb.w / (svg.getBoundingClientRect().width || 300);
+    gRoute.querySelectorAll('.plane').forEach(p => p.setAttribute('transform', 'scale(' + upx.toFixed(4) + ')'));
 }
 
 /* ---- 白天／夜晚陰影、午夜線 ---- */
@@ -330,6 +413,7 @@ function clientToSvg(cx, cy){
     return [vb.x + (cx - r.left) / r.width * vb.w, vb.y + (cy - r.top) / r.height * vb.h];
 }
 function zoomAt(factor, cx, cy){
+    tweenId++;
     const r = svg.getBoundingClientRect();
     const fx = cx == null ? 0.5 : (cx - r.left) / r.width, fy = cy == null ? 0.5 : (cy - r.top) / r.height;
     const nw = Math.max(W/12, Math.min(W, vb.w / factor));
@@ -350,7 +434,7 @@ svg.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY < 0 ? 1
 const ptrs = new Map();
 let drag = null, pinch = null, moved = false;
 svg.addEventListener('pointerdown', e => {
-    svg.setPointerCapture(e.pointerId);
+    svg.setPointerCapture(e.pointerId); tweenId++;
     ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
     if (ptrs.size === 1) { drag = {x:e.clientX, y:e.clientY, vx:vb.x, vy:vb.y}; moved = false; }
     if (ptrs.size === 2) { const [a,b] = [...ptrs.values()]; pinch = {d:Math.hypot(a.x-b.x, a.y-b.y)}; moved = true; }
@@ -430,12 +514,19 @@ async function getJSON(url, ms){
 
 function selectPlace(p, countryEl){
     const my = ++seq;
+    const prev = cur;
     cur = p;
     tz = null; isDay = null; tzFallbackMin = Math.round(p.lon / 15) * 60;
     document.querySelectorAll('.country.sel').forEach(e => e.classList.remove('sel'));
     if (countryEl) countryEl.classList.add('sel');
     setPin(p.lon, p.lat);
+    let routed = false;
+    if (prev && Math.hypot(px(prev.lon) - px(p.lon), py(prev.lat) - py(p.lat)) > 12) { drawRoute(prev, p); routed = true; } else gRoute.textContent = '';
+    if (p.focus) { if (routed) fitRoute(prev, p); else focusTween(p.lon, p.lat); }
     markChip(p.pinned ? p.name : null);
+    $('boxCard').classList.toggle('hidden', !p.roll);
+    if (p.roll) setState('boxBody', '正在打開盲盒…');
+    setState('fxBody', '匯率載入中…');
     showMapMsg('');
     $('placeName').textContent = p.name || '查詢中…';
     $('placeSub').textContent = `${Math.abs(p.lat).toFixed(2)}°${p.lat >= 0 ? 'N' : 'S'}　${Math.abs(p.lon).toFixed(2)}°${p.lon >= 0 ? 'E' : 'W'}`;
@@ -449,7 +540,7 @@ function selectPlace(p, countryEl){
     loadWeather(p, my);
     // 2) 地名（點一般地點時才需要）
     const geo = p.name ? Promise.resolve(null) : reverseGeo(p, my);
-    geo.then(() => { if (my !== seq) return; loadNews(cur, my); loadSpots(cur, my); });
+    geo.then(() => { if (my !== seq) return; loadNews(cur, my); loadSpots(cur, my); loadFx(cur, my); if (cur.roll) loadBox(cur, my); });
 }
 
 async function reverseGeo(p, my){
@@ -497,6 +588,7 @@ function tickClock(){
     $('clk').textContent = `${pad(L.h)}:${pad(L.mi)}:${pad(L.s)}`;
     $('dateTxt').textContent = `${L.y}年${L.m}月${L.d}日　星期${WD[L.wd]}`;
     const dayNow = isDay != null ? isDay : (L.h >= 6 && L.h < 18 ? 1 : 0);
+    if (dayNow !== curDayFlag) { curDayFlag = dayNow; applyTheme(); }
     $('dn').textContent = dayNow ? '☀️' : '🌙';
     $('tzTxt').textContent = (tz ? tz.replace(/_/g, ' ') : '估計時區') + '（' + fmtOff(off) + '）';
     const diff = (off - TW_OFFSET) / 60;
@@ -690,10 +782,200 @@ async function loadSpots(p, my){
     }
 }
 
+
+/* =====================================================================
+   飛行航線：從上一個地點到新地點，畫一條虛線拱形，紙飛機飛過去
+   ===================================================================== */
+function shortestLon(l0, l1){ return l0 + (((l1 - l0 + 540) % 360) - 180); }
+function routeGeom(a, b){
+    const x0 = px(a.lon), y0 = py(a.lat), x1 = px(shortestLon(a.lon, b.lon)), y1 = py(b.lat);
+    const dist = Math.hypot(x1 - x0, y1 - y0), lift = Math.min(dist * 0.32, 260);
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2 - lift;
+    return {x0, y0, x1, y1, cx, cy, apexY:(y0 + y1) / 4 + cy / 2};
+}
+function drawRoute(a, b){
+    gRoute.textContent = '';
+    const g = routeGeom(a, b);
+    const d = `M${g.x0.toFixed(1)} ${g.y0.toFixed(1)}Q${g.cx.toFixed(1)} ${g.cy.toFixed(1)} ${g.x1.toFixed(1)} ${g.y1.toFixed(1)}`;
+    const starts = [];
+    for (const off of [-W, 0, W]) {      // 跨過換日線時，另一側也要看得到
+        const grp = el('g', {transform:`translate(${off} 0)`}, gRoute);
+        const path = el('path', {class:'route', d, opacity:'0'}, grp);
+        starts.push(el('animate', {attributeName:'opacity', from:'0', to:'1', dur:'0.6s', begin:'indefinite', fill:'freeze'}, path));
+        const pl = el('g', {opacity:'0'}, grp);
+        el('path', {class:'plane', d:'M-7 -5L9 0L-7 5L-3 0Z'}, pl);
+        starts.push(el('animateMotion', {path:d, dur:'1.6s', rotate:'auto', begin:'indefinite', fill:'freeze'}, pl));
+        starts.push(el('animate', {attributeName:'opacity', values:'1;1;0', keyTimes:'0;0.9;1', dur:'1.6s', begin:'indefinite', fill:'freeze'}, pl));
+    }
+    scaleMarkers();
+    starts.forEach(a => { try { a.beginElement(); } catch(e) {} });
+}
+function tweenVB(tx, ty, tw, ms){
+    const id = ++tweenId, s0 = {x:vb.x, y:vb.y, w:vb.w}, t0 = performance.now();
+    (function step(now){
+        if (id !== tweenId) return;
+        let t = Math.min(1, (now - t0) / ms); t = t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+        vb.w = s0.w + (tw - s0.w) * t; vb.x = s0.x + (tx - s0.x) * t; vb.y = s0.y + (ty - s0.y) * t;
+        applyVB();
+        if (t < 1) requestAnimationFrame(step);
+    })(t0);
+}
+function fitRoute(a, b){
+    const g = routeGeom(a, b);
+    const minX = Math.min(g.x0, g.x1), maxX = Math.max(g.x0, g.x1);
+    if (minX < 0 || maxX > W) { tweenVB(0, 0, W, 800); return; }   // 跨換日線：直接看整張地圖
+    const minY = Math.min(g.y0, g.y1, g.apexY), maxY = Math.max(g.y0, g.y1), pad = 60;
+    const w = Math.min(W, Math.max(maxX - minX + pad*2, (maxY - minY + pad*2) * W / H, W / 6));
+    tweenVB((minX + maxX) / 2 - w / 2, (minY + maxY) / 2 - w * H / W / 2, w, 800);
+}
+function focusTween(lon, lat){
+    const w = Math.min(vb.w, W / 2.2);
+    tweenVB(px(lon) - w / 2, py(lat) - w * H / W / 2, w, 700);
+}
+
+/* =====================================================================
+   即時匯率（以新台幣為基準）
+   ===================================================================== */
+const CUR = {};
+('TW:TWD,JP:JPY,KR:KRW,CN:CNY,HK:HKD,MO:MOP,SG:SGD,TH:THB,VN:VND,PH:PHP,ID:IDR,MY:MYR,IN:INR,LK:LKR,NP:NPR,BD:BDT,PK:PKR,MN:MNT,KZ:KZT,UZ:UZS,IR:IRR,AE:AED,SA:SAR,IL:ILS,TR:TRY,RU:RUB,GB:GBP,CH:CHF,CZ:CZK,PL:PLN,SE:SEK,NO:NOK,DK:DKK,IS:ISK,HU:HUF,EG:EGP,MA:MAD,NG:NGN,KE:KES,ET:ETB,ZA:ZAR,US:USD,CA:CAD,MX:MXN,CU:CUP,CO:COP,PE:PEN,CL:CLP,AR:ARS,BR:BRL,AU:AUD,NZ:NZD,FJ:FJD,GU:USD,PF:XPF,NC:XPF,'
+ + 'QA:QAR,KW:KWD,BH:BHD,OM:OMR,JO:JOD,LB:LBP,IQ:IQD,AF:AFN,MM:MMK,KH:KHR,LA:LAK,BN:BND,BT:BTN,MV:MVR,KG:KGS,TJ:TJS,TM:TMT,AZ:AZN,AM:AMD,GE:GEL,BY:BYN,UA:UAH,RO:RON,BG:BGN,RS:RSD,AL:ALL,MK:MKD,BA:BAM,MD:MDL,DZ:DZD,TN:TND,LY:LYD,SD:SDG,GH:GHS,SN:XOF,CI:XOF,CM:XAF,TZ:TZS,UG:UGX,RW:RWF,AO:AOA,ZM:ZMW,MZ:MZN,MG:MGA,NA:NAD,BW:BWP,VE:VES,EC:USD,BO:BOB,PY:PYG,UY:UYU,PA:PAB,CR:CRC,GT:GTQ,HN:HNL,NI:NIO,DO:DOP,JM:JMD,HT:HTG,PG:PGK,SB:SBD,VU:VUV,WS:WST,TO:TOP,GL:DKK,'
+ + 'DE:EUR,FR:EUR,IT:EUR,ES:EUR,NL:EUR,BE:EUR,AT:EUR,PT:EUR,IE:EUR,FI:EUR,GR:EUR,HR:EUR,SI:EUR,SK:EUR,EE:EUR,LV:EUR,LT:EUR,LU:EUR,MT:EUR,CY:EUR').split(',').forEach(x => { const [a, b] = x.split(':'); CUR[a] = b; });
+const curName = c => { try { return new Intl.DisplayNames(['zh-TW'], {type:'currency'}).of(c); } catch(e) { return c; } };
+let fxCache = null, fxAmt = 1000;
+async function getRates(){
+    if (fxCache && Date.now() - fxCache.t < 30*60000) return fxCache;
+    const srcs = [
+        async () => { const j = await getJSON('https://open.er-api.com/v6/latest/TWD', 12000); if (!j.rates) throw new Error('x'); return {rates:j.rates, date:j.time_last_update_unix ? new Date(j.time_last_update_unix * 1000) : new Date()}; },
+        async () => { const j = await getJSON('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/twd.json', 12000); if (!j.twd) throw new Error('x'); const r = {}; for (const k in j.twd) r[k.toUpperCase()] = j.twd[k]; return {rates:r, date:j.date ? new Date(j.date) : new Date()}; }
+    ];
+    try {
+        const r = await Promise.any(srcs.map(f => f()));
+        fxCache = {rates:r.rates, date:r.date, t:Date.now()};
+        save('tm_fx', JSON.stringify({rates:r.rates, date:+r.date}));
+        return fxCache;
+    } catch(e) {
+        try { const c = JSON.parse(load('tm_fx') || 'null'); if (c && c.rates) return {rates:c.rates, date:new Date(c.date), stale:true}; } catch(_) {}
+        throw e;
+    }
+}
+function fmtAmt(n){ if (!isFinite(n)) return ''; const a = Math.abs(n); return String(a >= 1 ? Math.round(n * 100) / 100 : Number(n.toPrecision(3))); }
+async function loadFx(p, my){
+    const b = $('fxBody');
+    const code = p.ocean ? null : CUR[(p.cc || '').toUpperCase()];
+    if (!code) { setState('fxBody', p.ocean ? '這裡是海上，沒有通用貨幣。' : '查不到這個地方的貨幣。'); return; }
+    let R;
+    try { R = await getRates(); } catch(e) { if (my !== seq) return; setState('fxBody', '匯率暫時抓不到，稍後再點一次試試。', true); return; }
+    if (my !== seq) return;
+    const tgt = code === 'TWD' ? 'USD' : code, r = R.rates[tgt];
+    if (!r) { setState('fxBody', `查不到 ${tgt} 的匯率。`); return; }
+    const nm = curName(tgt);
+    b.textContent = '';
+    if (code === 'TWD') { const n0 = document.createElement('div'); n0.className = 'state'; n0.textContent = '這裡用的就是新台幣，下面拿美元當參考：'; b.appendChild(n0); }
+    const rows = document.createElement('div'); rows.className = 'rows'; rows.style.marginTop = '0';
+    const row = (k, v) => { const d = document.createElement('div'); d.className = 'row'; const a = document.createElement('span'); a.className = 'k'; a.textContent = k; const c = document.createElement('span'); c.className = 'v'; c.textContent = v; d.appendChild(a); d.appendChild(c); return d; };
+    rows.appendChild(row('1 台幣 ≈', `${fmtAmt(r)} ${nm}（${tgt}）`));
+    rows.appendChild(row(`1 ${nm} ≈`, `${fmtAmt(1 / r)} 台幣`));
+    b.appendChild(rows);
+    const cv = document.createElement('div'); cv.className = 'fx-cv';
+    cv.innerHTML = '<div><label>台幣 TWD</label><input type="text" inputmode="decimal" id="fxA" autocomplete="off"></div><div><label></label><input type="text" inputmode="decimal" id="fxB" autocomplete="off"></div>';
+    cv.children[1].querySelector('label').textContent = `${nm} ${tgt}`;
+    b.appendChild(cv);
+    const A = $('fxA'), B = $('fxB'), num = v => parseFloat(String(v).replace(/,/g, ''));
+    A.value = fmtAmt(fxAmt); B.value = fmtAmt(fxAmt * r);
+    A.oninput = () => { const v = num(A.value); if (isFinite(v)) { fxAmt = v; B.value = fmtAmt(v * r); } else B.value = ''; };
+    B.oninput = () => { const v = num(B.value); if (isFinite(v)) { fxAmt = v / r; A.value = fmtAmt(fxAmt); } else A.value = ''; };
+    const n = document.createElement('div'); n.className = 'note';
+    const dt = R.date ? `${R.date.getFullYear()}/${R.date.getMonth() + 1}/${R.date.getDate()}` : '';
+    n.textContent = `這是每日更新的參考匯率（資料日：${dt}）${R.stale ? '，網路不穩，用的是之前存下來的資料' : ''}，實際換匯請以銀行或兌換所牌價為準。`;
+    b.appendChild(n);
+}
+
+/* =====================================================================
+   🎲 隨機傳送盲盒
+   ===================================================================== */
+function pip(pt, ring){
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
+        if (((yi > pt[1]) !== (yj > pt[1])) && (pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi)) inside = !inside;
+    }
+    return inside;
+}
+function randomSpot(){
+    if (landList.length && Math.random() < 0.7) {          // 七成機率落在陸地（每個國家機會一樣大）
+        const c = landList[Math.floor(Math.random() * landList.length)];
+        for (let i = 0; i < 60; i++) {
+            const lon = c.bb[0] + Math.random() * (c.bb[2] - c.bb[0]), lat = c.bb[1] + Math.random() * (c.bb[3] - c.bb[1]);
+            if (pip([lon, lat], c.ring)) return {lat, lon};
+        }
+        return {lat:c.ring[0][1], lon:c.ring[0][0]};
+    }
+    const lat = Math.max(LAT_BOT + 2, Math.min(LAT_TOP - 2, Math.asin(Math.random() * 2 - 1) * 180 / Math.PI));
+    return {lat, lon:Math.random() * 360 - 180};              // 三成機率：地球上任何地方（多半是海）
+}
+function oceanName(lat, lon){
+    if (lat > 66) return '北冰洋';
+    if (lon > -70 && lon < 20) return '大西洋';
+    if (lon >= 20 && lon < 105 && lat < 28) return '印度洋';
+    return '太平洋';
+}
+$('rollBtn').onclick = () => {
+    const b = $('rollBtn'); b.classList.remove('rolling'); void b.offsetWidth; b.classList.add('rolling');
+    const s = randomSpot();
+    selectPlace({name:null, lat:s.lat, lon:s.lon, cc:null, roll:true, focus:true}, null);
+};
+async function loadBox(p, my){
+    const b = $('boxBody');
+    const head = (flag, txt) => { const h = document.createElement('div'); h.className = 'bhead'; const f = document.createElement('span'); f.className = 'bf'; f.textContent = flag; h.appendChild(f); h.appendChild(document.createTextNode(txt)); return h; };
+    if (p.ocean || !p.cc) {
+        b.textContent = '';
+        b.appendChild(head('🌊', '你降落在海上！'));
+        const t = document.createElement('div'); t.className = 'btxt'; t.style.marginTop = '8px'; t.style.textAlign = 'center';
+        t.textContent = `大約是在${oceanName(p.lat, p.lon)}一帶，四周只有海浪和海鷗，沒有國家的資料。看看下面的天氣，再按一次 🎲 繼續旅行吧！`;
+        b.appendChild(t); return;
+    }
+    const cc = p.cc.toUpperCase(), country = p.country || regionZh(cc);
+    b.textContent = '';
+    b.appendChild(head(flagOf(cc), `你抵達了${country}${p.name && p.name !== country ? '・' + p.name : ''}`));
+    const intro = document.createElement('div'), hol = document.createElement('div');
+    b.appendChild(intro); b.appendChild(hol);
+    const wurl = 'https://zh.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&exchars=200&redirects=1&titles=' + encodeURIComponent(country) + '&format=json&formatversion=2&origin=*&variant=zh-tw';
+    const [w, h] = await Promise.allSettled([getJSON(wurl, 12000), getJSON('https://date.nager.at/api/v3/NextPublicHolidays/' + cc, 12000)]);
+    if (my !== seq) return;
+    const sh = txt => { const d = document.createElement('div'); d.className = 'bh'; d.textContent = txt; return d; };
+    let ex = '';
+    if (w.status === 'fulfilled') { const pg = w.value.query && w.value.query.pages && w.value.query.pages[0]; ex = pg && pg.extract ? pg.extract.trim() : ''; }
+    intro.appendChild(sh('📖 國家特色'));
+    const it = document.createElement('div'); it.className = 'btxt'; it.textContent = ex || '這個國家的介紹暫時查不到。';
+    intro.appendChild(it);
+    hol.appendChild(sh('🎉 接下來的節慶與假日'));
+    if (h.status === 'fulfilled' && Array.isArray(h.value) && h.value.length) {
+        const rows = document.createElement('div'); rows.className = 'rows'; rows.style.marginTop = '0';
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const seen = new Set();
+        for (const x of h.value) {
+            if (seen.has(x.date + x.localName)) continue; seen.add(x.date + x.localName);
+            if (seen.size > 3) break;
+            const d = new Date(x.date + 'T00:00:00'), days = Math.round((d - today) / 86400000);
+            const r = document.createElement('div'); r.className = 'row';
+            const k = document.createElement('span'); k.className = 'k'; k.textContent = `${d.getMonth() + 1}月${d.getDate()}日`;
+            const v = document.createElement('span'); v.className = 'v';
+            v.textContent = (x.localName || x.name) + (x.name && x.name !== x.localName ? `（${x.name}）` : '') + (days <= 0 ? '・今天' : `・還有 ${days} 天`);
+            r.appendChild(k); r.appendChild(v); rows.appendChild(r);
+        }
+        hol.appendChild(rows);
+    } else {
+        const t = document.createElement('div'); t.className = 'btxt'; t.textContent = '節慶資料庫沒有收錄這個國家，或暫時抓不到。';
+        hol.appendChild(t);
+    }
+    const n = document.createElement('div'); n.className = 'note'; n.textContent = '假日資料來自 Nager.Date，只涵蓋部分國家，名稱多半是當地語言與英文。';
+    hol.appendChild(n);
+}
+
 /* =====================================================================
    起動
    ===================================================================== */
-const CHIP_TZ = {'舊金山':'America/Los_Angeles','東京':'Asia/Tokyo','雪梨':'Australia/Sydney','開普敦':'Africa/Johannesburg','杜拜':'Asia/Dubai','倫敦':'Europe/London','巴黎':'Europe/Paris','卡達':'Asia/Qatar','哥本哈根':'Europe/Copenhagen','檀香山':'Pacific/Honolulu','雪梨':'Australia/Sydney'};
+const CHIP_TZ = {'台北':'Asia/Taipei','舊金山':'America/Los_Angeles','東京':'Asia/Tokyo','杜拜':'Asia/Dubai','雅加達':'Asia/Jakarta','倫敦':'Europe/London','奧克蘭':'Pacific/Auckland','巴黎':'Europe/Paris','羅馬':'Europe/Rome','雪梨':'Australia/Sydney','柏林':'Europe/Berlin','曼谷':'Asia/Bangkok','伯斯':'Australia/Perth','愛丁堡':'Europe/London','開普敦':'Africa/Johannesburg','哥本哈根':'Europe/Copenhagen','檀香山':'Pacific/Honolulu','首爾':'Asia/Seoul','新加坡':'Asia/Singapore','紐約':'America/New_York','洛杉磯':'America/Los_Angeles'};
 const chipFmt = {};
 function chipTime(z, d){
     try { const f = chipFmt[z] || (chipFmt[z] = new Intl.DateTimeFormat('en-GB', {timeZone:z, hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23'})); return f.format(d); }
@@ -701,7 +983,12 @@ function chipTime(z, d){
 }
 function tickChips(){
     const d = new Date();
-    document.querySelectorAll('#chips .chip .ct').forEach(t => { t.textContent = chipTime(CHIP_TZ[t.parentNode.dataset.n] || 'UTC', d); });
+    document.querySelectorAll('#chips .chip .ct').forEach(t => {
+        const n = t.parentNode.dataset.n, z = CHIP_TZ[n];
+        if (z) { t.textContent = chipTime(z, d); return; }
+        const c = CITIES.find(x => x[0] === n), L = localParts(d, Math.round((c ? c[2] : 0) / 15) * 60);   // 沒有時區資料：用經度估
+        t.textContent = `${pad(L.h)}:${pad(L.mi)}:${pad(L.s)}`;
+    });
 }
 function chipOrder(){
     let o = null; try { o = JSON.parse(load('timemachine_chips') || 'null'); } catch(e) {}
@@ -717,7 +1004,7 @@ function buildChips(){
         const a1 = document.createElement('span'); a1.className = 'cn'; a1.textContent = n;
         const a2 = document.createElement('span'); a2.className = 'ct';
         b.appendChild(a1); b.appendChild(document.createTextNode(' ')); b.appendChild(a2);
-        b.onclick = () => { focusOn(c[2], c[1]); selectPlace({name:c[0], lat:c[1], lon:c[2], cc:c[3], pinned:true}, null); };
+        b.onclick = () => { selectPlace({name:c[0], lat:c[1], lon:c[2], cc:c[3], pinned:true, focus:true}, null); };
         box.appendChild(b);
     }
     tickChips();

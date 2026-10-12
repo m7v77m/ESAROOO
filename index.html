@@ -64,7 +64,7 @@ body{
 .clock .t{font-size:19px;font-weight:700;color:var(--primary-dark);font-variant-numeric:tabular-nums;white-space:nowrap}
 .clock .dn{font-size:15px;line-height:1}
 .date{text-align:center;font-size:14px;color:var(--text-primary);font-weight:600}
-.rows{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.rows{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .row{display:flex;justify-content:space-between;gap:10px;font-size:13px;background:var(--bg-input);border:1px solid var(--primary-light);border-radius:15px;padding:6px 12px}
 .row .k{color:var(--text-secondary);white-space:nowrap}
 .row .v{font-weight:600;text-align:right}
@@ -137,7 +137,8 @@ footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2p
             </div>
             <div class="clock"><div class="t" id="clk">--:--:--</div><div class="dn" id="dn"></div></div>
         </div>
-        <div class="date" id="dateTxt" style="font-size: 20px; font-weight: bold;"></div>
+        <!-- 修改後（增加了間距） -->
+        <div class="date" id="dateTxt" style="font-size: 20px; font-weight: bold; margin-bottom: 18px;"></div>
         <div class="rows">
             <div class="row"><span class="k">時區</span><span class="v" id="tzTxt">—</span></div>
             <div class="row"><span class="k">與台灣時差</span><span class="v" id="diffTxt">—</span></div>
@@ -193,7 +194,7 @@ const CITIES = [
  ['聖保羅',-23.55,-46.63,'BR'],['里約熱內盧',-22.91,-43.17,'BR'],['雪梨',-33.87,151.21,'AU'],['墨爾本',-37.81,144.96,'AU'],['伯斯',-31.95,115.86,'AU'],['布里斯本',-27.47,153.03,'AU'],
  ['奧克蘭',-36.85,174.76,'NZ'],['蘇瓦',-18.14,178.44,'FJ'],['關島',13.44,144.79,'GU'],['大溪地',-17.54,-149.57,'PF']
 ];
-const CHIPS = ['舊金山','東京','杜拜','雅加達','倫敦','奧克蘭','巴黎','羅馬','雪梨','柏林','曼谷','伯斯','愛丁堡','開普敦','海參崴','哥本哈根'];
+const CHIPS = ['舊金山','東京','杜拜','雅加達','倫敦','奧克蘭','巴黎','羅馬','雪梨','柏林','曼谷','伯斯','愛丁堡','開普敦','哥本哈根'];
 
 /* WMO 天氣代碼 → 中文與圖示 */
 function wmo(code, isDay){

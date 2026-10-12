@@ -193,7 +193,7 @@ const CITIES = [
  ['聖保羅',-23.55,-46.63,'BR'],['里約熱內盧',-22.91,-43.17,'BR'],['雪梨',-33.87,151.21,'AU'],['墨爾本',-37.81,144.96,'AU'],['伯斯',-31.95,115.86,'AU'],['布里斯本',-27.47,153.03,'AU'],
  ['奧克蘭',-36.85,174.76,'NZ'],['蘇瓦',-18.14,178.44,'FJ'],['關島',13.44,144.79,'GU'],['大溪地',-17.54,-149.57,'PF']
 ];
-const CHIPS = ['舊金山','東京','杜拜','雅加達','倫敦','奧克蘭','巴黎','羅馬','雪梨','柏林','洛杉磯','伯斯','愛丁堡','開普敦','海參崴','哥本哈根'];
+const CHIPS = ['舊金山','東京','杜拜','雅加達','倫敦','奧克蘭','巴黎','羅馬','雪梨','柏林','曼谷','伯斯','愛丁堡','開普敦','海參崴','哥本哈根'];
 
 /* WMO 天氣代碼 → 中文與圖示 */
 function wmo(code, isDay){
@@ -691,9 +691,9 @@ async function loadSpots(p, my){
 }
 
 /* =====================================================================
-   起動'舊金山','東京','杜拜','雅加達','倫敦','奧克蘭','巴黎','羅馬','雪梨','柏林','洛杉磯','伯斯','愛丁堡','開普敦','海參崴','哥本哈根'
+   起動
    ===================================================================== */
-const CHIP_TZ = {'舊金山':'America/Los_Angeles','東京':'Asia/Tokyo','雪梨':'Australia/Sydney','開普敦':'Africa/Johannesburg','杜拜':'Asia/Dubai','倫敦':'Europe/London','巴黎':'Europe/Paris','紐約':'America/New_York','哥本哈根':'Europe/Copenhagen','檀香山':'Pacific/Honolulu','雪梨':'Australia/Sydney','奧克蘭':'Pacific/Auckland'};
+const CHIP_TZ = {'舊金山':'America/Los_Angeles','東京':'Asia/Tokyo','雪梨':'Australia/Sydney','開普敦':'Africa/Johannesburg','杜拜':'Asia/Dubai','倫敦':'Europe/London','巴黎':'Europe/Paris','卡達':'Asia/Qatar','哥本哈根':'Europe/Copenhagen','檀香山':'Pacific/Honolulu','雪梨':'Australia/Sydney'};
 const chipFmt = {};
 function chipTime(z, d){
     try { const f = chipFmt[z] || (chipFmt[z] = new Intl.DateTimeFormat('en-GB', {timeZone:z, hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23'})); return f.format(d); }

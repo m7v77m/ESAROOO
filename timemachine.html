@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>全球時光機</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2280%22>🕰️</text></svg>">
+<style>
+:root{
+    --bg-body:#D7C4A5; --bg-container:#EDE0C8; --bg-card:#FFF8EB; --bg-input:#FFFEF7; --bg-hover:#E8D5B0;
+    --primary:#A67C52; --primary-hover:#8C6846; --primary-light:#F0DFC0; --primary-dark:#5C4033;
+    --matcha:#8fa382; --matcha-dark:#6f8463; --matcha-pale:#E3EBDC;
+    --income-color:#8fa382; --expense-color:#C17A4E; --asset-color:#8B6D5C;
+    --text-primary:#4A3728; --text-secondary:#7A5F4B; --text-muted:#9C8A7A; --border-color:#D4B896;
+    --gap:10px; --radius:15px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+    background:var(--bg-body); color:var(--text-primary);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+    line-height:1.5; padding:var(--gap); padding-bottom:calc(var(--gap) + env(safe-area-inset-bottom));
+}
+.app{max-width:760px;margin:0 auto;background:var(--bg-container);border:1px solid var(--border-color);border-radius:20px;padding:var(--gap);display:flex;flex-direction:column;gap:var(--gap)}
+.card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:12px;box-shadow:0 2px 8px rgba(92,64,51,.08)}
+.card h2{margin:0 0 8px;font-size:15px;color:var(--primary-dark);display:flex;align-items:center;gap:6px}
+
+/* ---------- 地圖 ---------- */
+.map-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border-color);background:#cfdcc6;aspect-ratio:var(--map-ratio,2/1);touch-action:none;user-select:none;-webkit-user-select:none}
+#map{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+#map.dragging{cursor:grabbing}
+.country{fill:#FFF8EB;stroke:#cdb592;stroke-width:.5;vector-effect:non-scaling-stroke}
+.country.sel{fill:#b9c8ad}
+#night{fill:rgba(74,55,40,.30);pointer-events:none}
+.dl{stroke:#C17A4E;stroke-width:1.4;stroke-dasharray:5 4;vector-effect:non-scaling-stroke;pointer-events:none}
+.ml{stroke:#5C4033;stroke-width:1.2;stroke-dasharray:2 4;vector-effect:non-scaling-stroke;pointer-events:none;opacity:.8}
+.city{fill:#A67C52;stroke:#FFF8EB;stroke-width:.8;vector-effect:non-scaling-stroke;cursor:pointer}
+.pin-dot{fill:#C17A4E;stroke:#fff;stroke-width:1.5;vector-effect:non-scaling-stroke}
+.pin-ring{fill:none;stroke:#C17A4E;stroke-width:1.5;vector-effect:non-scaling-stroke;opacity:.7}
+.zoom{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px}
+.zoom button{width:34px;height:34px;border-radius:50%;border:1px solid var(--border-color);background:var(--bg-card);color:var(--primary-dark);font-size:18px;font-weight:700;line-height:1;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15);padding:0}
+.zoom button:active{background:var(--bg-hover)}
+.map-msg{position:absolute;left:8px;bottom:8px;background:rgba(255,248,235,.92);border:1px solid var(--border-color);border-radius:10px;padding:3px 9px;font-size:11.5px;color:var(--text-secondary);display:none}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:11.5px;color:var(--text-secondary)}
+.legend i{display:inline-block;width:18px;height:0;border-top:2px dashed #C17A4E;vertical-align:middle;margin-right:4px}
+.legend i.m{border-top:2px dotted #5C4033}
+.legend b{display:inline-block;width:12px;height:12px;border-radius:3px;background:rgba(74,55,40,.30);vertical-align:-2px;margin-right:4px}
+
+.chips{display:grid;grid-auto-flow:column;grid-template-rows:repeat(3,auto);grid-auto-columns:124px;gap:6px;margin-top:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.chip{border:1px dashed var(--primary);background:var(--primary-light);color:var(--text-primary);border-radius:15px;padding:5px 4px;font-size:12.5px;cursor:pointer;font-family:inherit;white-space:nowrap;text-align:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:transform .12s,box-shadow .12s}
+.chip .ct{font-variant-numeric:tabular-nums}
+.chip:active{background:var(--bg-hover)}
+.chip.on{background:var(--matcha);border-color:var(--matcha-dark);color:#fff;font-weight:600}
+.chip.drag{transform:scale(1.07);box-shadow:0 3px 10px rgba(92,64,51,.35);position:relative;z-index:2;opacity:.92}
+.chip-tip{font-size:11.5px;color:var(--text-muted);margin-top:4px}
+
+/* ---------- 時間 ---------- */
+.place{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.place .pl{flex:1;min-width:0}
+.place .flag{font-size:30px;line-height:1}
+.place .nm{font-size:17px;font-weight:700;color:var(--primary-dark);line-height:1.25}
+.place .sub{font-size:12px;color:var(--text-secondary)}
+.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:1px dashed var(--primary);border-radius:15px;padding:5px 9px}
+.clock .t{font-size:19px;font-weight:700;color:var(--primary-dark);font-variant-numeric:tabular-nums;white-space:nowrap}
+.clock .dn{font-size:15px;line-height:1}
+.date{text-align:center;font-size:14px;color:var(--text-primary);font-weight:600}
+.rows{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:13px;background:var(--bg-input);border:1px solid var(--primary-light);border-radius:15px;padding:6px 12px}
+.row .k{color:var(--text-secondary);white-space:nowrap}
+.row .v{font-weight:600;text-align:right}
+.row .v.big{color:var(--expense-color)}
+.note{font-size:12px;color:var(--text-muted);margin-top:6px}
+
+/* ---------- 天氣 ---------- */
+.now{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.now .ic{font-size:40px;line-height:1}
+.now .tp{font-size:32px;font-weight:700;color:var(--primary-dark)}
+.now .ds{font-size:13px;color:var(--text-secondary)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
+.cell{background:var(--bg-input);border:1px solid var(--primary-light);border-radius:15px;padding:8px 4px;text-align:center}
+.cell .l{font-size:12px;color:var(--text-secondary)}
+.cell .r{font-size:15px;font-weight:700;color:var(--primary-dark);margin-top:2px;white-space:nowrap}
+.cell .u{font-size:11px;color:var(--text-muted);margin-top:1px}
+
+/* ---------- 新聞 / 景點 ---------- */
+.list{display:flex;flex-direction:column;gap:8px}
+.news a{display:block;text-decoration:none;color:var(--text-primary);background:var(--bg-input);border:1px solid var(--primary-light);border-radius:15px;padding:8px 12px}
+.news a:active{background:var(--bg-hover)}
+.news .tt{font-size:14px;font-weight:600;line-height:1.4}
+.news .mt{font-size:11.5px;color:var(--text-muted);margin-top:2px}
+.spot a{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-primary);background:var(--bg-input);border:1px solid var(--primary-light);border-radius:15px;padding:8px 10px}
+.spot a:active{background:var(--bg-hover)}
+.spot img{width:64px;height:64px;object-fit:cover;border-radius:10px;flex:0 0 auto;background:var(--primary-light)}
+.spot .ph{width:64px;height:64px;border-radius:10px;flex:0 0 auto;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:24px}
+.spot a>div:last-child{min-width:0;flex:1}
+.spot .tt{font-size:14px;font-weight:700}
+.spot .ds{font-size:12px;color:var(--text-secondary);margin-top:2px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.more{display:inline-block;margin-top:8px;font-size:13px;color:var(--matcha-dark);font-weight:600;text-decoration:none}
+.state{font-size:13px;color:var(--text-muted);padding:6px 2px}
+.state.err{color:var(--expense-color)}
+.hidden{display:none !important}
+footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2px 6px 4px}
+</style>
+</head>
+<body>
+<div class="app">
+
+    <div class="card">
+        <h2>🗺️ 世界地圖</h2>
+        <div class="map-wrap" id="mapWrap">
+            <svg id="map" xmlns="http://www.w3.org/2000/svg" aria-label="世界地圖"></svg>
+            <div class="zoom">
+                <button id="zIn" aria-label="放大">＋</button>
+                <button id="zOut" aria-label="縮小">－</button>
+                <button id="zReset" aria-label="回到全圖" style="font-size:14px">⟲</button>
+            </div>
+            <div class="map-msg" id="mapMsg"></div>
+        </div>
+        <div class="legend">
+            <span><i></i>國際換日線（東西經180°）</span>
+            <span><i class="m"></i>此刻的午夜線</span>
+            <span><b></b>此刻的夜晚</span>
+        </div>
+        <div class="chips" id="chips"></div>
+        <div class="chip-tip">👆 長按城市可拖曳排序，左右滑動看更多</div>
+    </div>
+
+    <div class="card" id="timeCard">
+        <h2>⏱️ 當地時間</h2>
+        <div class="place">
+            <div class="flag" id="flag">🌏</div>
+            <div class="pl">
+                <div class="nm" id="placeName">載入中…</div>
+                <div class="sub" id="placeSub"></div>
+            </div>
+            <div class="clock"><div class="t" id="clk">--:--:--</div><div class="dn" id="dn"></div></div>
+        </div>
+        <div class="date" id="dateTxt"></div>
+        <div class="rows">
+            <div class="row"><span class="k">時區</span><span class="v" id="tzTxt">—</span></div>
+            <div class="row"><span class="k">與台灣時差</span><span class="v" id="diffTxt">—</span></div>
+            <div class="row"><span class="k">換日線</span><span class="v" id="dlTxt">—</span></div>
+            <div class="row"><span class="k">距離此地下次換日</span><span class="v big" id="midTxt">—</span></div>
+            <div class="row"><span class="k">離國際換日線</span><span class="v" id="idlTxt">—</span></div>
+        </div>
+        <div class="note" id="tzNote"></div>
+    </div>
+
+    <div class="card" id="wxCard">
+        <h2>🌤️ 今日天氣</h2>
+        <div id="wxBody"><div class="state">點地圖選一個地方吧</div></div>
+    </div>
+
+    <div class="card" id="newsCard">
+        <h2>📰 重要新聞</h2>
+        <div id="newsBody"><div class="state">點地圖選一個地方吧</div></div>
+    </div>
+
+    <div class="card" id="spotCard">
+        <h2>🧳 旅遊資訊</h2>
+        <div id="spotBody"><div class="state">點地圖選一個地方吧</div></div>
+    </div>
+
+    <footer>資料來源：Open-Meteo（天氣）、BigDataCloud（地名）、維基百科（景點）、Google 新聞（新聞）。換日線以東西經 180° 簡化繪製。</footer>
+</div>
+
+<script>
+/* =====================================================================
+   全球時光機
+   ===================================================================== */
+const WORLD_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+const TW_OFFSET = 480;               // 台灣 UTC+8（分鐘）
+const LAT_TOP = 84, LAT_BOT = -58;   // 地圖顯示的緯度範圍
+
+/* 常用城市：名稱、緯度、經度、國碼 */
+const CITIES = [
+ ['台北',25.04,121.56,'TW'],['高雄',22.63,120.30,'TW'],['東京',35.68,139.69,'JP'],['大阪',34.69,135.50,'JP'],['札幌',43.06,141.35,'JP'],['首爾',37.57,126.98,'KR'],
+ ['北京',39.90,116.40,'CN'],['上海',31.23,121.47,'CN'],['香港',22.32,114.17,'HK'],['澳門',22.20,113.54,'MO'],['新加坡',1.35,103.82,'SG'],['曼谷',13.76,100.50,'TH'],
+ ['河內',21.03,105.85,'VN'],['胡志明市',10.82,106.63,'VN'],['馬尼拉',14.60,120.98,'PH'],['雅加達',-6.21,106.85,'ID'],['峇里島',-8.65,115.22,'ID'],['吉隆坡',3.14,101.69,'MY'],
+ ['新德里',28.61,77.21,'IN'],['孟買',19.08,72.88,'IN'],['可倫坡',6.93,79.86,'LK'],['加德滿都',27.72,85.32,'NP'],['達卡',23.81,90.41,'BD'],['喀拉蚩',24.86,67.01,'PK'],
+ ['烏蘭巴托',47.89,106.91,'MN'],['阿拉木圖',43.24,76.89,'KZ'],['塔什干',41.30,69.24,'UZ'],['德黑蘭',35.69,51.39,'IR'],['杜拜',25.20,55.27,'AE'],['利雅德',24.71,46.68,'SA'],
+ ['特拉維夫',32.09,34.78,'IL'],['伊斯坦堡',41.01,28.98,'TR'],['莫斯科',55.76,37.62,'RU'],['海參崴',43.12,131.89,'RU'],['聖彼得堡',59.93,30.34,'RU'],
+ ['倫敦',51.51,-0.13,'GB'],['愛丁堡',55.95,-3.19,'GB'],['都柏林',53.35,-6.26,'IE'],['巴黎',48.86,2.35,'FR'],['馬賽',43.30,5.37,'FR'],['柏林',52.52,13.40,'DE'],['慕尼黑',48.14,11.58,'DE'],
+ ['阿姆斯特丹',52.37,4.90,'NL'],['布魯塞爾',50.85,4.35,'BE'],['蘇黎世',47.38,8.54,'CH'],['維也納',48.21,16.37,'AT'],['布拉格',50.08,14.44,'CZ'],['華沙',52.23,21.01,'PL'],
+ ['羅馬',41.90,12.50,'IT'],['米蘭',45.46,9.19,'IT'],['馬德里',40.42,-3.70,'ES'],['巴塞隆納',41.39,2.17,'ES'],['里斯本',38.72,-9.14,'PT'],['雅典',37.98,23.73,'GR'],
+ ['斯德哥爾摩',59.33,18.07,'SE'],['奧斯陸',59.91,10.75,'NO'],['赫爾辛基',60.17,24.94,'FI'],['哥本哈根',55.68,12.57,'DK'],['雷克雅維克',64.15,-21.94,'IS'],['布達佩斯',47.50,19.04,'HU'],
+ ['開羅',30.04,31.24,'EG'],['卡薩布蘭加',33.57,-7.59,'MA'],['拉哥斯',6.52,3.38,'NG'],['奈洛比',-1.29,36.82,'KE'],['阿迪斯阿貝巴',9.03,38.74,'ET'],['約翰尼斯堡',-26.20,28.05,'ZA'],['開普敦',-33.92,18.42,'ZA'],
+ ['紐約',40.71,-74.01,'US'],['華盛頓',38.91,-77.04,'US'],['芝加哥',41.88,-87.63,'US'],['洛杉磯',34.05,-118.24,'US'],['舊金山',37.77,-122.42,'US'],['西雅圖',47.61,-122.33,'US'],
+ ['拉斯維加斯',36.17,-115.14,'US'],['邁阿密',25.76,-80.19,'US'],['檀香山',21.31,-157.86,'US'],['安克拉治',61.22,-149.90,'US'],['溫哥華',49.28,-123.12,'CA'],['多倫多',43.65,-79.38,'CA'],
+ ['墨西哥城',19.43,-99.13,'MX'],['哈瓦那',23.11,-82.37,'CU'],['波哥大',4.71,-74.07,'CO'],['利馬',-12.05,-77.04,'PE'],['聖地牙哥',-33.45,-70.67,'CL'],['布宜諾斯艾利斯',-34.60,-58.38,'AR'],
+ ['聖保羅',-23.55,-46.63,'BR'],['里約熱內盧',-22.91,-43.17,'BR'],['雪梨',-33.87,151.21,'AU'],['墨爾本',-37.81,144.96,'AU'],['伯斯',-31.95,115.86,'AU'],['布里斯本',-27.47,153.03,'AU'],
+ ['奧克蘭',-36.85,174.76,'NZ'],['蘇瓦',-18.14,178.44,'FJ'],['關島',13.44,144.79,'GU'],['大溪地',-17.54,-149.57,'PF']
+];
+const CHIPS = ['台北','東京','首爾','新加坡','杜拜','倫敦','巴黎','紐約','洛杉磯','檀香山','雪梨','奧克蘭'];
+
+/* WMO 天氣代碼 → 中文與圖示 */
+function wmo(code, isDay){
+    const d = isDay !== 0;
+    if (code === 0) return d ? ['☀️','晴天'] : ['🌙','晴朗夜晚'];
+    if (code === 1) return d ? ['🌤️','大致晴朗'] : ['🌙','大致晴朗'];
+    if (code === 2) return ['⛅','多雲'];
+    if (code === 3) return ['☁️','陰天'];
+    if (code === 45 || code === 48) return ['🌫️','霧'];
+    if (code >= 51 && code <= 57) return ['🌦️','毛毛雨'];
+    if (code >= 61 && code <= 67) return ['🌧️','下雨'];
+    if (code >= 71 && code <= 77) return ['❄️','下雪'];
+    if (code >= 80 && code <= 82) return ['🌦️','陣雨'];
+    if (code === 85 || code === 86) return ['🌨️','陣雪'];
+    if (code >= 95) return ['⛈️','雷雨'];
+    return ['🌡️','—'];
+}
+
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,'0');
+const flagOf = cc => (cc && cc.length === 2) ? String.fromCodePoint(...[...cc.toUpperCase()].map(c => 127397 + c.charCodeAt(0))) : '🌏';
+const regionZh = cc => { try { return new Intl.DisplayNames(['zh-TW'], {type:'region'}).of(cc.toUpperCase()); } catch(e){ return cc; } };
+const save = (k,v) => { try{ localStorage.setItem(k,v);}catch(e){} };
+const load = k => { try{ return localStorage.getItem(k);}catch(e){ return null; } };
+
+/* =====================================================================
+   地圖：米勒投影（反推公式簡單，點哪裡都能換回經緯度）
+   ===================================================================== */
+const W = 1000;
+const mill = lat => 1.25 * Math.log(Math.tan(Math.PI/4 + 0.4 * lat * Math.PI/180));
+const S = W / (2*Math.PI);
+const Y0 = mill(LAT_TOP);
+const H = Math.round((Y0 - mill(LAT_BOT)) * S);
+const px = lon => (lon + 180) / 360 * W;
+const py = lat => (Y0 - mill(Math.max(LAT_BOT, Math.min(LAT_TOP, lat)))) * S;
+const invLon = x => x / W * 360 - 180;
+const invLat = y => { const m = Y0 - y / S; return (2.5 * Math.atan(Math.exp(0.8 * m)) - 0.625 * Math.PI) * 180 / Math.PI; };
+
+const svg = $('map');
+const NS = 'http://www.w3.org/2000/svg';
+const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in (a||{})) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+let vb = {x:0, y:0, w:W, h:H};
+$('mapWrap').style.setProperty('--map-ratio', W + '/' + H);
+svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+const gLand = el('g', {id:'land'}, svg);
+const gNight = el('g', {}, svg);
+const nightPath = el('path', {id:'night', d:''}, gNight);
+const gLines = el('g', {}, svg);
+const idlL = el('line', {class:'dl', x1:1, y1:0, x2:1, y2:H}, gLines);
+const idlR = el('line', {class:'dl', x1:W-1, y1:0, x2:W-1, y2:H}, gLines);
+const midLine = el('line', {class:'ml', x1:0, y1:0, x2:0, y2:H}, gLines);
+const midLine2 = el('line', {class:'ml', x1:0, y1:0, x2:0, y2:H}, gLines);
+const gCities = el('g', {}, svg);
+const gPin = el('g', {}, svg);
+
+/* ---- 解 TopoJSON（world-atlas 格式） ---- */
+function topoToCountries(topo){
+    const tf = topo.transform || {scale:[1,1], translate:[0,0]};
+    const arcs = topo.arcs.map(a => { let x = 0, y = 0; return a.map(p => { x += p[0]; y += p[1]; return [x*tf.scale[0] + tf.translate[0], y*tf.scale[1] + tf.translate[1]]; }); });
+    const ringPts = idxs => { const pts = []; idxs.forEach(i => { let a = i < 0 ? arcs[~i].slice().reverse() : arcs[i]; if (pts.length) a = a.slice(1); for (const p of a) pts.push(p); }); return pts; };
+    const obj = topo.objects.countries || topo.objects[Object.keys(topo.objects)[0]];
+    const out = [];
+    for (const g of obj.geometries) {
+        const name = (g.properties && g.properties.name) || '';
+        if (name === 'Antarctica') continue;
+        const polys = g.type === 'Polygon' ? [g.arcs] : g.type === 'MultiPolygon' ? g.arcs : [];
+        let d = '';
+        for (const poly of polys) for (const ring of poly) {
+            const pts = ringPts(ring);
+            if (pts.length < 3) continue;
+            d += 'M' + pts.map(p => px(p[0]).toFixed(1) + ' ' + py(p[1]).toFixed(1)).join('L') + 'Z';
+        }
+        if (d) out.push({name, d});
+    }
+    return out;
+}
+function drawCountries(list){
+    gLand.textContent = '';
+    for (const c of list) { const p = el('path', {class:'country', d:c.d}, gLand); p.dataset.name = c.name; }
+}
+
+/* ---- 城市小圓點 ---- */
+function drawCities(){
+    gCities.textContent = '';
+    for (const c of CITIES) {
+        const e = el('circle', {class:'city', cx:px(c[2]).toFixed(1), cy:py(c[1]).toFixed(1), r:3}, gCities);
+        e.dataset.city = c[0];
+    }
+}
+function scaleMarkers(){
+    const k = vb.w / W;   // 放大後圓點縮小，才不會糊成一團
+    gCities.querySelectorAll('circle').forEach(c => c.setAttribute('r', (3.2 * Math.max(0.35, Math.min(1, k * 1.3))).toFixed(2)));
+    gPin.querySelectorAll('.pin-dot').forEach(c => c.setAttribute('r', (6 * Math.max(0.5, k)).toFixed(2)));
+}
+
+/* ---- 白天／夜晚陰影、午夜線 ---- */
+function updateSky(){
+    const now = new Date();
+    const utcH = now.getUTCHours() + now.getUTCMinutes()/60 + now.getUTCSeconds()/3600;
+    const start = Date.UTC(now.getUTCFullYear(), 0, 0);
+    const N = Math.floor((now.getTime() - start) / 86400000);
+    let dec = -23.44 * Math.cos(2*Math.PI/365 * (N + 10)) * Math.PI/180;
+    if (Math.abs(dec) < 0.01) dec = dec < 0 ? -0.01 : 0.01;
+    const sunLon = (12 - utcH) * 15;
+    const pts = [];
+    for (let lon = -180; lon <= 180; lon += 3) {
+        const dl = (lon - sunLon) * Math.PI/180;
+        const lat = Math.atan(-Math.cos(dl) / Math.tan(dec)) * 180/Math.PI;
+        pts.push([px(lon), py(lat)]);
+    }
+    const edgeY = dec > 0 ? H : 0;   // 太陽在北半球 → 夜晚在曲線南邊
+    let d = 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('L');
+    d += `L${W} ${edgeY}L0 ${edgeY}Z`;
+    nightPath.setAttribute('d', d);
+    // 午夜線：太陽正對面那條經線
+    let ml = ((sunLon + 180 + 540) % 360) - 180;
+    const x = px(ml);
+    midLine.setAttribute('x1', x); midLine.setAttribute('x2', x);
+    midLine2.setAttribute('x1', x); midLine2.setAttribute('x2', x);
+}
+
+/* ---- 縮放、拖曳 ---- */
+function applyVB(){
+    vb.w = Math.max(W/12, Math.min(W, vb.w));
+    vb.h = vb.w * H / W;
+    vb.x = Math.max(0, Math.min(W - vb.w, vb.x));
+    vb.y = Math.max(0, Math.min(H - vb.h, vb.y));
+    svg.setAttribute('viewBox', `${vb.x.toFixed(1)} ${vb.y.toFixed(1)} ${vb.w.toFixed(1)} ${vb.h.toFixed(1)}`);
+    scaleMarkers();
+}
+function clientToSvg(cx, cy){
+    const r = svg.getBoundingClientRect();
+    return [vb.x + (cx - r.left) / r.width * vb.w, vb.y + (cy - r.top) / r.height * vb.h];
+}
+function zoomAt(factor, cx, cy){
+    const r = svg.getBoundingClientRect();
+    const fx = cx == null ? 0.5 : (cx - r.left) / r.width, fy = cy == null ? 0.5 : (cy - r.top) / r.height;
+    const nw = Math.max(W/12, Math.min(W, vb.w / factor));
+    vb.x += (vb.w - nw) * fx; vb.y += (vb.h - nw*H/W) * fy; vb.w = nw;
+    applyVB();
+}
+function focusOn(lon, lat){
+    if (vb.w > W / 2.2) vb.w = W / 2.2;
+    vb.h = vb.w * H / W;
+    vb.x = px(lon) - vb.w/2; vb.y = py(lat) - vb.h/2;
+    applyVB();
+}
+$('zIn').onclick = () => zoomAt(1.6);
+$('zOut').onclick = () => zoomAt(1/1.6);
+$('zReset').onclick = () => { vb = {x:0, y:0, w:W, h:H}; applyVB(); };
+svg.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.deltaY < 0 ? 1.25 : 0.8, e.clientX, e.clientY); }, {passive:false});
+
+const ptrs = new Map();
+let drag = null, pinch = null, moved = false;
+svg.addEventListener('pointerdown', e => {
+    svg.setPointerCapture(e.pointerId);
+    ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    if (ptrs.size === 1) { drag = {x:e.clientX, y:e.clientY, vx:vb.x, vy:vb.y}; moved = false; }
+    if (ptrs.size === 2) { const [a,b] = [...ptrs.values()]; pinch = {d:Math.hypot(a.x-b.x, a.y-b.y)}; moved = true; }
+});
+svg.addEventListener('pointermove', e => {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+    if (ptrs.size === 2 && pinch) {
+        const [a,b] = [...ptrs.values()];
+        const d = Math.hypot(a.x-b.x, a.y-b.y);
+        if (pinch.d > 0) { zoomAt(d / pinch.d, (a.x+b.x)/2, (a.y+b.y)/2); }
+        pinch.d = d; return;
+    }
+    if (drag && ptrs.size === 1) {
+        const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+        if (!moved && Math.hypot(dx, dy) < 6) return;
+        moved = true; svg.classList.add('dragging');
+        const r = svg.getBoundingClientRect();
+        vb.x = drag.vx - dx / r.width * vb.w; vb.y = drag.vy - dy / r.height * vb.h;
+        applyVB();
+    }
+});
+function endPtr(e){
+    const was = ptrs.has(e.pointerId);
+    ptrs.delete(e.pointerId);
+    if (ptrs.size < 2) pinch = null;
+    svg.classList.remove('dragging');
+    if (was && ptrs.size === 0 && drag && !moved && e.type === 'pointerup') {
+        const [sx, sy] = clientToSvg(e.clientX, e.clientY);
+        mapTap(sx, sy, document.elementFromPoint(e.clientX, e.clientY));
+    }
+    if (ptrs.size === 0) drag = null;
+}
+svg.addEventListener('pointerup', endPtr);
+svg.addEventListener('pointercancel', endPtr);
+
+/* ---- 點到哪：先看附近有沒有常用城市，沒有就用點到的座標 ---- */
+function mapTap(sx, sy, target){
+    const lon = invLon(sx), lat = invLat(sy);
+    const rect = svg.getBoundingClientRect();
+    const snap = 10 * vb.w / rect.width;        // 手指點下去 10 螢幕像素內有常用城市，就吸附過去
+    let best = null, bd = 1e9;
+    for (const c of CITIES) { const d = Math.hypot(px(c[2]) - sx, py(c[1]) - sy); if (d < bd) { bd = d; best = c; } }
+    const country = target && target.classList && target.classList.contains('country') ? target : null;
+    if (best && bd <= snap) selectPlace({name:best[0], lat:best[1], lon:best[2], cc:best[3], pinned:true}, country);
+    else selectPlace({name:null, lat, lon, cc:null}, country);
+}
+
+/* =====================================================================
+   選到地點之後
+   ===================================================================== */
+let cur = null;        // 目前的地點
+let seq = 0;           // 避免舊的回應蓋掉新的
+let tz = null;         // IANA 時區
+let tzFallbackMin = 0; // 抓不到時區時，用經度估計
+let isDay = null;
+
+function showMapMsg(t){ const m = $('mapMsg'); if (!t) { m.style.display = 'none'; return; } m.textContent = t; m.style.display = 'block'; }
+function setPin(lon, lat){
+    gPin.textContent = '';
+    const x = px(lon), y = py(lat);
+    const ring = el('circle', {class:'pin-ring', cx:x, cy:y, r:12}, gPin);
+    el('animate', {attributeName:'r', from:'4', to:'16', dur:'1.6s', repeatCount:'indefinite'}, ring);
+    el('animate', {attributeName:'opacity', from:'.8', to:'0', dur:'1.6s', repeatCount:'indefinite'}, ring);
+    el('circle', {class:'pin-dot', cx:x, cy:y, r:6}, gPin);
+    scaleMarkers();
+}
+function markChip(name){ document.querySelectorAll('#chips .chip').forEach(c => c.classList.toggle('on', c.dataset.n === name)); }
+function setState(id, text, err){ const b = $(id); b.textContent = ''; const d = document.createElement('div'); d.className = 'state' + (err ? ' err' : ''); d.textContent = text; b.appendChild(d); }
+
+async function getJSON(url, ms){
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), ms || 12000);
+    try { const r = await fetch(url, {signal:ctl.signal}); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.json(); }
+    finally { clearTimeout(t); }
+}
+
+function selectPlace(p, countryEl){
+    const my = ++seq;
+    cur = p;
+    tz = null; isDay = null; tzFallbackMin = Math.round(p.lon / 15) * 60;
+    document.querySelectorAll('.country.sel').forEach(e => e.classList.remove('sel'));
+    if (countryEl) countryEl.classList.add('sel');
+    setPin(p.lon, p.lat);
+    markChip(p.pinned ? p.name : null);
+    showMapMsg('');
+    $('placeName').textContent = p.name || '查詢中…';
+    $('placeSub').textContent = `${Math.abs(p.lat).toFixed(2)}°${p.lat >= 0 ? 'N' : 'S'}　${Math.abs(p.lon).toFixed(2)}°${p.lon >= 0 ? 'E' : 'W'}`;
+    $('flag').textContent = p.cc ? flagOf(p.cc) : '🌏';
+    $('tzNote').textContent = '';
+    setState('wxBody', '天氣載入中…'); setState('newsBody', '新聞載入中…'); setState('spotBody', '景點載入中…');
+    tickClock();
+    if (p.save !== false) save('timemachine_last', JSON.stringify({lat:p.lat, lon:p.lon, name:p.name, cc:p.cc}));
+
+    // 1) 天氣＋時區（最先）
+    loadWeather(p, my);
+    // 2) 地名（點一般地點時才需要）
+    const geo = p.name ? Promise.resolve(null) : reverseGeo(p, my);
+    geo.then(() => { if (my !== seq) return; loadNews(cur, my); loadSpots(cur, my); });
+}
+
+async function reverseGeo(p, my){
+    try {
+        const j = await getJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${p.lat.toFixed(4)}&longitude=${p.lon.toFixed(4)}&localityLanguage=zh`, 9000);
+        if (my !== seq) return;
+        const cc = (j.countryCode || '').toUpperCase();
+        const nm = j.city || j.locality || j.principalSubdivision || '';
+        p.cc = cc || null;
+        p.country = cc ? regionZh(cc) : (j.countryName || '');
+        p.name = nm ? nm : (p.country || '海上');
+        p.ocean = !cc;
+    } catch(e) {
+        if (my !== seq) return;
+        p.name = '所選地點'; p.country = ''; p.ocean = false;
+    }
+    $('placeName').textContent = p.name;
+    $('flag').textContent = p.cc ? flagOf(p.cc) : '🌏';
+    if (p.country && p.country !== p.name) $('placeSub').textContent = p.country + '　' + $('placeSub').textContent;
+}
+
+/* =====================================================================
+   時間：每秒跳動
+   ===================================================================== */
+const dtfCache = {};
+function offsetMin(zone, date){
+    try {
+        const f = dtfCache[zone] || (dtfCache[zone] = new Intl.DateTimeFormat('en-US', {timeZone:zone, hourCycle:'h23', year:'numeric', month:'numeric', day:'numeric', hour:'numeric', minute:'numeric', second:'numeric'}));
+        const o = {}; f.formatToParts(date).forEach(x => o[x.type] = x.value);
+        const asUTC = Date.UTC(+o.year, +o.month - 1, +o.day, +o.hour, +o.minute, +o.second);
+        return Math.round((asUTC - Math.floor(date.getTime()/1000)*1000) / 60000);
+    } catch(e) { return tzFallbackMin; }
+}
+function fmtOff(min){ const s = min < 0 ? '-' : '+'; const a = Math.abs(min); return 'UTC' + s + pad(Math.floor(a/60)) + (a % 60 ? ':' + pad(a % 60) : ':00'); }
+const WD = '日一二三四五六';
+function localParts(now, off){
+    const t = new Date(now.getTime() + off * 60000);
+    return {y:t.getUTCFullYear(), m:t.getUTCMonth()+1, d:t.getUTCDate(), h:t.getUTCHours(), mi:t.getUTCMinutes(), s:t.getUTCSeconds(), wd:t.getUTCDay(), day:Math.floor(t.getTime()/86400000)};
+}
+function tickClock(){
+    if (!cur) return;
+    const now = new Date();
+    const off = tz ? offsetMin(tz, now) : tzFallbackMin;
+    const L = localParts(now, off), T = localParts(now, TW_OFFSET);
+    $('clk').textContent = `${pad(L.h)}:${pad(L.mi)}:${pad(L.s)}`;
+    $('dateTxt').textContent = `${L.y}年${L.m}月${L.d}日　星期${WD[L.wd]}`;
+    const dayNow = isDay != null ? isDay : (L.h >= 6 && L.h < 18 ? 1 : 0);
+    $('dn').textContent = dayNow ? '☀️' : '🌙';
+    $('tzTxt').textContent = (tz ? tz.replace(/_/g, ' ') : '估計時區') + '（' + fmtOff(off) + '）';
+    const diff = (off - TW_OFFSET) / 60;
+    $('diffTxt').textContent = diff === 0 ? '和台灣一樣' : (diff > 0 ? `比台灣快 ${fmtH(diff)} 小時` : `比台灣慢 ${fmtH(-diff)} 小時`);
+    const dd = L.day - T.day;
+    $('dlTxt').textContent = dd === 0 ? '和台灣同一天' : dd > 0 ? `已是台灣的明天（多 ${dd} 天）` : `還在台灣的昨天（少 ${-dd} 天）`;
+    const rem = 86400 - (L.h*3600 + L.mi*60 + L.s);
+    $('midTxt').textContent = `${Math.floor(rem/3600)} 小時 ${pad(Math.floor(rem%3600/60))} 分 ${pad(rem%60)} 秒`;
+    const km = Math.round((180 - Math.abs(cur.lon)) * 111.32 * Math.cos(cur.lat * Math.PI/180));
+    $('idlTxt').textContent = `約 ${km.toLocaleString()} 公里（${cur.lon >= 0 ? '在線的西側' : '在線的東側'}）`;
+    $('tzNote').textContent = tz ? '' : '時區查不到，先用經度估算。';
+}
+function fmtH(h){ return Number.isInteger(h) ? String(h) : h.toFixed(2).replace(/0+$/, '').replace(/\.$/, ''); }
+setInterval(tickClock, 1000);
+setInterval(() => tickChips(), 1000);
+setInterval(updateSky, 60000);
+
+/* =====================================================================
+   天氣
+   ===================================================================== */
+async function loadWeather(p, my){
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${p.lat.toFixed(4)}&longitude=${p.lon.toFixed(4)}`
+        + `&current=temperature_2m,relative_humidity_2m,wind_gusts_10m,is_day,weather_code`
+        + `&hourly=relative_humidity_2m,wind_gusts_10m&daily=temperature_2m_max,temperature_2m_min`
+        + `&timezone=auto&forecast_days=1&wind_speed_unit=kmh`;
+    try {
+        const j = await getJSON(url);
+        if (my !== seq) return;
+        if (j.timezone) tz = j.timezone;
+        if (j.current && j.current.is_day != null) isDay = j.current.is_day;
+        tickClock();
+        const rng = a => { const v = (a || []).filter(x => x != null); return v.length ? [Math.min(...v), Math.max(...v)] : null; };
+        const hum = rng(j.hourly && j.hourly.relative_humidity_2m), gust = rng(j.hourly && j.hourly.wind_gusts_10m);
+        const tmin = j.daily && j.daily.temperature_2m_min && j.daily.temperature_2m_min[0], tmax = j.daily && j.daily.temperature_2m_max && j.daily.temperature_2m_max[0];
+        const c = j.current || {};
+        const [ic, ds] = wmo(c.weather_code, c.is_day);
+        const b = $('wxBody'); b.textContent = '';
+        const now = document.createElement('div'); now.className = 'now';
+        now.innerHTML = '<div class="ic"></div><div><div class="tp"></div><div class="ds"></div></div>';
+        now.querySelector('.ic').textContent = ic;
+        now.querySelector('.tp').textContent = c.temperature_2m != null ? `${Math.round(c.temperature_2m)}°C` : '—';
+        now.querySelector('.ds').textContent = `${ds}　（現在）`;
+        b.appendChild(now);
+        const g = document.createElement('div'); g.className = 'grid3';
+        const cell = (l, r, u) => { const d = document.createElement('div'); d.className = 'cell'; d.innerHTML = '<div class="l"></div><div class="r"></div><div class="u"></div>'; d.children[0].textContent = l; d.children[1].textContent = r; d.children[2].textContent = u; return d; };
+        g.appendChild(cell('🌡️ 溫度', (tmin != null && tmax != null) ? `${Math.round(tmin)} ~ ${Math.round(tmax)}` : '—', '°C（今日）'));
+        g.appendChild(cell('💧 濕度', hum ? `${Math.round(hum[0])} ~ ${Math.round(hum[1])}` : '—', '%（今日）'));
+        g.appendChild(cell('💨 陣風', gust ? `${Math.round(gust[0])} ~ ${Math.round(gust[1])}` : '—', 'km/hr（今日）'));
+        b.appendChild(g);
+        const n = document.createElement('div'); n.className = 'note';
+        n.textContent = `現在：濕度 ${c.relative_humidity_2m != null ? Math.round(c.relative_humidity_2m) : '—'}%　陣風 ${c.wind_gusts_10m != null ? Math.round(c.wind_gusts_10m) : '—'} km/hr（區間是當地今天 0 點到 24 點的預報）`;
+        b.appendChild(n);
+    } catch(e) {
+        if (my !== seq) return;
+        setState('wxBody', '天氣暫時抓不到，稍後再點一次試試。', true);
+    }
+}
+
+/* =====================================================================
+   新聞（Google 新聞 RSS → rss2json）
+   ===================================================================== */
+function timeAgo(s){
+    s = (s || '').trim();
+    if (/^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/.test(s)) s = s.replace(' ', 'T') + 'Z';
+    const t = Date.parse(s);
+    if (isNaN(t)) return '';
+    const m = Math.round((Date.now() - t) / 60000);
+    if (m < 1) return '剛剛'; if (m < 60) return m + ' 分鐘前';
+    if (m < 1440) return Math.round(m/60) + ' 小時前';
+    return Math.round(m/1440) + ' 天前';
+}
+async function getText(url, ms){
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), ms || 12000);
+    try { const r = await fetch(url, {signal:ctl.signal}); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.text(); }
+    finally { clearTimeout(t); }
+}
+function parseRSS(txt){
+    const doc = new DOMParser().parseFromString(txt, 'text/xml');
+    if (doc.querySelector('parsererror')) throw new Error('bad xml');
+    const out = [];
+    doc.querySelectorAll('item').forEach(it => {
+        const g = n => { const e = it.querySelector(n); return e ? e.textContent.trim() : ''; };
+        const title = g('title'), link = g('link');
+        if (title && link) out.push({title, link, pubDate:g('pubDate')});
+    });
+    return out;
+}
+/* 三個管道同時跑，誰先抓到就用誰 */
+const NEWS_SRC = [
+    ['rss2json', async rss => {
+        const j = await getJSON('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rss), 15000);
+        return (j.items || []).map(x => ({title:x.title, link:x.link, pubDate:x.pubDate}));
+    }],
+    ['allorigins', async rss => parseRSS(await getText('https://api.allorigins.win/raw?url=' + encodeURIComponent(rss), 15000))],
+    ['corsproxy', async rss => parseRSS(await getText('https://corsproxy.io/?' + encodeURIComponent(rss), 15000))]
+];
+async function fetchNews(q){
+    const wins = [' when:3d', ' when:14d', ''];
+    const tried = [];
+    for (const w of wins) {
+        const key = 'tm_news_' + q + w;
+        const rss = `https://news.google.com/rss/search?q=${encodeURIComponent(q + w)}&hl=zh-TW&gl=TW&ceid=TW:zh-Hant`;
+        try {
+            const items = await Promise.any(NEWS_SRC.map(([name, fn]) => fn(rss).then(r => {
+                if (!r.length) throw new Error(name + ' empty');
+                return r;
+            })));
+            const list = items.slice(0, 6);
+            save(key, JSON.stringify({t:Date.now(), list}));
+            return {list, wide:w};
+        } catch(e) { tried.push(w || '不限時間'); }
+    }
+    // 全失敗：看有沒有舊資料
+    for (const w of wins) {
+        try { const c = JSON.parse(load('tm_news_' + q + w) || 'null'); if (c && c.list && c.list.length) return {list:c.list, wide:w, stale:c.t}; } catch(e) {}
+    }
+    throw new Error('all failed');
+}
+async function loadNews(p, my){
+    const country = p.country || (p.cc ? regionZh(p.cc) : '');
+    if (p.ocean) { setState('newsBody', '這裡是海上，沒有新聞。點一塊陸地試試～'); return; }
+    const names = [...new Set([country, p.name].map(x => (x || '').trim()).filter(Boolean))];
+    if (!names.length) { setState('newsBody', '找不到地區名稱，沒辦法查新聞。'); return; }
+    const q = names[0];
+    const more = `https://news.google.com/search?q=${encodeURIComponent(q)}&hl=zh-TW&gl=TW&ceid=TW:zh-Hant`;
+    setState('newsBody', '新聞讀取中…');
+    let res = null;
+    for (const nm of names) {
+        try { res = await fetchNews(nm); break; } catch(e) {}
+        if (my !== seq) return;
+    }
+    if (my !== seq) return;
+    const b = $('newsBody'); b.textContent = '';
+    if (res) {
+        const l = document.createElement('div'); l.className = 'list news';
+        for (const it of res.list) {
+            const a = document.createElement('a'); a.href = it.link; a.target = '_blank'; a.rel = 'noopener noreferrer';
+            const t = document.createElement('div'); t.className = 'tt'; t.textContent = it.title;
+            const m = document.createElement('div'); m.className = 'mt'; m.textContent = timeAgo(it.pubDate);
+            a.appendChild(t); a.appendChild(m); l.appendChild(a);
+        }
+        b.appendChild(l);
+        const notes = [];
+        if (res.stale) notes.push('網路不穩，先顯示之前存下來的舊新聞');
+        else if (res.wide === ' when:14d') notes.push('這裡近 3 天新聞很少，已放寬到近 14 天');
+        else if (res.wide === '') notes.push('這裡新聞很少，已放寬到不限時間');
+        if (notes.length) { const n = document.createElement('div'); n.className = 'note'; n.textContent = notes[0]; b.appendChild(n); }
+    } else {
+        const d = document.createElement('div'); d.className = 'state err'; d.textContent = '新聞暫時抓不到（已試過 3 條管道），可以直接點下面連結看。'; b.appendChild(d);
+    }
+    const mo = document.createElement('a'); mo.className = 'more'; mo.href = more; mo.target = '_blank'; mo.rel = 'noopener noreferrer'; mo.textContent = `到 Google 新聞看更多「${q}」 ›`;
+    b.appendChild(mo);
+}
+
+/* =====================================================================
+   旅遊資訊（維基百科：附近的地標）
+   ===================================================================== */
+async function loadSpots(p, my){
+    if (p.ocean) { setState('spotBody', '這裡是海上，附近沒有景點。'); return; }
+    const url = 'https://zh.wikipedia.org/w/api.php?action=query&generator=geosearch'
+        + `&ggscoord=${p.lat.toFixed(4)}|${p.lon.toFixed(4)}&ggsradius=10000&ggslimit=20`
+        + '&prop=pageimages|extracts|description&piprop=thumbnail&pithumbsize=160&exintro=1&explaintext=1&exchars=90&exlimit=20'
+        + '&format=json&formatversion=2&origin=*&variant=zh-tw';
+    const vg = `https://zh.wikivoyage.org/w/index.php?search=${encodeURIComponent(p.name || '')}`;
+    try {
+        const j = await getJSON(url, 15000);
+        if (my !== seq) return;
+        let pages = j.query && j.query.pages ? j.query.pages : [];
+        if (!Array.isArray(pages)) pages = Object.values(pages);
+        pages = pages.filter(x => x && x.title).sort((a, b) => ((b.thumbnail ? 1 : 0) - (a.thumbnail ? 1 : 0)) || ((a.index || 0) - (b.index || 0))).slice(0, 8);
+        const b = $('spotBody'); b.textContent = '';
+        if (!pages.length) { setState('spotBody', '附近 10 公里內沒有找到景點資料。'); }
+        else {
+            const l = document.createElement('div'); l.className = 'list spot';
+            for (const pg of pages) {
+                const a = document.createElement('a'); a.href = 'https://zh.wikipedia.org/wiki/' + encodeURIComponent(pg.title); a.target = '_blank'; a.rel = 'noopener noreferrer';
+                if (pg.thumbnail && pg.thumbnail.source) { const im = document.createElement('img'); im.src = pg.thumbnail.source; im.alt = ''; im.loading = 'lazy'; a.appendChild(im); }
+                else { const ph = document.createElement('div'); ph.className = 'ph'; ph.textContent = '📍'; a.appendChild(ph); }
+                const w = document.createElement('div');
+                const t = document.createElement('div'); t.className = 'tt'; t.textContent = pg.title;
+                const d = document.createElement('div'); d.className = 'ds'; d.textContent = (pg.description ? pg.description + '。' : '') + (pg.extract || '');
+                w.appendChild(t); w.appendChild(d); a.appendChild(w); l.appendChild(a);
+            }
+            b.appendChild(l);
+        }
+        if (p.name) { const mo = document.createElement('a'); mo.className = 'more'; mo.href = vg; mo.target = '_blank'; mo.rel = 'noopener noreferrer'; mo.textContent = `到維基導遊看「${p.name}」旅遊指南 ›`; b.appendChild(mo); }
+    } catch(e) {
+        if (my !== seq) return;
+        setState('spotBody', '景點資料暫時抓不到，稍後再點一次試試。', true);
+    }
+}
+
+/* =====================================================================
+   起動
+   ===================================================================== */
+const CHIP_TZ = {'台北':'Asia/Taipei','東京':'Asia/Tokyo','首爾':'Asia/Seoul','新加坡':'Asia/Singapore','杜拜':'Asia/Dubai','倫敦':'Europe/London','巴黎':'Europe/Paris','紐約':'America/New_York','洛杉磯':'America/Los_Angeles','檀香山':'Pacific/Honolulu','雪梨':'Australia/Sydney','奧克蘭':'Pacific/Auckland'};
+const chipFmt = {};
+function chipTime(z, d){
+    try { const f = chipFmt[z] || (chipFmt[z] = new Intl.DateTimeFormat('en-GB', {timeZone:z, hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23'})); return f.format(d); }
+    catch(e) { return '--:--:--'; }
+}
+function tickChips(){
+    const d = new Date();
+    document.querySelectorAll('#chips .chip .ct').forEach(t => { t.textContent = chipTime(CHIP_TZ[t.parentNode.dataset.n] || 'UTC', d); });
+}
+function chipOrder(){
+    let o = null; try { o = JSON.parse(load('timemachine_chips') || 'null'); } catch(e) {}
+    if (!Array.isArray(o)) return CHIPS.slice();
+    const ok = o.filter((n, i) => CHIPS.includes(n) && o.indexOf(n) === i);
+    return ok.concat(CHIPS.filter(n => !ok.includes(n)));
+}
+function buildChips(){
+    const box = $('chips');
+    for (const n of chipOrder()) {
+        const c = CITIES.find(x => x[0] === n); if (!c) continue;
+        const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.dataset.n = n;
+        const a1 = document.createElement('span'); a1.className = 'cn'; a1.textContent = n;
+        const a2 = document.createElement('span'); a2.className = 'ct';
+        b.appendChild(a1); b.appendChild(document.createTextNode(' ')); b.appendChild(a2);
+        b.onclick = () => { focusOn(c[2], c[1]); selectPlace({name:c[0], lat:c[1], lon:c[2], cc:c[3], pinned:true}, null); };
+        box.appendChild(b);
+    }
+    tickChips();
+    setupChipDrag(box);
+}
+/* 長按（滑鼠：直接拖）城市按鈕，拖到別的按鈕上就換位置 */
+function setupChipDrag(box){
+    let el = null, timer = null, active = false, pid = null, sx = 0, sy = 0, lx = 0, edgeT = null, suppress = false;
+    const stop = () => {
+        clearTimeout(timer); clearInterval(edgeT); edgeT = null;
+        if (active && el) {
+            el.classList.remove('drag');
+            save('timemachine_chips', JSON.stringify([...box.children].map(c => c.dataset.n)));
+            suppress = true; setTimeout(() => { suppress = false; }, 80);
+        }
+        el = null; active = false; pid = null;
+    };
+    const begin = () => {
+        active = true; el.classList.add('drag');
+        try { if (navigator.vibrate) navigator.vibrate(15); } catch(e) {}
+        edgeT = setInterval(() => {
+            const r = box.getBoundingClientRect();
+            if (lx > r.right - 30) box.scrollLeft += 8; else if (lx < r.left + 30) box.scrollLeft -= 8;
+        }, 30);
+    };
+    box.addEventListener('pointerdown', e => {
+        const c = e.target.closest('.chip');
+        if (!c || (e.pointerType === 'mouse' && e.button !== 0)) return;
+        stop(); el = c; pid = e.pointerId; sx = lx = e.clientX; sy = e.clientY;
+        if (e.pointerType !== 'mouse') timer = setTimeout(begin, 380);
+    });
+    box.addEventListener('pointermove', e => {
+        if (!el || e.pointerId !== pid) return;
+        lx = e.clientX;
+        if (!active) {
+            const d = Math.hypot(e.clientX - sx, e.clientY - sy);
+            if (e.pointerType === 'mouse') { if (d > 5) begin(); }
+            else if (d > 8) { clearTimeout(timer); el = null; }
+            return;
+        }
+        const t = document.elementsFromPoint(e.clientX, e.clientY).find(x => x !== el && x.classList && x.classList.contains('chip') && x.parentNode === box);
+        if (t) { const k = [...box.children]; if (k.indexOf(el) < k.indexOf(t)) t.after(el); else t.before(el); }
+    });
+    box.addEventListener('touchmove', e => { if (active) e.preventDefault(); }, {passive:false});
+    box.addEventListener('pointerup', stop);
+    box.addEventListener('pointercancel', stop);
+    box.addEventListener('contextmenu', e => e.preventDefault());
+    box.addEventListener('click', e => { if (suppress) { e.stopPropagation(); e.preventDefault(); } }, true);
+}
+
+/* 備用的簡易大陸輪廓（地圖資料載不到時才用） */
+const FALLBACK = {
+ 'North America':[[-168,66],[-162,70],[-140,70],[-125,70],[-95,72],[-82,68],[-80,63],[-94,59],[-92,57],[-82,55],[-78,60],[-70,60],[-62,57],[-56,52],[-66,45],[-70,42],[-76,36],[-81,31],[-80,25],[-83,29],[-90,30],[-97,27],[-97,21],[-92,18],[-88,21],[-87,16],[-83,15],[-83,10],[-78,8],[-80,7],[-85,10],[-92,15],[-105,20],[-110,24],[-113,31],[-110,23],[-118,32],[-124,40],[-124,48],[-130,54],[-140,60],[-150,60],[-155,57],[-165,55],[-158,58],[-166,62]],
+ 'South America':[[-78,8],[-72,12],[-62,10],[-52,5],[-50,0],[-35,-5],[-39,-14],[-41,-22],[-48,-26],[-58,-35],[-57,-38],[-65,-41],[-66,-47],[-69,-52],[-72,-54],[-75,-48],[-73,-37],[-71,-30],[-70,-18],[-76,-14],[-81,-5],[-80,0],[-77,4]],
+ 'Africa':[[-17,21],[-10,30],[-6,36],[10,37],[11,33],[20,31],[32,31],[35,28],[43,12],[51,12],[51,2],[40,-3],[40,-15],[35,-24],[32,-29],[26,-34],[18,-34],[12,-18],[14,-10],[9,-1],[9,4],[-5,5],[-13,8],[-17,14]],
+ 'Eurasia':[[-9,37],[-9,43],[-2,44],[-4,48],[2,51],[8,54],[9,57],[12,56],[18,59],[22,65],[25,66],[30,70],[40,68],[60,70],[80,73],[105,78],[140,72],[170,70],[180,68],[180,65],[165,60],[160,55],[155,58],[143,59],[135,54],[141,48],[135,43],[130,42],[129,35],[126,35],[122,40],[121,37],[122,31],[120,25],[110,20],[108,17],[109,12],[105,9],[100,13],[100,7],[103,1],[98,8],[98,16],[94,17],[92,22],[87,21],[80,15],[78,8],[73,16],[72,21],[67,25],[58,25],[56,27],[50,30],[48,29],[52,24],[56,26],[59,22],[52,16],[43,13],[35,28],[34,31],[36,36],[30,36],[26,38],[26,41],[23,40],[23,37],[19,40],[16,38],[12,42],[8,44],[3,43],[-2,37]],
+ 'Australia':[[114,-22],[122,-18],[130,-12],[137,-12],[142,-11],[146,-19],[153,-26],[150,-37],[141,-38],[135,-34],[130,-32],[115,-34]],
+ 'Greenland':[[-73,78],[-60,82],[-30,83],[-18,76],[-22,70],[-40,65],[-44,60],[-52,64],[-56,70]],
+ 'Great Britain':[[-5,50],[1,51],[2,53],[-2,57],[-4,58],[-6,56],[-3,54],[-5,52]],
+ 'Japan':[[130,31],[133,34],[140,35],[142,40],[141,45],[145,44],[140,41],[137,37],[132,35]],
+ 'Indonesia':[[95,5],[104,-3],[106,-6],[100,-1]],
+ 'Borneo':[[109,2],[116,7],[119,1],[116,-4],[110,-3]],
+ 'New Zealand':[[172,-34],[178,-38],[175,-41],[172,-41],[174,-46],[167,-46]],
+ 'Madagascar':[[44,-25],[47,-25],[50,-15],[49,-12],[44,-17]]
+};
+function fallbackCountries(){
+    return Object.keys(FALLBACK).map(n => ({name:n, d:'M' + FALLBACK[n].map(p => px(p[0]).toFixed(1) + ' ' + py(p[1]).toFixed(1)).join('L') + 'Z'}));
+}
+
+async function init(){
+    drawCities(); buildChips(); updateSky(); applyVB();
+    // 地圖資料
+    getJSON(WORLD_URL, 20000).then(t => drawCountries(topoToCountries(t)))
+        .catch(() => { drawCountries(fallbackCountries()); showMapMsg('地圖資料沒載入，先顯示簡易地圖'); setTimeout(() => showMapMsg(''), 5000); });
+    // 一開始顯示上次看的地方，沒有就台北
+    let first = null;
+    try { first = JSON.parse(load('timemachine_last') || 'null'); } catch(e) {}
+    if (first && typeof first.lat === 'number' && typeof first.lon === 'number') {
+        const c = CITIES.find(x => x[0] === first.name);
+        selectPlace(c ? {name:c[0], lat:c[1], lon:c[2], cc:c[3], pinned:true} : {name:first.name || null, lat:first.lat, lon:first.lon, cc:first.cc || null}, null);
+    } else {
+        const c = CITIES[0];
+        selectPlace({name:c[0], lat:c[1], lon:c[2], cc:c[3], pinned:true}, null);
+    }
+}
+init();
+</script>
+</body>
+</html>

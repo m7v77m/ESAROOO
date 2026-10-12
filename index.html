@@ -24,9 +24,6 @@ body{
 .app{max-width:760px;margin:0 auto;background:var(--bg-container);border:1px solid var(--border-color);border-radius:20px;padding:var(--gap);display:flex;flex-direction:column;gap:var(--gap)}
 .card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:12px;box-shadow:0 2px 8px rgba(92,64,51,.08)}
 .card h2{margin:0 0 8px;font-size:15px;color:var(--primary-dark);display:flex;align-items:center;gap:6px}
-.title-card{text-align:center;padding:12px 10px}
-.title-card h1{margin:0;font-size:22px;color:var(--primary-dark);letter-spacing:2px}
-.title-card p{margin:2px 0 0;font-size:12.5px;color:var(--text-secondary)}
 
 /* ---------- 地圖 ---------- */
 .map-wrap{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border-color);background:#cfdcc6;aspect-ratio:var(--map-ratio,2/1);touch-action:none;user-select:none;-webkit-user-select:none}
@@ -49,22 +46,26 @@ body{
 .legend i.m{border-top:2px dotted #5C4033}
 .legend b{display:inline-block;width:12px;height:12px;border-radius:3px;background:rgba(74,55,40,.30);vertical-align:-2px;margin-right:4px}
 
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.chip{border:1px solid var(--border-color);background:var(--primary-light);color:var(--text-primary);border-radius:15px;padding:4px 11px;font-size:13px;cursor:pointer;font-family:inherit}
+.chips{display:grid;grid-auto-flow:column;grid-template-rows:repeat(3,auto);grid-auto-columns:124px;gap:6px;margin-top:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.chip{border:1px dashed var(--primary);background:var(--primary-light);color:var(--text-primary);border-radius:15px;padding:5px 4px;font-size:12.5px;cursor:pointer;font-family:inherit;white-space:nowrap;text-align:center;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:transform .12s,box-shadow .12s}
+.chip .ct{font-variant-numeric:tabular-nums}
 .chip:active{background:var(--bg-hover)}
-.chip.on{background:var(--matcha);border-color:var(--matcha);color:#fff;font-weight:600}
+.chip.on{background:var(--matcha);border-color:var(--matcha-dark);color:#fff;font-weight:600}
+.chip.drag{transform:scale(1.07);box-shadow:0 3px 10px rgba(92,64,51,.35);position:relative;z-index:2;opacity:.92}
+.chip-tip{font-size:11.5px;color:var(--text-muted);margin-top:4px}
 
 /* ---------- 時間 ---------- */
-.place{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.place{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.place .pl{flex:1;min-width:0}
 .place .flag{font-size:30px;line-height:1}
-.place .nm{font-size:18px;font-weight:700;color:var(--primary-dark);line-height:1.25}
+.place .nm{font-size:17px;font-weight:700;color:var(--primary-dark);line-height:1.25}
 .place .sub{font-size:12px;color:var(--text-secondary)}
-.clock{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--bg-input);border:1px solid var(--border-color);border-radius:12px;padding:8px 10px;margin:8px 0}
-.clock .t{font-size:38px;font-weight:700;color:var(--primary-dark);font-variant-numeric:tabular-nums;letter-spacing:1px}
-.clock .dn{font-size:28px}
+.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:1px dashed var(--primary);border-radius:15px;padding:5px 9px}
+.clock .t{font-size:19px;font-weight:700;color:var(--primary-dark);font-variant-numeric:tabular-nums;white-space:nowrap}
+.clock .dn{font-size:15px;line-height:1}
 .date{text-align:center;font-size:14px;color:var(--text-primary);font-weight:600}
 .rows{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-.row{display:flex;justify-content:space-between;gap:10px;font-size:13px;background:var(--bg-input);border:1px solid var(--primary-light);border-radius:10px;padding:6px 10px}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:13px;background:var(--bg-input);border:1px solid var(--primary-light);border-radius:15px;padding:6px 12px}
 .row .k{color:var(--text-secondary);white-space:nowrap}
 .row .v{font-weight:600;text-align:right}
 .row .v.big{color:var(--expense-color)}
@@ -76,21 +77,22 @@ body{
 .now .tp{font-size:32px;font-weight:700;color:var(--primary-dark)}
 .now .ds{font-size:13px;color:var(--text-secondary)}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap)}
-.cell{background:var(--bg-input);border:1px solid var(--primary-light);border-radius:12px;padding:8px 4px;text-align:center}
+.cell{background:var(--bg-input);border:1px solid var(--primary-light);border-radius:15px;padding:8px 4px;text-align:center}
 .cell .l{font-size:12px;color:var(--text-secondary)}
 .cell .r{font-size:15px;font-weight:700;color:var(--primary-dark);margin-top:2px;white-space:nowrap}
 .cell .u{font-size:11px;color:var(--text-muted);margin-top:1px}
 
 /* ---------- 新聞 / 景點 ---------- */
 .list{display:flex;flex-direction:column;gap:8px}
-.news a{display:block;text-decoration:none;color:var(--text-primary);background:var(--bg-input);border:1px solid var(--primary-light);border-radius:12px;padding:8px 10px}
+.news a{display:block;text-decoration:none;color:var(--text-primary);background:var(--bg-input);border:1px solid var(--primary-light);border-radius:15px;padding:8px 12px}
 .news a:active{background:var(--bg-hover)}
 .news .tt{font-size:14px;font-weight:600;line-height:1.4}
 .news .mt{font-size:11.5px;color:var(--text-muted);margin-top:2px}
-.spot a{display:flex;gap:10px;text-decoration:none;color:var(--text-primary);background:var(--bg-input);border:1px solid var(--primary-light);border-radius:12px;padding:8px}
+.spot a{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text-primary);background:var(--bg-input);border:1px solid var(--primary-light);border-radius:15px;padding:8px 10px}
 .spot a:active{background:var(--bg-hover)}
 .spot img{width:64px;height:64px;object-fit:cover;border-radius:10px;flex:0 0 auto;background:var(--primary-light)}
 .spot .ph{width:64px;height:64px;border-radius:10px;flex:0 0 auto;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:24px}
+.spot a>div:last-child{min-width:0;flex:1}
 .spot .tt{font-size:14px;font-weight:700}
 .spot .ds{font-size:12px;color:var(--text-secondary);margin-top:2px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .more{display:inline-block;margin-top:8px;font-size:13px;color:var(--matcha-dark);font-weight:600;text-decoration:none}
@@ -102,11 +104,6 @@ footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2p
 </head>
 <body>
 <div class="app">
-
-    <div class="card title-card">
-        <h1>🕰️ 全球時光機</h1>
-        <p>點一下世界地圖，馬上看當地的時間、天氣、新聞和景點</p>
-    </div>
 
     <div class="card">
         <h2>🗺️ 世界地圖</h2>
@@ -125,18 +122,19 @@ footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2p
             <span><b></b>此刻的夜晚</span>
         </div>
         <div class="chips" id="chips"></div>
+        <div class="chip-tip">👆 長按城市可拖曳排序，左右滑動看更多</div>
     </div>
 
     <div class="card" id="timeCard">
         <h2>⏱️ 當地時間</h2>
         <div class="place">
             <div class="flag" id="flag">🌏</div>
-            <div>
+            <div class="pl">
                 <div class="nm" id="placeName">載入中…</div>
                 <div class="sub" id="placeSub"></div>
             </div>
+            <div class="clock"><div class="t" id="clk">--:--:--</div><div class="dn" id="dn"></div></div>
         </div>
-        <div class="clock"><div class="t" id="clk">--:--:--</div><div class="dn" id="dn"></div></div>
         <div class="date" id="dateTxt"></div>
         <div class="rows">
             <div class="row"><span class="k">時區</span><span class="v" id="tzTxt">—</span></div>
@@ -193,7 +191,7 @@ const CITIES = [
  ['聖保羅',-23.55,-46.63,'BR'],['里約熱內盧',-22.91,-43.17,'BR'],['雪梨',-33.87,151.21,'AU'],['墨爾本',-37.81,144.96,'AU'],['伯斯',-31.95,115.86,'AU'],['布里斯本',-27.47,153.03,'AU'],
  ['奧克蘭',-36.85,174.76,'NZ'],['蘇瓦',-18.14,178.44,'FJ'],['關島',13.44,144.79,'GU'],['大溪地',-17.54,-149.57,'PF']
 ];
-const CHIPS = ['舊金山','東京','杜拜','台北','倫敦','奧克蘭','巴黎','羅馬','雪梨','柏林','洛杉磯','伯斯','愛丁堡','哥本哈根','里約熱內盧'];
+const CHIPS = ['台北','東京','首爾','新加坡','杜拜','倫敦','巴黎','紐約','洛杉磯','檀香山','雪梨','奧克蘭'];
 
 /* WMO 天氣代碼 → 中文與圖示 */
 function wmo(code, isDay){
@@ -511,6 +509,7 @@ function tickClock(){
 }
 function fmtH(h){ return Number.isInteger(h) ? String(h) : h.toFixed(2).replace(/0+$/, '').replace(/\.$/, ''); }
 setInterval(tickClock, 1000);
+setInterval(() => tickChips(), 1000);
 setInterval(updateSky, 60000);
 
 /* =====================================================================
@@ -558,44 +557,97 @@ async function loadWeather(p, my){
    新聞（Google 新聞 RSS → rss2json）
    ===================================================================== */
 function timeAgo(s){
-    const t = Date.parse((s || '').replace(' ', 'T') + 'Z');
+    s = (s || '').trim();
+    if (/^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/.test(s)) s = s.replace(' ', 'T') + 'Z';
+    const t = Date.parse(s);
     if (isNaN(t)) return '';
     const m = Math.round((Date.now() - t) / 60000);
     if (m < 1) return '剛剛'; if (m < 60) return m + ' 分鐘前';
     if (m < 1440) return Math.round(m/60) + ' 小時前';
     return Math.round(m/1440) + ' 天前';
 }
+async function getText(url, ms){
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), ms || 12000);
+    try { const r = await fetch(url, {signal:ctl.signal}); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.text(); }
+    finally { clearTimeout(t); }
+}
+function parseRSS(txt){
+    const doc = new DOMParser().parseFromString(txt, 'text/xml');
+    if (doc.querySelector('parsererror')) throw new Error('bad xml');
+    const out = [];
+    doc.querySelectorAll('item').forEach(it => {
+        const g = n => { const e = it.querySelector(n); return e ? e.textContent.trim() : ''; };
+        const title = g('title'), link = g('link');
+        if (title && link) out.push({title, link, pubDate:g('pubDate')});
+    });
+    return out;
+}
+/* 三個管道同時跑，誰先抓到就用誰 */
+const NEWS_SRC = [
+    ['rss2json', async rss => {
+        const j = await getJSON('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rss), 15000);
+        return (j.items || []).map(x => ({title:x.title, link:x.link, pubDate:x.pubDate}));
+    }],
+    ['allorigins', async rss => parseRSS(await getText('https://api.allorigins.win/raw?url=' + encodeURIComponent(rss), 15000))],
+    ['corsproxy', async rss => parseRSS(await getText('https://corsproxy.io/?' + encodeURIComponent(rss), 15000))]
+];
+async function fetchNews(q){
+    const wins = [' when:3d', ' when:14d', ''];
+    const tried = [];
+    for (const w of wins) {
+        const key = 'tm_news_' + q + w;
+        const rss = `https://news.google.com/rss/search?q=${encodeURIComponent(q + w)}&hl=zh-TW&gl=TW&ceid=TW:zh-Hant`;
+        try {
+            const items = await Promise.any(NEWS_SRC.map(([name, fn]) => fn(rss).then(r => {
+                if (!r.length) throw new Error(name + ' empty');
+                return r;
+            })));
+            const list = items.slice(0, 6);
+            save(key, JSON.stringify({t:Date.now(), list}));
+            return {list, wide:w};
+        } catch(e) { tried.push(w || '不限時間'); }
+    }
+    // 全失敗：看有沒有舊資料
+    for (const w of wins) {
+        try { const c = JSON.parse(load('tm_news_' + q + w) || 'null'); if (c && c.list && c.list.length) return {list:c.list, wide:w, stale:c.t}; } catch(e) {}
+    }
+    throw new Error('all failed');
+}
 async function loadNews(p, my){
     const country = p.country || (p.cc ? regionZh(p.cc) : '');
     if (p.ocean) { setState('newsBody', '這裡是海上，沒有新聞。點一塊陸地試試～'); return; }
-    const q = (country || p.name || '').trim();
-    if (!q) { setState('newsBody', '找不到地區名稱，沒辦法查新聞。'); return; }
-    const gnews = `https://news.google.com/rss/search?q=${encodeURIComponent(q + ' when:3d')}&hl=zh-TW&gl=TW&ceid=TW:zh-Hant`;
-    const more = `https://news.google.com/search?q=${encodeURIComponent(q + ' when:3d')}&hl=zh-TW&gl=TW&ceid=TW:zh-Hant`;
-    try {
-        const j = await getJSON('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(gnews), 15000);
+    const names = [...new Set([country, p.name].map(x => (x || '').trim()).filter(Boolean))];
+    if (!names.length) { setState('newsBody', '找不到地區名稱，沒辦法查新聞。'); return; }
+    const q = names[0];
+    const more = `https://news.google.com/search?q=${encodeURIComponent(q)}&hl=zh-TW&gl=TW&ceid=TW:zh-Hant`;
+    setState('newsBody', '新聞讀取中…');
+    let res = null;
+    for (const nm of names) {
+        try { res = await fetchNews(nm); break; } catch(e) {}
         if (my !== seq) return;
-        const items = (j.items || []).slice(0, 6);
-        if (!items.length) throw new Error('empty');
-        const b = $('newsBody'); b.textContent = '';
+    }
+    if (my !== seq) return;
+    const b = $('newsBody'); b.textContent = '';
+    if (res) {
         const l = document.createElement('div'); l.className = 'list news';
-        for (const it of items) {
+        for (const it of res.list) {
             const a = document.createElement('a'); a.href = it.link; a.target = '_blank'; a.rel = 'noopener noreferrer';
             const t = document.createElement('div'); t.className = 'tt'; t.textContent = it.title;
             const m = document.createElement('div'); m.className = 'mt'; m.textContent = timeAgo(it.pubDate);
             a.appendChild(t); a.appendChild(m); l.appendChild(a);
         }
         b.appendChild(l);
-        const mo = document.createElement('a'); mo.className = 'more'; mo.href = more; mo.target = '_blank'; mo.rel = 'noopener noreferrer'; mo.textContent = `到 Google 新聞看更多「${q}」 ›`;
-        b.appendChild(mo);
-    } catch(e) {
-        if (my !== seq) return;
-        const b = $('newsBody'); b.textContent = '';
-        const d = document.createElement('div'); d.className = 'state err'; d.textContent = '新聞暫時抓不到。';
-        b.appendChild(d);
-        const mo = document.createElement('a'); mo.className = 'more'; mo.href = more; mo.target = '_blank'; mo.rel = 'noopener noreferrer'; mo.textContent = `直接到 Google 新聞看「${q}」 ›`;
-        b.appendChild(mo);
+        const notes = [];
+        if (res.stale) notes.push('網路不穩，先顯示之前存下來的舊新聞');
+        else if (res.wide === ' when:14d') notes.push('這裡近 3 天新聞很少，已放寬到近 14 天');
+        else if (res.wide === '') notes.push('這裡新聞很少，已放寬到不限時間');
+        if (notes.length) { const n = document.createElement('div'); n.className = 'note'; n.textContent = notes[0]; b.appendChild(n); }
+    } else {
+        const d = document.createElement('div'); d.className = 'state err'; d.textContent = '新聞暫時抓不到（已試過 3 條管道），可以直接點下面連結看。'; b.appendChild(d);
     }
+    const mo = document.createElement('a'); mo.className = 'more'; mo.href = more; mo.target = '_blank'; mo.rel = 'noopener noreferrer'; mo.textContent = `到 Google 新聞看更多「${q}」 ›`;
+    b.appendChild(mo);
 }
 
 /* =====================================================================
@@ -639,14 +691,79 @@ async function loadSpots(p, my){
 /* =====================================================================
    起動
    ===================================================================== */
+const CHIP_TZ = {'台北':'Asia/Taipei','東京':'Asia/Tokyo','首爾':'Asia/Seoul','新加坡':'Asia/Singapore','杜拜':'Asia/Dubai','倫敦':'Europe/London','巴黎':'Europe/Paris','紐約':'America/New_York','洛杉磯':'America/Los_Angeles','檀香山':'Pacific/Honolulu','雪梨':'Australia/Sydney','奧克蘭':'Pacific/Auckland'};
+const chipFmt = {};
+function chipTime(z, d){
+    try { const f = chipFmt[z] || (chipFmt[z] = new Intl.DateTimeFormat('en-GB', {timeZone:z, hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23'})); return f.format(d); }
+    catch(e) { return '--:--:--'; }
+}
+function tickChips(){
+    const d = new Date();
+    document.querySelectorAll('#chips .chip .ct').forEach(t => { t.textContent = chipTime(CHIP_TZ[t.parentNode.dataset.n] || 'UTC', d); });
+}
+function chipOrder(){
+    let o = null; try { o = JSON.parse(load('timemachine_chips') || 'null'); } catch(e) {}
+    if (!Array.isArray(o)) return CHIPS.slice();
+    const ok = o.filter((n, i) => CHIPS.includes(n) && o.indexOf(n) === i);
+    return ok.concat(CHIPS.filter(n => !ok.includes(n)));
+}
 function buildChips(){
     const box = $('chips');
-    for (const n of CHIPS) {
+    for (const n of chipOrder()) {
         const c = CITIES.find(x => x[0] === n); if (!c) continue;
-        const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.dataset.n = n; b.textContent = flagOf(c[3]) + ' ' + n;
+        const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.dataset.n = n;
+        const a1 = document.createElement('span'); a1.className = 'cn'; a1.textContent = n;
+        const a2 = document.createElement('span'); a2.className = 'ct';
+        b.appendChild(a1); b.appendChild(document.createTextNode(' ')); b.appendChild(a2);
         b.onclick = () => { focusOn(c[2], c[1]); selectPlace({name:c[0], lat:c[1], lon:c[2], cc:c[3], pinned:true}, null); };
         box.appendChild(b);
     }
+    tickChips();
+    setupChipDrag(box);
+}
+/* 長按（滑鼠：直接拖）城市按鈕，拖到別的按鈕上就換位置 */
+function setupChipDrag(box){
+    let el = null, timer = null, active = false, pid = null, sx = 0, sy = 0, lx = 0, edgeT = null, suppress = false;
+    const stop = () => {
+        clearTimeout(timer); clearInterval(edgeT); edgeT = null;
+        if (active && el) {
+            el.classList.remove('drag');
+            save('timemachine_chips', JSON.stringify([...box.children].map(c => c.dataset.n)));
+            suppress = true; setTimeout(() => { suppress = false; }, 80);
+        }
+        el = null; active = false; pid = null;
+    };
+    const begin = () => {
+        active = true; el.classList.add('drag');
+        try { if (navigator.vibrate) navigator.vibrate(15); } catch(e) {}
+        edgeT = setInterval(() => {
+            const r = box.getBoundingClientRect();
+            if (lx > r.right - 30) box.scrollLeft += 8; else if (lx < r.left + 30) box.scrollLeft -= 8;
+        }, 30);
+    };
+    box.addEventListener('pointerdown', e => {
+        const c = e.target.closest('.chip');
+        if (!c || (e.pointerType === 'mouse' && e.button !== 0)) return;
+        stop(); el = c; pid = e.pointerId; sx = lx = e.clientX; sy = e.clientY;
+        if (e.pointerType !== 'mouse') timer = setTimeout(begin, 380);
+    });
+    box.addEventListener('pointermove', e => {
+        if (!el || e.pointerId !== pid) return;
+        lx = e.clientX;
+        if (!active) {
+            const d = Math.hypot(e.clientX - sx, e.clientY - sy);
+            if (e.pointerType === 'mouse') { if (d > 5) begin(); }
+            else if (d > 8) { clearTimeout(timer); el = null; }
+            return;
+        }
+        const t = document.elementsFromPoint(e.clientX, e.clientY).find(x => x !== el && x.classList && x.classList.contains('chip') && x.parentNode === box);
+        if (t) { const k = [...box.children]; if (k.indexOf(el) < k.indexOf(t)) t.after(el); else t.before(el); }
+    });
+    box.addEventListener('touchmove', e => { if (active) e.preventDefault(); }, {passive:false});
+    box.addEventListener('pointerup', stop);
+    box.addEventListener('pointercancel', stop);
+    box.addEventListener('contextmenu', e => e.preventDefault());
+    box.addEventListener('click', e => { if (suppress) { e.stopPropagation(); e.preventDefault(); } }, true);
 }
 
 /* 備用的簡易大陸輪廓（地圖資料載不到時才用） */

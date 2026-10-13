@@ -148,13 +148,14 @@ html[data-theme="dark"] .chip,html[data-theme="dark"] .row,html[data-theme="dark
 html[data-theme="dark"] .place .nm,html[data-theme="dark"] .clock .t,html[data-theme="dark"] .date,html[data-theme="dark"] .row .v,html[data-theme="dark"] .cell .r,html[data-theme="dark"] .now .tp,html[data-theme="dark"] .news .tt,html[data-theme="dark"] .spot .tt,html[data-theme="dark"] .chip{color:#A9BD9B}
 html[data-theme="dark"] .row .v.big{color:#C9DDB8}
 html[data-theme="dark"] .chip.on{color:#fff}
+html[data-theme="dark"] .clock,html[data-theme="dark"] .tbtn,html[data-theme="dark"] .roll{border-color:#B79A78}
 </style>
 </head>
 <body>
 <div class="app">
 
     <div class="card">
-        <h2>🗺️ 世界地圖<button id="themeBtn" class="tbtn" type="button">🌗 自動</button></h2>
+        <h2>🗺️ 世界地圖<button id="homeBtn" class="tbtn" type="button">🌳 亞馬遜</button><button id="themeBtn" class="tbtn" type="button" style="margin-left:0">🌗 自動</button></h2>
         <div class="map-wrap" id="mapWrap">
             <svg id="map" xmlns="http://www.w3.org/2000/svg" aria-label="世界地圖"></svg>
             <div class="zoom">
@@ -781,6 +782,14 @@ async function loadSpots(p, my){
         let pages = j.query && j.query.pages ? j.query.pages : [];
         if (!Array.isArray(pages)) pages = Object.values(pages);
         pages = pages.filter(x => x && x.title).sort((a, b) => ((b.thumbnail ? 1 : 0) - (a.thumbnail ? 1 : 0)) || ((a.index || 0) - (b.index || 0))).slice(0, 8);
+        if (!pages.length && p.secret) {
+            try {
+                const j2 = await getJSON('https://zh.wikipedia.org/w/api.php?action=query&prop=pageimages|extracts&piprop=thumbnail&pithumbsize=160&exintro=1&explaintext=1&exchars=90&redirects=1&titles=' + encodeURIComponent(p.secret.wiki) + '&format=json&formatversion=2&origin=*&variant=zh-tw', 15000);
+                const pg0 = j2.query && j2.query.pages && j2.query.pages[0];
+                if (pg0 && !pg0.missing && pg0.title) pages = [pg0];
+            } catch(e) {}
+            if (my !== seq) return;
+        }
         const b = $('spotBody'); b.textContent = '';
         if (!pages.length) { setState('spotBody', '附近 10 公里內沒有找到景點資料。'); }
         else {
@@ -922,7 +931,25 @@ function pip(pt, ring){
     }
     return inside;
 }
+const SECRET = [
+ {name:'亞馬遜雨林', emoji:'🌳', lat:-4.0, lon:-63.0, cc:'BR', wiki:'亞馬遜雨林', line:'地球之肺，據說住著全世界約十分之一的已知物種。'},
+ {name:'撒哈拉沙漠', emoji:'🏜️', lat:25.0, lon:5.0, cc:'DZ', wiki:'撒哈拉沙漠', line:'世界最大的熱帶沙漠，面積和整個美國差不多大。'},
+ {name:'瓦特納冰川', emoji:'🧊', lat:64.4, lon:-16.8, cc:'IS', wiki:'瓦特納冰川', line:'冰島的大冰帽，是歐洲最大的冰川之一，冬天洞穴裡藍得像水晶。'},
+ {name:'馬爾地夫環礁', emoji:'🏝️', lat:3.9, lon:73.4, cc:'MV', wiki:'馬爾地夫', line:'一千多座珊瑚小島散落在印度洋，是全世界平均海拔最低的國家。'},
+ {name:'聖母峰', emoji:'🏔️', lat:27.99, lon:86.93, cc:'NP', wiki:'珠穆朗瑪峰', line:'世界最高峰，海拔約 8,849 公尺，離天空最近的地方。'},
+ {name:'加拉巴哥群島', emoji:'🐢', lat:-0.74, lon:-90.31, cc:'EC', wiki:'加拉帕戈斯群島', line:'據說啟發了達爾文的演化論，這裡的動物完全不怕人。'},
+ {name:'貝加爾湖', emoji:'🏞️', lat:53.5, lon:108.2, cc:'RU', wiki:'貝加爾湖', line:'世界最深、也是最古老的淡水湖之一，冬天整片湖會結成藍冰。'},
+ {name:'大堡礁', emoji:'🐠', lat:-18.3, lon:147.7, cc:'AU', wiki:'大堡礁', line:'世界最大的珊瑚礁系統，大到太空中也看得見。'},
+ {name:'塞倫蓋蒂', emoji:'🦓', lat:-2.33, lon:34.83, cc:'TZ', wiki:'塞倫蓋蒂國家公園', line:'每年有上百萬頭角馬和斑馬跟著雨水大遷徙。'},
+ {name:'烏尤尼鹽沼', emoji:'🪞', lat:-20.13, lon:-67.49, cc:'BO', wiki:'烏尤尼鹽沼', line:'世界最大的鹽沼，雨季時變成一面「天空之鏡」。'},
+ {name:'巴塔哥尼亞', emoji:'🌬️', lat:-50.34, lon:-72.26, cc:'AR', wiki:'巴塔哥尼亞', line:'南美洲最南端的荒野，風超大、冰川超多。'},
+ {name:'特羅姆瑟', emoji:'🌌', lat:69.65, lon:18.96, cc:'NO', wiki:'特羅姆瑟', line:'挪威北極圈內的小城，是看極光的熱門地點。'}
+];
+function secretPlace(sp, home){
+    return {name:sp.name, lat:sp.lat, lon:sp.lon, cc:sp.cc, country:regionZh(sp.cc), roll:true, focus:true, secret:sp, home:!!home};
+}
 function randomSpot(){
+    if (Math.random() < 0.12) return {secret:SECRET[Math.floor(Math.random() * SECRET.length)]};   // 約 8 次擲中 1 次隱藏景點
     if (landList.length && Math.random() < 0.7) {          // 七成機率落在陸地（每個國家機會一樣大）
         const c = landList[Math.floor(Math.random() * landList.length)];
         for (let i = 0; i < 60; i++) {
@@ -943,8 +970,9 @@ function oceanName(lat, lon){
 $('rollBtn').onclick = () => {
     const b = $('rollBtn'); b.classList.remove('rolling'); void b.offsetWidth; b.classList.add('rolling');
     const s = randomSpot();
-    selectPlace({name:null, lat:s.lat, lon:s.lon, cc:null, roll:true, focus:true}, null);
+    selectPlace(s.secret ? secretPlace(s.secret) : {name:null, lat:s.lat, lon:s.lon, cc:null, roll:true, focus:true}, null);
 };
+$('homeBtn').onclick = () => selectPlace(secretPlace(SECRET[0], true), null);
 async function loadBox(p, my){
     const b = $('boxBody');
     const head = (flag, txt) => { const h = document.createElement('div'); h.className = 'bhead'; const f = document.createElement('span'); f.className = 'bf'; f.textContent = flag; h.appendChild(f); h.appendChild(document.createTextNode(txt)); return h; };
@@ -957,17 +985,21 @@ async function loadBox(p, my){
     }
     const cc = p.cc.toUpperCase(), country = p.country || regionZh(cc);
     b.textContent = '';
-    b.appendChild(head(flagOf(cc), `你抵達了${country}${p.name && p.name !== country ? '・' + p.name : ''}`));
+    const sp = p.secret;
+    if (sp) {
+        b.appendChild(head(sp.emoji, p.home ? `歡迎回家，甜姐兒！${sp.name}` : `隱藏景點！你抵達了${sp.name}`));
+        const sl = document.createElement('div'); sl.className = 'btxt'; sl.style.cssText = 'text-align:center;margin-top:6px'; sl.textContent = `📍 ${country}・${sp.line}`; b.appendChild(sl);
+    } else b.appendChild(head(flagOf(cc), `你抵達了${country}${p.name && p.name !== country ? '・' + p.name : ''}`));
     const intro = document.createElement('div'), hol = document.createElement('div');
     b.appendChild(intro); b.appendChild(hol);
-    const wurl = 'https://zh.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&exchars=200&redirects=1&titles=' + encodeURIComponent(country) + '&format=json&formatversion=2&origin=*&variant=zh-tw';
+    const wurl = 'https://zh.wikipedia.org/w/api.php?action=query&prop=extracts&exintro=1&explaintext=1&exchars=200&redirects=1&titles=' + encodeURIComponent(sp ? sp.wiki : country) + '&format=json&formatversion=2&origin=*&variant=zh-tw';
     const [w, h] = await Promise.allSettled([getJSON(wurl, 12000), getJSON('https://date.nager.at/api/v3/NextPublicHolidays/' + cc, 12000)]);
     if (my !== seq) return;
     const sh = txt => { const d = document.createElement('div'); d.className = 'bh'; d.textContent = txt; return d; };
     let ex = '';
     if (w.status === 'fulfilled') { const pg = w.value.query && w.value.query.pages && w.value.query.pages[0]; ex = pg && pg.extract ? pg.extract.trim() : ''; }
-    intro.appendChild(sh('📖 國家特色'));
-    const it = document.createElement('div'); it.className = 'btxt'; it.textContent = ex || '這個國家的介紹暫時查不到。';
+    intro.appendChild(sh(sp ? '📖 認識這裡' : '📖 國家特色'));
+    const it = document.createElement('div'); it.className = 'btxt'; it.textContent = ex || (sp ? '這裡的介紹暫時查不到。' : '這個國家的介紹暫時查不到。');
     intro.appendChild(it);
     hol.appendChild(sh('🎉 接下來的節慶與假日'));
     if (h.status === 'fulfilled' && Array.isArray(h.value) && h.value.length) {

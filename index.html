@@ -677,35 +677,53 @@ function parseRSS(txt){
     });
     return out;
 }
-/* 三個管道同時跑，誰先抓到就用誰 */
+/* 好幾個管道同時跑，誰先抓到就用誰（免費的中繼站常常今天好、明天壞，所以多備幾條） */
+const EMPTY = () => new Error('empty');
+const viaProxy = prefix => async rss => parseRSS(await getText(prefix + encodeURIComponent(rss), 14000));
 const NEWS_SRC = [
     ['rss2json', async rss => {
-        const j = await getJSON('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rss), 15000);
+        const j = await getJSON('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rss), 14000);
         return (j.items || []).map(x => ({title:x.title, link:x.link, pubDate:x.pubDate}));
     }],
-    ['allorigins', async rss => parseRSS(await getText('https://api.allorigins.win/raw?url=' + encodeURIComponent(rss), 15000))],
-    ['corsproxy', async rss => parseRSS(await getText('https://corsproxy.io/?' + encodeURIComponent(rss), 15000))]
+    ['allorigins-raw', viaProxy('https://api.allorigins.win/raw?url=')],
+    ['allorigins-get', async rss => { const j = await getJSON('https://api.allorigins.win/get?url=' + encodeURIComponent(rss), 14000); return parseRSS(j.contents || ''); }],
+    ['codetabs', viaProxy('https://api.codetabs.com/v1/proxy/?quest=')],
+    ['corsproxy', viaProxy('https://corsproxy.io/?')],
+    ['thingproxy', async rss => parseRSS(await getText('https://thingproxy.freeboard.io/fetch/' + rss, 14000))]
 ];
+/* 備援：GDELT 全球新聞資料庫（自己就允許跨網站讀取，不靠中繼站） */
+async function gdeltNews(q){
+    const tries = [`"${q}" sourcelang:chinese`, `"${q}"`];
+    for (const qq of tries) {
+        const j = await getJSON('https://api.gdeltproject.org/api/v2/doc/doc?mode=ArtList&format=json&maxrecords=10&sort=DateDesc&timespan=7d&query=' + encodeURIComponent(qq), 15000);
+        const list = (j.articles || []).filter(x => x.title && x.url).map(x => {
+            const m = /^(\d{4})(\d\d)(\d\d)T(\d\d)(\d\d)(\d\d)Z$/.exec(x.seendate || '');
+            return {title:x.title + (x.domain ? ' - ' + x.domain : ''), link:x.url, pubDate:m ? `${m[1]}-${m[2]}-${m[3]} ${m[4]}:${m[5]}:${m[6]}` : ''};
+        });
+        if (list.length) return list.slice(0, 6);
+    }
+    throw EMPTY();
+}
 async function fetchNews(q){
+    const key = 'tm_news2_' + q;
+    let cached = null; try { cached = JSON.parse(load(key) || 'null'); } catch(e) {}
+    if (cached && cached.list && cached.list.length && Date.now() - cached.t < 20*60000) return {list:cached.list, wide:cached.wide};   // 20 分鐘內直接用
     const wins = [' when:3d', ' when:14d', ''];
-    const tried = [];
     for (const w of wins) {
-        const key = 'tm_news_' + q + w;
         const rss = `https://news.google.com/rss/search?q=${encodeURIComponent(q + w)}&hl=zh-TW&gl=TW&ceid=TW:zh-Hant`;
         try {
-            const items = await Promise.any(NEWS_SRC.map(([name, fn]) => fn(rss).then(r => {
-                if (!r.length) throw new Error(name + ' empty');
-                return r;
-            })));
+            const items = await Promise.any(NEWS_SRC.map(([name, fn]) => fn(rss).then(r => { if (!r.length) throw EMPTY(); return r; })));
             const list = items.slice(0, 6);
-            save(key, JSON.stringify({t:Date.now(), list}));
+            save(key, JSON.stringify({t:Date.now(), list, wide:w}));
             return {list, wide:w};
-        } catch(e) { tried.push(w || '不限時間'); }
+        } catch(e) {
+            // 有管道回答「真的沒有新聞」才放寬時間；全部都連不上就別浪費時間重試
+            const anyEmpty = (e.errors || []).some(x => x && x.message === 'empty');
+            if (!anyEmpty) break;
+        }
     }
-    // 全失敗：看有沒有舊資料
-    for (const w of wins) {
-        try { const c = JSON.parse(load('tm_news_' + q + w) || 'null'); if (c && c.list && c.list.length) return {list:c.list, wide:w, stale:c.t}; } catch(e) {}
-    }
+    try { const list = await gdeltNews(q); save(key, JSON.stringify({t:Date.now(), list, wide:'gdelt'})); return {list, wide:'gdelt'}; } catch(e) {}
+    if (cached && cached.list && cached.list.length) return {list:cached.list, wide:cached.wide, stale:cached.t};
     throw new Error('all failed');
 }
 async function loadNews(p, my){
@@ -734,11 +752,14 @@ async function loadNews(p, my){
         b.appendChild(l);
         const notes = [];
         if (res.stale) notes.push('網路不穩，先顯示之前存下來的舊新聞');
+        else if (res.wide === 'gdelt') notes.push('Google 新聞暫時連不上，改用 GDELT 全球新聞資料庫（近 7 天）');
         else if (res.wide === ' when:14d') notes.push('這裡近 3 天新聞很少，已放寬到近 14 天');
         else if (res.wide === '') notes.push('這裡新聞很少，已放寬到不限時間');
         if (notes.length) { const n = document.createElement('div'); n.className = 'note'; n.textContent = notes[0]; b.appendChild(n); }
     } else {
-        const d = document.createElement('div'); d.className = 'state err'; d.textContent = '新聞暫時抓不到（已試過 3 條管道），可以直接點下面連結看。'; b.appendChild(d);
+        const d = document.createElement('div'); d.className = 'state err'; d.textContent = '新聞暫時抓不到（已試過 7 條管道），可以按「再試一次」，或直接點下面連結看。'; b.appendChild(d);
+        const rb = document.createElement('button'); rb.type = 'button'; rb.className = 'tbtn'; rb.style.marginLeft = '0'; rb.style.display = 'block'; rb.style.padding = '6px 14px'; rb.style.fontSize = '13px'; rb.textContent = '🔄 再試一次';
+        rb.onclick = () => loadNews(cur, seq); b.appendChild(rb);
     }
     const mo = document.createElement('a'); mo.className = 'more'; mo.href = more; mo.target = '_blank'; mo.rel = 'noopener noreferrer'; mo.textContent = `到 Google 新聞看更多「${q}」 ›`;
     b.appendChild(mo);

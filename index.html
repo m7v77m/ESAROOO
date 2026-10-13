@@ -325,6 +325,15 @@ const gPin = el('g', {}, svg);
 
 /* ---- 解 TopoJSON（world-atlas 格式） ---- */
 const landList = [];
+/* 跨過 180° 經線的輪廓（俄羅斯東端、斐濟…）要接成連續的線，不然會畫出一條橫過整張地圖的長條 */
+function unwrapRing(pts){
+    const out = []; let sh = 0, prev = null;
+    for (const p of pts) {
+        if (prev !== null) { const d = p[0] - prev; if (d > 180) sh -= 360; else if (d < -180) sh += 360; }
+        prev = p[0]; out.push([p[0] + sh, p[1]]);
+    }
+    return Math.abs(out[out.length - 1][0] - out[0][0]) > 180 ? null : out;   // 繞著極點的（南極洲）略過
+}
 function topoToCountries(topo){
     landList.length = 0;
     const tf = topo.transform || {scale:[1,1], translate:[0,0]};
@@ -338,15 +347,19 @@ function topoToCountries(topo){
         const polys = g.type === 'Polygon' ? [g.arcs] : g.type === 'MultiPolygon' ? g.arcs : [];
         let d = '', best = null;
         for (const poly of polys) for (const ring of poly) {
-            const pts = ringPts(ring);
-            if (pts.length < 3) continue;
+            const pts = unwrapRing(ringPts(ring));
+            if (!pts || pts.length < 3) continue;
             if (ring === poly[0]) {
                 const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
                 const bb = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
                 const a = (bb[2] - bb[0]) * (bb[3] - bb[1]);
                 if (!best || a > best.a) best = {a, pts, bb};
             }
-            d += 'M' + pts.map(p => px(p[0]).toFixed(1) + ' ' + py(p[1]).toFixed(1)).join('L') + 'Z';
+            const lons = pts.map(p => p[0]), mnL = Math.min(...lons), mxL = Math.max(...lons);
+            for (const off of [0, 360, -360]) {      // 超出 ±180° 的部分，另一邊也要補上
+                if (off === 0 || (off === 360 && mnL < -180) || (off === -360 && mxL > 180))
+                    d += 'M' + pts.map(p => px(p[0] + off).toFixed(1) + ' ' + py(p[1]).toFixed(1)).join('L') + 'Z';
+            }
         }
         if (d) out.push({name, d});
         if (best) landList.push({name, ring:best.pts, bb:best.bb});
@@ -954,9 +967,9 @@ function randomSpot(){
         const c = landList[Math.floor(Math.random() * landList.length)];
         for (let i = 0; i < 60; i++) {
             const lon = c.bb[0] + Math.random() * (c.bb[2] - c.bb[0]), lat = c.bb[1] + Math.random() * (c.bb[3] - c.bb[1]);
-            if (pip([lon, lat], c.ring)) return {lat, lon};
+            if (pip([lon, lat], c.ring)) return {lat, lon:((lon + 540) % 360) - 180};
         }
-        return {lat:c.ring[0][1], lon:c.ring[0][0]};
+        return {lat:c.ring[0][1], lon:((c.ring[0][0] + 540) % 360) - 180};
     }
     const lat = Math.max(LAT_BOT + 2, Math.min(LAT_TOP - 2, Math.asin(Math.random() * 2 - 1) * 180 / Math.PI));
     return {lat, lon:Math.random() * 360 - 180};              // 三成機率：地球上任何地方（多半是海）

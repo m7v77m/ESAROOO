@@ -883,7 +883,11 @@ const CUR = {};
 ('TW:TWD,JP:JPY,KR:KRW,CN:CNY,HK:HKD,MO:MOP,SG:SGD,TH:THB,VN:VND,PH:PHP,ID:IDR,MY:MYR,IN:INR,LK:LKR,NP:NPR,BD:BDT,PK:PKR,MN:MNT,KZ:KZT,UZ:UZS,IR:IRR,AE:AED,SA:SAR,IL:ILS,TR:TRY,RU:RUB,GB:GBP,CH:CHF,CZ:CZK,PL:PLN,SE:SEK,NO:NOK,DK:DKK,IS:ISK,HU:HUF,EG:EGP,MA:MAD,NG:NGN,KE:KES,ET:ETB,ZA:ZAR,US:USD,CA:CAD,MX:MXN,CU:CUP,CO:COP,PE:PEN,CL:CLP,AR:ARS,BR:BRL,AU:AUD,NZ:NZD,FJ:FJD,GU:USD,PF:XPF,NC:XPF,'
  + 'QA:QAR,KW:KWD,BH:BHD,OM:OMR,JO:JOD,LB:LBP,IQ:IQD,AF:AFN,MM:MMK,KH:KHR,LA:LAK,BN:BND,BT:BTN,MV:MVR,KG:KGS,TJ:TJS,TM:TMT,AZ:AZN,AM:AMD,GE:GEL,BY:BYN,UA:UAH,RO:RON,BG:BGN,RS:RSD,AL:ALL,MK:MKD,BA:BAM,MD:MDL,DZ:DZD,TN:TND,LY:LYD,SD:SDG,GH:GHS,SN:XOF,CI:XOF,CM:XAF,TZ:TZS,UG:UGX,RW:RWF,AO:AOA,ZM:ZMW,MZ:MZN,MG:MGA,NA:NAD,BW:BWP,VE:VES,EC:USD,BO:BOB,PY:PYG,UY:UYU,PA:PAB,CR:CRC,GT:GTQ,HN:HNL,NI:NIO,DO:DOP,JM:JMD,HT:HTG,PG:PGK,SB:SBD,VU:VUV,WS:WST,TO:TOP,GL:DKK,'
  + 'DE:EUR,FR:EUR,IT:EUR,ES:EUR,NL:EUR,BE:EUR,AT:EUR,PT:EUR,IE:EUR,FI:EUR,GR:EUR,HR:EUR,SI:EUR,SK:EUR,EE:EUR,LV:EUR,LT:EUR,LU:EUR,MT:EUR,CY:EUR').split(',').forEach(x => { const [a, b] = x.split(':'); CUR[a] = b; });
-const curName = c => { try { return new Intl.DisplayNames(['zh-TW'], {type:'currency'}).of(c); } catch(e) { return c; } };
+/* 修改後：完美縮短名稱 */
+const curName = c => { 
+    if (c === 'AED') return '阿拉伯杜拜';
+    try { return new Intl.DisplayNames(['zh-TW'], {type:'currency'}).of(c); } catch(e) { return c; } 
+};
 let fxCache = null, fxAmt = 1000;
 async function getRates(){
     if (fxCache && Date.now() - fxCache.t < 30*60000) return fxCache;

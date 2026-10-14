@@ -885,7 +885,7 @@ const CUR = {};
  + 'DE:EUR,FR:EUR,IT:EUR,ES:EUR,NL:EUR,BE:EUR,AT:EUR,PT:EUR,IE:EUR,FI:EUR,GR:EUR,HR:EUR,SI:EUR,SK:EUR,EE:EUR,LV:EUR,LT:EUR,LU:EUR,MT:EUR,CY:EUR').split(',').forEach(x => { const [a, b] = x.split(':'); CUR[a] = b; });
 /* 修改後：完美縮短名稱 */
 const curName = c => { 
-    if (c === 'AED') return '阿拉伯杜拜';
+    if (c === 'AED') return '阿拉伯迪拉姆';
     try { return new Intl.DisplayNames(['zh-TW'], {type:'currency'}).of(c); } catch(e) { return c; } 
 };
 let fxCache = null, fxAmt = 1000;

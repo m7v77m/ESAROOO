@@ -8,7 +8,7 @@
     <style>
         /* ===== 奶茶 × 抹茶 配色 ===== */
         :root {
-            --matcha: #7BA05B;          /* 抹茶綠 - 主色 */
+            --matcha: #8fa382;          /* 抹茶綠 - 主色 */
             --matcha-dark: #5D7A42;     /* 深抹茶 */
             --matcha-light: #A3C68C;    /* 淺抹茶 */
             --matcha-pale: #E8F0E0;     /* 極淺抹茶 */
@@ -27,7 +27,7 @@
             --text-muted: #A89888;      /* 淺棕 - 弱文字 */
 
             --border-light: #E8D5C4;    /* 奶茶色邊框 */
-            --border-focus: #7BA05B;    /* 聚焦邊框 */
+            --border-focus: #8fa382;    /* 聚焦邊框 */
             
             --radius-sm: 12px;
             --radius-md: 18px;
@@ -346,6 +346,7 @@
         .btn-add {
             background-color: var(--matcha);
             color: #fff;
+            margin-top: 2.5px;
         }
         .btn-add:hover {
             background-color: var(--matcha-dark);
@@ -353,9 +354,10 @@
         }
 
         .btn-reset {
-            background-color: var(--milk-tea-pale);
+            background-color: #F0DFC0;
             color: var(--text-main);
             border-color: var(--border-light);
+            margin-top: 2.5px;
         }
         .btn-reset:hover {
             background-color: var(--milk-tea-light);
@@ -1480,6 +1482,7 @@ table {
         .btn-add,
         .btn-reset {
             width: 100% !important;
+            margin-bottom: 2.0px !important;
         }
 
         .modal-box {
@@ -2786,6 +2789,7 @@ html body #tab-other #bowelNote.bowel-note-box {
     padding: 8px 10px;
     font-size: 13px;
     line-height: 20px;
+    margin-top: 2.5px;
 }
 html body #tab-other textarea.edit-input.bowel-note-box {
     height: 28px !important;
@@ -2864,6 +2868,76 @@ html body #tab-other td.bowel-note-cell {
     }
 }
 </style>
+<style id="v9-dashed-and-tags">
+/* ============================================================
+   V9：①電費按鈕對齊 ②三處虛線框 ③用品分類標籤手機版一列 4 個
+   放在所有樣式最後面，蓋過前面各版本。
+   ============================================================ */
+
+/* ① 電費（及各頁）搜尋面板內的小按鈕：去掉 .btn-sm 預設的右邊 4px 外距，
+      寬度就會和下方「重新設定」一樣滿版，對齊到藍線 */
+@media screen and (max-width: 768px) {
+    html body .search-panel > .btn-sm {
+        margin: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+}
+
+/* ② 電費：勾選後的「已選取統計」框 → 1.5px 虛線 #8fa382 */
+html body #elecSelectionPanel {
+    border: 1.5px dashed #8fa382 !important;
+}
+
+/* ③ 灌溉：所選範圍 最近7天／本月次數／每週平均 → 1.5px 虛線 #8fa382 */
+html body #bowelStats {
+    border: 1.5px dashed #8fa382 !important;
+}
+
+/* ④ 用品：已使用項目 平均天數＋採計筆數 → 1px 虛線 #D4B896 */
+html body #itemStats {
+    border: 1px dashed #8fa382 !important;
+}
+
+/* ⑤ 用品：分類篩選小標籤 → 1px 虛線 #D4B896（選取中的標籤維持綠底，框線與底色同色） */
+html body .filter-tag {
+    border: 1px dashed #D4B896 !important;
+}
+html body .filter-tag.active {
+    border: 1px dashed #8fa382 !important;
+}
+
+/* ⑥ 用品：分類標籤固定「一列 4 個」等寬排列（手機、電腦都一樣，不受字型寬度影響） */
+html body #itemFilterTags.tag-container {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    overflow: visible !important;
+    width: 100% !important;
+    max-width: 440px;            /* 電腦版寬螢幕時不要被拉得太寬 */
+}
+html body #itemFilterTags .filter-tag {
+    flex: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 3px 2px !important;
+    font-size: 12px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    box-sizing: border-box !important;
+}
+@media screen and (max-width: 768px) {
+    html body #itemFilterTags.tag-container { max-width: none; }   /* 手機吃滿整張卡片 */
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style id="v10-cat-lines">
+/* 用品列表：同分類之間＝虛線，不同分類之間＝實線 */
+html body #itemTableBody td { border-bottom: 1px dashed #D4B896 !important; }
+html body #itemTableBody tr:last-child td { border-bottom: 1px solid #D4B896 !important; }
+</style>
 </head>
 <body>
 
@@ -2875,6 +2949,7 @@ html body #tab-other td.bowel-note-cell {
             <div class="nav-item">
                 <button class="nav-btn">檔案 ▾</button>
                 <div class="dropdown-content">
+                    <a href="#" id="menuCloud" onclick="cloudMenuClick(event)">☁️ 雲端同步：點此登入</a>
                     <a href="javascript:void(0)" onclick="exportJSON()">匯出JSON</a>
                     <a href="javascript:void(0)" onclick="document.getElementById('importFile').click()">匯入JSON</a>
                     <a href="javascript:void(0)" onclick="clearAllData()" class="text-danger">清 空 檔 案</a>
@@ -2940,13 +3015,13 @@ html body #tab-other td.bowel-note-cell {
     <span style="font-size:13px; color:var(--text-light);">｜電費平均：<strong id="selElecNoteAvg">0.00</strong> 元</span>
     
     <!-- 終極縮小按鈕（已經把舊的刪除囉！） -->
-    <button class="btn-sm btn-save" style="margin-left: 10px; width: max-content !important; flex-grow: 0 !important; flex-shrink: 0 !important;" onclick="autoFillSerial()">自動依序編號</button>
+    <button class="btn-sm btn-save" style="margin-left: 52px; width: max-content !important; flex-grow: 0 !important; flex-shrink: 0 !important;" onclick="autoFillSerial()">自 動 依 序 編 號</button>
 </div>
 
 
             <div class="form-group">
                 <div class="input-box" style="width:60px;">
-                    <label>序號</label>
+                    <label>月組序號</label>
                     <input type="text" id="elecSerial" maxlength="2" placeholder= "&nbsp;&nbsp;&nbsp;01" onblur="if(this.value) this.value = this.value.padStart(2, '0')">
                 </div>
                 <div class="input-box">
@@ -3215,6 +3290,7 @@ html body #tab-other td.bowel-note-cell {
             updateCategoryDropdown('itemCategory');
             updateCategoryDropdown('batchItemCategory');
             renderAll();
+            try { if (typeof cloudBoot === 'function') cloudBoot(); } catch (err) { console.error('雲端同步啟動失敗:', err); }
         };
 
         function setTodayInputs() {
@@ -3524,8 +3600,10 @@ html body #tab-other td.bowel-note-cell {
         //  儲存 / 載入 / 匯出 / 匯入 / 清空
         // ================================================================
         function saveData() {
+            appData._savedAt = Date.now();
             localStorage.setItem('MonthlyDataMgmt', JSON.stringify(appData));
             renderAll();
+            if (typeof cloudPushSoon === 'function') cloudPushSoon();
         }
 
         // 時間一律轉成 HH:MM（去掉秒數，例如 08:30:00 -> 08:30）
@@ -3649,6 +3727,9 @@ html body #tab-other td.bowel-note-cell {
                 updateCategoryDropdown('itemCategory');
                 updateCategoryDropdown('batchItemCategory');
                 renderAll();
+                appData._savedAt = Date.now();
+                try { localStorage.setItem('MonthlyDataMgmt', JSON.stringify(appData)); } catch (e) {}
+                if (typeof cloudPushSoon === 'function') cloudPushSoon();
                 alert("資料已完全清空！");
             }
         }
@@ -4110,7 +4191,7 @@ html body #tab-other td.bowel-note-cell {
                 const isEditing = (editState.category === 'items' && editState.id === item.id);
                 let rowStyle = "";
                 if (index > 0 && item.category !== prevCategory) {
-                    rowStyle = "border-top: 2px dashed var(--milk-tea-light);";
+                    rowStyle = "border-top: 2px solid #D4B896;";
                 }
                 prevCategory = item.category;
                 const displayCategory = item.category || '尚未分類';
@@ -4787,7 +4868,7 @@ input[type="checkbox"] {
 
     /* 日期框本身設成不接收點擊，改用座標判斷「點到哪一個日期框」，連之後才產生的編輯列日期框也適用 */
     document.addEventListener('click', function(e){
-        if (e.target.closest && (e.target.closest('#dpOverlay') || e.target.closest('.today-btn'))) return;
+        if (e.target.closest && (e.target.closest('#dpOverlay') || e.target.closest('#cloudLoginOverlay') || e.target.closest('.today-btn'))) return;
         const list = document.querySelectorAll('input[type="date"]');
         for (const inp of list){
             if (inp.disabled) continue;
@@ -4842,9 +4923,10 @@ input[type="checkbox"] {
         setTimeout(() => t.remove(), 3500);
     }
 
-    function importPending(){
+    function importPending(extra){
         let q = [];
         try { q = JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); } catch (e) { q = []; }
+        if (Array.isArray(extra)) q = (Array.isArray(q) ? q : []).concat(extra);
         if (!Array.isArray(q) || q.length === 0) return;
         if (typeof appData === 'undefined' || !Array.isArray(appData.items)) return;
         const seen = new Set(appData.items.map(i => i.syncId).filter(Boolean));
@@ -4860,123 +4942,242 @@ input[type="checkbox"] {
         localStorage.removeItem(QUEUE_KEY);
         if (added > 0) {
             saveData();
-            toast('🔄 已從時來運轉同步 ' + added + ' 筆用品' + (uncat ? '（' + uncat + ' 筆待分類）' : ''));
+            if (uncat) toast('🔄 已同步 ' + added + ' 筆用品（' + uncat + ' 筆待分類）');   // 全部自動分類成功就不打擾
         }
     }
 
-    window.importCrossSyncNow = importPending;
-    window.addEventListener('load', () => setTimeout(importPending, 400));
-    window.addEventListener('pageshow', () => setTimeout(importPending, 200));
-    window.addEventListener('focus', importPending);
+    window.importCrossSyncNow = () => importPending();
+    window.importCrossSyncItems = arr => importPending(arr);
+    window.addEventListener('load', () => setTimeout(() => importPending(), 400));
+    window.addEventListener('pageshow', () => setTimeout(() => importPending(), 200));
+    window.addEventListener('focus', () => importPending());
     window.addEventListener('storage', e => { if (e.key === QUEUE_KEY) importPending(); });
     document.addEventListener('visibilitychange', () => { if (!document.hidden) importPending(); });
 })();
 </script>
-<!-- 貼在 </body> 正上方，強制讓電費按鈕吃滿寬度對齊紅線 -->
-<style>
-/* 強制讓電費搜尋面板裡的所有小按鈕在手機上都 100% 吃滿寬度 */
-@media screen and (max-width: 768px) {
-    #tab-elec .search-panel.tab-search-panel button,
-    #tab-elec .search-panel.tab-search-panel .btn-sm {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        box-sizing: border-box !important;
-        margin-left: 0 !important; /* 消除原本向左推的空白 */
-        margin-right: 0 !important;
+<script id="cloud-sync">
+/* ☁️ 雲端同步（Supabase 登入版）：登入後手機／電腦自動同步，沒登入就只存在這台裝置 */
+const SUPABASE_URL = 'https://yexvokrciccppopllppy.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_jpC8c-MKooe5pdtfOs5NBw_M57RuUln';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+(function cloudSync(){
+  const LS_SYNC = 'combinedLastSynced';
+  const LS_PREV = 'MonthlyDataMgmt_beforeCloudPull';
+  let session = null, cloudReady = false, pushTimer = null, pushing = false, pendingPush = false, reconciling = null;
+  const $ = id => document.getElementById(id);
+
+  document.head.insertAdjacentHTML('beforeend', '<style id="cloud-sync-css">' +
+    '#cloudLoginOverlay{position:fixed;inset:0;z-index:100001;display:none;align-items:center;justify-content:center;background:rgba(74,55,40,.45);backdrop-filter:blur(4px);padding:16px;box-sizing:border-box}' +
+    '#cloudLoginOverlay.open{display:flex}' +
+    '#cloudLoginCard{width:min(360px,100%);background:#FFF8EB;border:1px solid #D4B896;border-radius:24px;box-shadow:0 14px 40px rgba(74,55,40,.28);padding:22px 20px 18px;color:#4A3728;box-sizing:border-box;text-align:center}' +
+    '#cloudLoginCard h3{margin:0 0 4px;font-size:1.1rem;color:#5C4033}' +
+    '#cloudLoginCard .cl-sub{font-size:.8rem;color:#7A5F4B;margin-bottom:14px;line-height:1.5}' +
+    '#cloudLoginCard input{display:block;width:100%;height:42px;margin:0 0 10px;padding:0 14px;border:1.5px solid #E8D5B0;border-radius:21px;background:#FFFEF7;color:#4A3728;font-size:16px;box-sizing:border-box}' +
+    '#cloudLoginCard input:focus{outline:2px solid #8fa382;border-color:transparent}' +
+    '#cloudLoginCard .cl-show{display:flex;align-items:center;justify-content:flex-start;gap:6px;margin:-2px 0 8px 6px;font-size:.8rem;color:#7A5F4B;cursor:pointer;text-align:left}' +
+    '#cloudLoginCard .cl-show input{display:inline-block;width:16px;height:16px;margin:0;padding:0;border-radius:4px;accent-color:#8fa382}' +
+    '#cloudLoginCard .cl-err{min-height:18px;font-size:.78rem;color:#C17A4E;margin-bottom:6px}' +
+    '#cloudLoginCard .cl-btn{width:100%;height:42px;border:none;border-radius:21px;background:#8fa382;color:#fff;font-size:15px;font-weight:700;cursor:pointer}' +
+    '#cloudLoginCard .cl-btn:disabled{opacity:.6}' +
+    '#cloudLoginCard .cl-skip{margin-top:10px;background:none;border:none;color:#7A5F4B;font-size:.8rem;cursor:pointer;text-decoration:underline}' +
+    '#cloudToast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);z-index:100002;background:#5C4033;color:#FFF8EB;padding:9px 18px;border-radius:20px;font-size:.82rem;opacity:0;pointer-events:none;transition:.25s;max-width:88vw;text-align:center}' +
+    '#cloudToast.show{opacity:.95;transform:translateX(-50%) translateY(0)}' +
+    '</style>');
+  document.body.insertAdjacentHTML('beforeend',
+    '<div id="cloudLoginOverlay"><form id="cloudLoginForm" autocomplete="on"><div id="cloudLoginCard">' +
+    '<h3>☁️ 雲端同步登入</h3>' +
+    '<div class="cl-sub">登入後，手機和電腦的綜合紀錄會自動同步 🐻<br>不登入也可以用，資料只會存在這台裝置</div>' +
+    '<input type="email" id="cloudEmail" name="username" autocomplete="username" placeholder="Email" required>' +
+    '<input type="password" id="cloudPass" name="password" autocomplete="current-password" placeholder="密碼" required>' +
+    '<label class="cl-show"><input type="checkbox" id="cloudShowPw"> 顯示密碼（確認大小寫）</label>' +
+    '<div class="cl-err" id="cloudErr"></div>' +
+    '<button type="submit" class="cl-btn" id="cloudLoginBtn">登入</button>' +
+    '<button type="button" class="cl-skip" id="cloudSkipBtn">先不登入（只存在這台裝置）</button>' +
+    '</div></form></div>');
+
+  function toast(msg, ms){
+    let t = $('cloudToast');
+    if (!t) { document.body.insertAdjacentHTML('beforeend', '<div id="cloudToast"></div>'); t = $('cloudToast'); }
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), ms || 3500);
+  }
+  const hasData = s => ((s.electricity || []).length + (s.items || []).length + (s.bowel || []).length) > 0;
+  const getLast = () => parseInt(localStorage.getItem(LS_SYNC), 10) || 0;
+  const setLast = v => { try { localStorage.setItem(LS_SYNC, String(v || 0)); } catch (e) {} };
+  const setMenu = txt => { const a = $('menuCloud'); if (a) a.innerHTML = txt; };
+  const OK_LABEL = '☁️ 已連線同步中（點此登出）';
+  function fmt(ts){
+    if (!ts) return '未知時間';
+    const d = new Date(ts), p = n => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  async function fetchStamp(){
+    const { data, error } = await supabaseClient.from('combined_records_backup')
+      .select('saved:content->>_savedAt').eq('user_id', session.user.id).maybeSingle();
+    if (error) throw error;
+    return data ? (parseInt(data.saved, 10) || 0) : null;   // null = 雲端還沒有資料
+  }
+  async function fetchContent(){
+    const { data, error } = await supabaseClient.from('combined_records_backup')
+      .select('content').eq('user_id', session.user.id).maybeSingle();
+    if (error) throw error;
+    return data ? data.content : null;
+  }
+  async function upload(){
+    if (!appData._savedAt) appData._savedAt = Date.now();
+    const { error } = await supabaseClient.from('combined_records_backup')
+      .upsert({ user_id: session.user.id, content: appData, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+    if (error) throw error;
+    try { localStorage.setItem('MonthlyDataMgmt', JSON.stringify(appData)); } catch (e) {}
+    setLast(appData._savedAt);
+  }
+  function applyCloud(c){
+    try { localStorage.setItem(LS_PREV, localStorage.getItem('MonthlyDataMgmt') || ''); } catch (e) {}   // 被覆蓋前先留一份舊的在本機
+    appData = {
+      electricity: c.electricity || [], items: c.items || [], bowel: c.bowel || [],
+      categories: c.categories || ["衛浴用品", "廚房用品", "清潔用品", "3C耗材", "其他"],
+      _savedAt: c._savedAt || 0
+    };
+    if (typeof normalizeAllTimes === 'function') normalizeAllTimes();
+    try { localStorage.setItem('MonthlyDataMgmt', JSON.stringify(appData)); } catch (e) {}
+    setLast(appData._savedAt);
+    updateCategoryDropdown('itemCategory'); updateCategoryDropdown('batchItemCategory');
+    renderAll();
+  }
+
+  async function reconcileInner(){
+    if (!session) return;
+    const stamp = await fetchStamp();
+    const localAt = appData._savedAt || 0, last = getLast();
+    if (stamp === null) { await upload(); return; }                       // 雲端是空的：把這台的資料放上去
+    if (stamp === localAt) { setLast(localAt); return; }                  // 兩邊一樣
+    if (stamp > localAt && localAt <= last && (localAt > 0 || !hasData(appData))) {   // 這台沒有未同步的修改：直接拿雲端的
+      applyCloud(await fetchContent()); toast('☁️ 已載入雲端最新資料'); return;
     }
-}
-</style>
-<!-- 貼在 </body> 正上方，無尾熊專屬指定內層小項目虛線邊框魔法 -->
-<style>
-/* ============================================================
-   ⚡ Ａ．電費模式：指定小框框換虛線
-   ============================================================ */
-/* 起始日期、結束日期、關鍵字串、序號、紀錄日期、電錶度數、備註內容 */
-#tab-elec input[type="date"],
-#tab-elec input[type="text"],
-#tab-elec input[type="number"] {
-    border: 1.5px dashed #D4B896 !important; /* 溫柔的細奶茶色虛線 */
-}
-
-/* ============================================================
-   🛒 Ｂ．用品模式：指定小項目與統計換虛線
-   ============================================================ */
-/* 分類篩選所有的小項目分類（未選中的灰色標籤與選中的綠色標籤） */
-#itemFilterTags .filter-tag {
-    border: 1.5px dashed #D4B896 !important; /* 奶茶色虛線 */
-}
-#itemFilterTags .filter-tag.active {
-    border: 1.5px dashed #D4B896 !important; /* 選中的抹茶綠標籤改用米色虛線襯托，更可愛 */
-}
-
-/* 起始日期、結束日期、關鍵字串、尚未分類(下拉)、品項分類(下拉)、商品名稱、購買日期、最終日期、商家平台 */
-#tab-items select,
-#tab-items input[type="date"],
-#tab-items input[type="text"] {
-    border: 1.5px dashed #D4B896 !important;
-}
-
-/* 已使用項目 平均天數 ＋ 已使用項目 採計筆數（右側最上方的統計綠框） */
-#itemStats.stats-panel {
-    border: 1.5px dashed #7BA05B !important; /* 漂亮的抹茶綠虛線 */
-}
-
-
-/* ============================================================
-   💩 Ｃ．灌溉模式：指定小項目與統計換虛線
-   ============================================================ */
-/* 起始日期、結束日期、關鍵字串、發生日期、紀錄時間 */
-#tab-other input[type="date"],
-#tab-other input[type="text"],
-#tab-other input[type="time"] {
-    border: 1.5px dashed #D4B896 !important;
-}
-
-/* 備註內容（因為灌溉備註是個特別的點擊小框框 textarea） */
-#tab-other textarea.bowel-note-box {
-    border: 1.5px dashed #D4B896 !important;
-}
-
-/* 所選範圍 最近7天 ＋ 本月次數 ＋ 每週平均（灌溉模式的統計綠框） */
-#tab-other #bowelStats.stats-panel {
-    border: 1.5px dashed #7BA05B !important; /* 抹茶綠虛線 */
-}
-
-
-/* ============================================================
-   🧚 完美保留：確保大卡片、中卡片外框依然是漂亮的實線
-   ============================================================ */
-.search-panel,
-.batch-panel,
-.tab-content {
-    border-style: solid !important; /* 卡片大外框強制維持實線，不被影響 */
-}
-</style>
-<!-- 貼在 </body> 正上方，強制讓分類篩選標籤在手機上恢復成四行 -->
-<style>
-@media screen and (max-width: 768px) {
-    /* 1. 強制讓裝標籤的容器變成四等分網格 */
-    #itemFilterTags.tag-container {
-        display: grid !important;
-        grid-template-columns: repeat(4, 1fr) !important; /* 完美平分四等分 */
-        gap: 7px 7px !important; /* 微調上下與左右的縫隙 */
-        width: 100% !important;
+    if (localAt > stamp && stamp <= last) { await upload(); return; }     // 雲端沒人動過：上傳這台的新資料
+    // 兩邊都有各自的修改 → 讓使用者選
+    const c = await fetchContent();
+    if (!c) { await upload(); return; }
+    if (!hasData(appData)) { applyCloud(c); toast('☁️ 已載入雲端資料'); return; }
+    const useCloud = confirm(
+      '雲端和這台裝置的綜合紀錄內容不一樣，要用哪一份？\n\n' +
+      '☁️ 雲端：' + ((c.electricity||[]).length+(c.items||[]).length+(c.bowel||[]).length) + ' 筆紀錄（' + fmt(c._savedAt) + '）\n' +
+      '📱 這台：' + ((appData.electricity||[]).length+(appData.items||[]).length+(appData.bowel||[]).length) + ' 筆紀錄（' + fmt(localAt) + '）\n\n' +
+      '按「確定」＝用【雲端】的（這台會被取代）\n按「取消」＝用【這台】的（雲端會被取代）');
+    if (useCloud) { applyCloud(c); toast('☁️ 已改用雲端資料'); }
+    else {
+      appData._savedAt = Math.max(Date.now(), stamp + 1);
+      await upload(); toast('☁️ 已用這台的資料更新雲端');
     }
+  }
+  function reconcile(){
+    if (reconciling) return reconciling;
+    reconciling = (async () => { try { await reconcileInner(); } finally { reconciling = null; } })();
+    return reconciling;
+  }
 
-    /* 2. 微調每個小標籤裡面的字體與左右內距，確保排成四行時不會擠爆換行 */
-    #itemFilterTags .filter-tag {
-        padding: 7px 7px !important; /* 收緊左右空白 */
-        font-size: 11.5px !important; /* 微調字體大小，讓四個字能完美塞進格子 */
-        text-align: center !important;
-        white-space: nowrap !important; /* 規定文字絕對不自己斷行 */
-        display: block !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
+  /* 🔄 雲端用品佇列：時來運轉在別台裝置新增的日用／交通支出，放在 combined_item_queue，這裡撿回來補進用品 */
+  async function pullQueue(){
+    if (!session) return;
+    try {
+      const { data, error } = await supabaseClient.from('combined_item_queue').select('*').eq('user_id', session.user.id);
+      if (error || !data || !data.length) return;
+      if (typeof window.importCrossSyncItems === 'function') {
+        window.importCrossSyncItems(data.map(r => ({ syncId: r.sync_id, name: r.name, start: r.start_date, store: r.store || '' })));
+      }
+      await supabaseClient.from('combined_item_queue').delete().eq('user_id', session.user.id).in('sync_id', data.map(r => r.sync_id));
+    } catch (e) { console.error('雲端佇列讀取失敗', e); }
+  }
+  window.cloudPullQueue = pullQueue;
+
+  async function doPush(){
+    if (!session) return;
+    if (pushing) { pendingPush = true; return; }
+    pushing = true;
+    try {
+      const stamp = await fetchStamp();
+      if (stamp !== null && stamp > getLast() && stamp !== appData._savedAt) await reconcile();   // 另一台裝置先改過了
+      else await upload();
+      setMenu(OK_LABEL);
+    } catch (e) {
+      console.error('雲端同步失敗', e);
+      toast('☁️ 雲端同步失敗，資料已先存在這台裝置');
+      setMenu('☁️ 同步失敗（點此登出／重新登入）');
+    } finally {
+      pushing = false;
+      if (pendingPush) { pendingPush = false; window.cloudPushSoon(); }
     }
-}
-</style>
+  }
+  window.cloudPushSoon = function(){
+    if (!session || !cloudReady) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(doPush, 800);
+  };
 
+  function showLogin(msg){
+    $('cloudErr').textContent = msg || '';
+    $('cloudLoginOverlay').classList.add('open');
+    try { $('cloudEmail').focus(); } catch (e) {}
+  }
+  function hideLogin(){ $('cloudLoginOverlay').classList.remove('open'); }
+  async function submitLogin(ev){
+    if (ev && ev.preventDefault) ev.preventDefault();
+    const email = ($('cloudEmail').value || '').trim(), password = $('cloudPass').value || '';
+    if (!email || !password) { $('cloudErr').textContent = '請輸入 Email 和密碼'; return; }
+    const btn = $('cloudLoginBtn'); btn.disabled = true; btn.textContent = '登入中…'; $('cloudErr').textContent = '';
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      session = data.session; cloudReady = true;
+      try { sessionStorage.removeItem('combinedSkipLogin'); } catch (e) {}
+      $('cloudPass').value = ''; $('cloudPass').type = 'password'; $('cloudShowPw').checked = false;
+      hideLogin();
+      setMenu('☁️ 同步中…');
+      try { await reconcile(); await pullQueue(); setMenu(OK_LABEL); toast('☁️ 登入成功，雲端同步已開啟'); }
+      catch (e) { console.error(e); setMenu('☁️ 同步失敗（點此登出／重新登入）'); toast('☁️ 登入成功，但同步失敗，稍後會再試'); }
+    } catch (e) {
+      const m = String((e && e.message) || e);
+      $('cloudErr').textContent = /invalid login/i.test(m) ? 'Email 或密碼不對，再試一次 🐻' : ('登入失敗：' + m);
+    } finally { btn.disabled = false; btn.textContent = '登入'; }
+  }
+  $('cloudLoginForm').addEventListener('submit', submitLogin);
+  $('cloudShowPw').addEventListener('change', e => { $('cloudPass').type = e.target.checked ? 'text' : 'password'; });
+  $('cloudSkipBtn').addEventListener('click', () => { try { sessionStorage.setItem('combinedSkipLogin', '1'); } catch (e) {} hideLogin(); });
 
+  window.cloudMenuClick = async function(ev){
+    if (ev && ev.preventDefault) ev.preventDefault();
+    if (session) {
+      if (confirm('要登出雲端同步嗎？\n登出後資料仍保留在這台裝置，只是不會再同步。')) {
+        try { await supabaseClient.auth.signOut(); } catch (e) {}
+        session = null; cloudReady = false;
+        setMenu('☁️ 雲端同步：點此登入');
+        toast('已登出雲端同步');
+      }
+    } else showLogin();
+  };
+
+  window.cloudBoot = async function(){
+    const { data } = await supabaseClient.auth.getSession();
+    session = (data && data.session) || null;
+    supabaseClient.auth.onAuthStateChange((evt, s) => { session = s || null; });
+    if (session) {
+      cloudReady = true; setMenu('☁️ 同步中…');
+      try { await reconcile(); await pullQueue(); setMenu(OK_LABEL); }
+      catch (e) { console.error(e); setMenu('☁️ 同步失敗（點此登出／重新登入）'); toast('☁️ 雲端同步失敗，先用這台裝置的資料'); }
+    } else {
+      setMenu('☁️ 雲端同步：點此登入');
+      let skip = false; try { skip = !!sessionStorage.getItem('combinedSkipLogin'); } catch (e) {}
+      if (!skip) showLogin();
+    }
+  };
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && session && cloudReady) {
+      reconcile().then(pullQueue).then(() => setMenu(OK_LABEL)).catch(e => console.error('回到畫面時同步失敗', e));
+    }
+  });
+})();
+</script>
 </body>
 </html>

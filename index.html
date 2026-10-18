@@ -60,7 +60,7 @@ body{
 .place .flag{font-size:30px;line-height:1}
 .place .nm{font-size:17px;font-weight:700;color:var(--primary-dark);line-height:1.25}
 .place .sub{font-size:12px;color:var(--text-secondary)}
-.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:0.5px dashed #69533a;border-radius:22px;padding:10px 14px}
+.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:0.5px dashed #69533a;border-radius:22px;padding:10px 16px}
 .clock .t{font-size:19px;font-weight:700;color:var(--primary-dark);font-variant-numeric:tabular-nums;white-space:nowrap}
 .clock .dn{font-size:15px;line-height:1}
 .date{text-align:center;font-size:14px;color:var(--text-primary);font-weight:600}
@@ -149,6 +149,9 @@ html[data-theme="dark"] .place .nm,html[data-theme="dark"] .clock .t,html[data-t
 html[data-theme="dark"] .row .v.big{color:#C9DDB8}
 html[data-theme="dark"] .chip.on{color:#fff}
 html[data-theme="dark"] .clock,html[data-theme="dark"] .tbtn,html[data-theme="dark"] .roll{border-color:#B79A78}
+/* 盲盒揭曉：白天深綠 #617553、夜晚淡綠 #A9BD9B */
+#boxCard .bhead,#boxCard .row .v{color:#617553}
+html[data-theme="dark"] #boxCard .bhead,html[data-theme="dark"] #boxCard .row .v,html[data-theme="dark"] #boxCard .row .v.big{color:#A9BD9B !important}
 html[data-theme="dark"] .roll{color:#A9BD9B}
 </style>
 </head>

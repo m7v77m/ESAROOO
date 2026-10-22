@@ -106,7 +106,7 @@ footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2p
 /* ===== v5：深淺模式、航線、匯率、盲盒 ===== */
 :root{--accent-text:#A9BD9B}
 .tbtn{margin-left:auto;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:20px;padding:3px 10px;font-size:12px;font-family:inherit;cursor:pointer}
-.roll{display:block;width:100%;margin-top:10px;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:20px;padding:6px 10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
+.roll{display:block;width:100%;margin-top:10px;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:15px;padding:6px 10px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
 .roll:active{background:var(--bg-hover)}
 .roll .dice{display:inline-block}
 .roll.rolling .dice{animation:dicespin .7s ease-out}
@@ -1715,6 +1715,14 @@ html body .fm-box .fm-act {
     padding-top: 0px !important;                 /* 頂部內距徹底抽乾歸零 */
     padding-bottom: 0px !important;              /* 底部內距徹底抽乾歸零 */
     height: auto !important;                     /* 解除固定高度，讓卡片按鈕自然貼合不留多餘大肥肉 */
+}
+</style>
+<!-- 終極完美大結局：幫即時匯率提示文字下方補上優雅的呼吸間距 -->
+<style>
+/* 🎯 降伏匯率提示文字：精準在水紅色兩橫條之間補上 10px 的舒服空隙，讓它們不再黏踢踢！ */
+html body #fxCard #fxBody > div.state {
+    margin-bottom: 10px !important;    /* 核心魔法：強制把下方橫條往下推開 10px！ */
+    padding-bottom: 2px !important;
 }
 </style>
 

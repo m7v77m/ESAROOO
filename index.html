@@ -60,7 +60,7 @@ body{
 .place .flag{font-size:30px;line-height:1}
 .place .nm{font-size:17px;font-weight:700;color:var(--primary-dark);line-height:1.25}
 .place .sub{font-size:12px;color:var(--text-secondary)}
-.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:0.5px dashed #69533a;border-radius:22px;padding:10px 16px}
+.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:0.5px dashed #69533a;border-radius:22px;padding:10px 12px}
 .clock .t{font-size:19px;font-weight:700;color:var(--primary-dark);font-variant-numeric:tabular-nums;white-space:nowrap}
 .clock .dn{font-size:15px;line-height:1}
 .date{text-align:center;font-size:14px;color:var(--text-primary);font-weight:600}
@@ -96,7 +96,7 @@ body{
 .spot .tt{font-size:14px;font-weight:700}
 .spot .ds{font-size:12px;color:var(--text-secondary);margin-top:2px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .more{display:inline-block;margin-top:10px;font-size:13px;color:var(--matcha-dark);font-weight:600;text-decoration:none}
-.state{font-size:13px;color:var(--text-muted);padding:6px 2px}
+.state{font-size:13px;color:var(--text-muted);padding:-2px 6px}
 .state.err{color:var(--expense-color)}
 .hidden{display:none !important}
 footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2px 6px 4px}
@@ -105,7 +105,7 @@ footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2p
 
 /* ===== v5：深淺模式、航線、匯率、盲盒 ===== */
 :root{--accent-text:#A9BD9B}
-.tbtn{margin-left:auto;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:13px;padding:3px 10px;font-size:12px;font-family:inherit;cursor:pointer}
+.tbtn{margin-left:auto;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:20px;padding:3px 10px;font-size:12px;font-family:inherit;cursor:pointer}
 .roll{display:block;width:100%;margin-top:10px;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:13px;padding:6px 10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
 .roll:active{background:var(--bg-hover)}
 .roll .dice{display:inline-block}
@@ -183,9 +183,9 @@ html[data-theme="dark"] .foot{stroke:#41342A}
 .ft-row{display:flex;gap:10px}
 #footCard{padding-left:9px;padding-right:9px}   /* 卡片邊框 1px + 9px = 虛線框離邊緣 10px，和框框之間的間隙一致 */
 .ft-row select{flex:1;min-width:0}
-.ft-tools input,.ft-tools select,.fm input,.fm select,.fm textarea{width:100%;font-size:16px;font-family:inherit;color:var(--text-primary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:15px;padding:8px 12px;outline:none}
+.ft-tools input,.ft-tools select,.fm input,.fm select,.fm textarea{width:100%;font-size:16px;font-family:inherit;color:var(--text-primary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px;padding:8px 12px;outline:none}
 .ft-tools input:focus,.ft-tools select:focus,.fm input:focus,.fm select:focus,.fm textarea:focus{border-color:var(--matcha)}
-.ft-row .tbtn{margin-left:0;font-size:13px;padding:0 12px}
+.ft-row .tbtn{margin-left:0;font-size:13px;padding:0 12px;border-radius:20px;}
 .ft-bar{display:flex;gap:8px;justify-content:center;margin-top:10px}
 .tl{position:relative;margin:6px 0 0 6px;padding-left:20px}
 .tl::before{content:"";position:absolute;left:5px;top:4px;bottom:4px;border-left:2px dashed var(--border-color)}
@@ -256,20 +256,20 @@ html[data-theme="dark"] .tl-name{color:#A9BD9B}
     </div>
 
     <div class="card" id="footCard">
-        <h2>👣 我的足跡<button id="fRoute" class="tbtn" type="button">🧭 路線：關</button><button id="fAdd" class="tbtn" type="button" style="margin-left:0">＋ 記錄</button></h2>
+        <h2>👣 我的足跡<button id="fRoute" class="tbtn" type="button">🧭 路線：關</button><button id="fAdd" class="tbtn" type="button" style="margin-left:0">＋ 新增記錄</button></h2>
         <div id="footStats"></div>
         <div class="ft-tools">
             <input id="fSearch" type="search" placeholder="🔍 搜尋地點或註解" autocomplete="off">
             <div class="ft-row">
                 <select id="fKind"><option value="all">全部</option><option value="been">👣 去過</option><option value="wish">🌠 想去</option></select>
                 <select id="fTag"></select>
-                <button id="fSort" class="tbtn" type="button">新→舊</button>
+                <button id="fSort" class="tbtn" type="button">新 → 舊</button>
             </div>
         </div>
         <div id="footList"></div>
         <div class="ft-bar">
             <button id="fExport" class="mini" type="button">📤 匯出備份</button>
-            <button id="fImport" class="mini" type="button">📥 匯入</button>
+            <button id="fImport" class="mini" type="button">📥 匯入備份</button>
             <input id="fFile" type="file" accept="application/json,.json" class="hidden">
         </div>
         <div class="chip-tip" style="text-align:center">地圖上的橘點是你的足跡，點一下就能回顧；資料存在這台裝置的瀏覽器裡，記得偶爾匯出備份。</div>
@@ -1351,7 +1351,7 @@ function statCell(l, r, u){ const d = mk('div', 'cell'); d.appendChild(mk('div',
 function renderStats(){
     const b = $('footStats'); b.textContent = '';
     const been = trips.filter(t => !t.wish), wish = trips.length - been.length;
-    if (!been.length) { b.appendChild(mk('div', 'state', wish ? `已有 ${wish} 個想去的地方。去過之後，編輯它改成「去過」就會變成足跡！` : '還沒有足跡。在地圖上點一個地方，按右上角「＋ 記錄」留下第一筆吧！')); return; }
+    if (!been.length) { b.appendChild(mk('div', 'state', wish ? `已有 ${wish} 個想去的地方。去過之後，編輯它改成「去過」就會變成足跡！` : '還沒有足跡。在地圖上點一個地方，按右上角「＋ 新增記錄」留下第一筆吧！')); return; }
     const g = mk('div', 'grid3');
     g.appendChild(statCell('🌍 國家', String(new Set(been.map(t => t.cc || t.country || t.name)).size), '個'));
     g.appendChild(statCell('📍 地點', String(new Set(been.map(t => t.name)).size), '處'));
@@ -1458,7 +1458,7 @@ function footHint(){
     const near = trips.filter(t => !t.wish && hav(t, cur) < 60).sort((a, c) => tkey(c).localeCompare(tkey(a)));
     const wish = trips.some(t => t.wish && hav(t, cur) < 60);
     b.appendChild(mk('span', '', near.length ? `👣 你來過這裡 ${near.length} 次${near[0].start ? '（最近：' + fmtD(near[0].start) + '）' : ''}` : wish ? '🌠 這裡在你的想去清單裡' : '👣 還沒在這裡留下足跡'));
-    const btn = mk('button', 'mini', '＋ 記錄'); btn.type = 'button'; btn.onclick = () => openFootForm();
+    const btn = mk('button', 'mini', '＋ 新增記錄'); btn.type = 'button'; btn.onclick = () => openFootForm();
     b.appendChild(btn);
 }
 
@@ -1569,7 +1569,7 @@ function locateMe(){
 
 function setupFoot(){
     TAGS.forEach(t => { const o = mk('option', '', t[1]); o.value = t[0]; $('fmTag').appendChild(o); });
-    [['all', '所有類別']].concat(TAGS).forEach(t => { const o = mk('option', '', t[1]); o.value = t[0]; $('fTag').appendChild(o); });
+    [['all', '類別']].concat(TAGS).forEach(t => { const o = mk('option', '', t[1]); o.value = t[0]; $('fTag').appendChild(o); });
     CITIES.forEach(c => { const o = document.createElement('option'); o.value = c[0]; $('cityList').appendChild(o); });
     for (let i = 1; i <= 5; i++) { const b = mk('button', '', '★'); b.type = 'button'; b.dataset.v = i; b.setAttribute('aria-label', i + ' 星'); b.onclick = () => { formRating = formRating === i ? 0 : i; paintStars(); }; $('fmStars').appendChild(b); }
     document.querySelectorAll('#fmSeg button').forEach(b => b.onclick = () => setKind(b.dataset.k));
@@ -1607,7 +1607,7 @@ function setupFoot(){
     $('fSearch').oninput = e => { fView.q = e.target.value; renderList(); };
     $('fKind').onchange = e => { fView.kind = e.target.value; renderList(); };
     $('fTag').onchange = e => { fView.tag = e.target.value; renderList(); };
-    $('fSort').onclick = () => { fView.asc = !fView.asc; $('fSort').textContent = fView.asc ? '舊→新' : '新→舊'; renderList(); };
+    $('fSort').onclick = () => { fView.asc = !fView.asc; $('fSort').textContent = fView.asc ? '舊 → 新' : '新 → 舊'; renderList(); };
     $('fExport').onclick = () => {
         if (!trips.length) { alert('目前沒有足跡可以匯出。'); return; }
         const a = document.createElement('a');

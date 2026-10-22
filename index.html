@@ -179,8 +179,9 @@ html[data-theme="dark"] .foot{stroke:#41342A}
 .mini{border:1px dashed #7A5F4B;background:var(--bg-card);color:var(--text-secondary);border-radius:12px;padding:2px 10px;font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap}
 .mini:active{background:var(--bg-hover)}
 .mini.danger{color:#B5523F}
-.ft-tools{display:flex;flex-direction:column;gap:8px;margin:10px 0 8px}
-.ft-row{display:flex;gap:8px}
+.ft-tools{display:flex;flex-direction:column;gap:10px;margin:10px 0 8px}
+.ft-row{display:flex;gap:10px}
+#footCard{padding-left:9px;padding-right:9px}   /* 卡片邊框 1px + 9px = 虛線框離邊緣 10px，和框框之間的間隙一致 */
 .ft-row select{flex:1;min-width:0}
 .ft-tools input,.ft-tools select,.fm input,.fm select,.fm textarea{width:100%;font-size:16px;font-family:inherit;color:var(--text-primary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:15px;padding:8px 12px;outline:none}
 .ft-tools input:focus,.ft-tools select:focus,.fm input:focus,.fm select:focus,.fm textarea:focus{border-color:var(--matcha)}
@@ -1331,8 +1332,8 @@ function durText(m){ const h = Math.floor(m / 60), r = m % 60; return (h ? h + '
 function dateText(t){
     if (!t.start) return t.wish ? '時間未定' : '未填日期';
     const st = t.startTime || '', et = t.endTime || '', multi = t.end && t.end !== t.start;
-    let s = fmtD(t.start) + (st ? ' ' + st : '');
-    if (multi) s += ' – ' + (t.end.slice(0, 4) === t.start.slice(0, 4) ? fmtD(t.end).slice(5) : fmtD(t.end)) + (et ? ' ' + et : '');
+    let s = fmtD(t.start) + (st ? '　' + st : '');
+    if (multi) s += ' – ' + (t.end.slice(0, 4) === t.start.slice(0, 4) ? fmtD(t.end).slice(5) : fmtD(t.end)) + (et ? '　' + et : '');
     else if (et) s += ' – ' + et;
     if (t.wish) return s;
     if (!multi && st && et) { const m = (+et.slice(0, 2) * 60 + +et.slice(3)) - (+st.slice(0, 2) * 60 + +st.slice(3)); if (m > 0) return s + '　·　' + durText(m); }

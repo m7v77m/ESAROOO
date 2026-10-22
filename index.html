@@ -1725,39 +1725,107 @@ html body #fxCard #fxBody > div.state {
     padding-bottom: 2px !important;
 }
 </style>
+
+<!-- 終極完美大團圓 V5：強迫全網頁所有卡片、輸入框、按鈕寬度一律對齊，與螢幕四週完美保持 10px 等距 -->
+<style>
+/* 🎯 1. 鎖定全網頁大外殼：強制將網頁左右與螢幕邊緣的間隙鎖死在 10px！ */
+body {
+    padding: 10px !important;         /* 規定整個網頁離手機左、右、下邊緣通通都是 10px，絕不留肥肉 */
+    box-sizing: border-box !important;
+}
+.app {
+    max-width: 760px !important;
+    width: 100% !important;
+    padding: 0 !important;            /* 清除外殼內襯墊，讓內部卡片寬度能 100% 撐滿 */
+    background: transparent !important; /* 讓背景透明，由下面的卡片自己拉開間距 */
+    border: none !important;
+    box-shadow: none !important;
+    gap: 10px !important;             /* 規定卡片與卡片之間的「上下間距」完美保持 10px */
+}
+
+/* 🎯 2. 鎖定三大主題卡片：讓地圖卡片、我的足跡卡片、當地時間卡片的寬度 100% 一模一樣大，四週等距 10px */
+html body .card {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 12px !important;         /* 卡片內部留白保持 12px */
+    margin: 0 !important;
+    border-radius: 20px !important;   /* 統一全域黃金圓角 */
+}
+
+/* 🎯 3. 降伏世界地圖：消滅不對稱，強迫地圖寬度撐滿、與其他卡片邊緣垂直切齊！ */
+html body .map-wrap {
+    width: 100% !important;           /* 讓地圖寬度 100% 塞滿卡片，左右邊緣絕對跟按鈕對齊 */
+    box-sizing: border-box !important;
+}
+
+/* 🎯 4. 降伏散落的手機版輸入框與下拉選單：強迫搜尋地點、全部/類別、匯出匯入按鈕通通 100% 撐滿或完美等分，邊緣絕不參差不齊 */
+@media (max-width: 768px) {
+    /* 讓搜尋地點框、匯出匯入按鈕大橫條等寬 100% 撐滿，左右一秒對齊地圖邊界 */
+    html body .ft-tools input,
+    html body .ft-tools select,
+    html body .fm input,
+    html body .fm select,
+    html body .fm textarea,
+    html body #footCard .ft-tools,
+    html body #footCard .ft-bar {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    /* 讓「全部、類別、新→舊」這三個下拉選單在一排裡 1:1:1 完美均分，邊緣絕對對齊 */
+    html body #footCard .ft-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr !important; /* 強制分成三等分格子 */
+        gap: 8px !important;          /* 欄位之間保持 8px 精緻小空隙 */
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    html body #footCard .ft-row select {
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+}
+
+/* 🎯 5. 保持之前調好的：按鈕與搜尋框上方的極致壓扁魔法（老婆最愛） */
+html body .legend { margin-top: 4px !important; margin-bottom: 2px !important; }
+html body button.roll#rollBtn { margin-top: 2px !important; }
+html body #footCard .ft-tools { margin-top: 2px !important; margin-bottom: 2px !important; }
+html body #footCard .ft-row { margin-bottom: 0px !important; }
+html body #footCard #footList { margin-top: 4px !important; }
+html body #footCard .chip-tip { margin-top: 4px !important; }
+</style>
 <!-- 終極完美大結局 V4：精準壓扁隨機傳送按鈕與搜尋地點框上方的兩處大空白 -->
 <style>
 /* 🎯 1. 降伏第一處大空白：強迫「隨機傳送按鈕」與上方的「國際換日線說明文字」黏得緊緊的！ */
 html body .legend {
-    margin-top: 2px !important;       /* 縮小說明文字本身的頂部外邊距 */
-    margin-bottom: 6px !important;    /* 規定說明文字下方不留多餘大空隙 */
+    margin-top: 3px !important;       /* 縮小說明文字本身的頂部外邊距 */
+    margin-bottom: 3px !important;    /* 規定說明文字下方不留多餘大空隙 */
 }
 html body button.roll#rollBtn {
-    margin-top: 2px !important;       /* 核心致命一擊：把隨機傳送按鈕原本 10px 的頭頂高度直接壓縮成 2px！一秒往上吸！ */
+    margin-top: 6px !important;       /* 核心致命一擊：把隨機傳送按鈕原本 10px 的頭頂高度直接壓縮成 2px！一秒往上吸！ */
 }
 
 /* 🎯 2. 降伏第二處大空白：強迫「🔍 搜尋地點或註解」輸入框與上方的「還沒有足跡...」文字徹底貼合！ */
 html body #footCard .ft-tools {
-    margin-top: 7px !important;       /* 核心致命一擊：把搜尋框大卡片頭頂的空白從 10px 狠狠擠壓只剩 2px！ */
-    margin-bottom: 9px !important;    /* 保持搜尋框屁股底下也精實俐落 */
-    gap: 9px !important;
+    margin-top: 9px !important;       /* 核心致命一擊：把搜尋框大卡片頭頂的空白從 10px 狠狠擠壓只剩 2px！ */
+    margin-bottom: 10px !important;    /* 保持搜尋框屁股底下也精實俐落 */
+    gap: 10px !important;
 }
 
 /* 🎯 3. 完美守護全域對稱：確保下面的月份小標籤、下拉選單和時間軸依然維持最舒服漂亮的黃金比例 */
 html body .chips {
-    margin-top: 9px !important;
-    margin-bottom: 0px !important;
+    margin-top: 10px !important;
+    margin-bottom: 2px !important;
 }
 html body #footCard .ft-row {
-    margin-bottom: 0px !important;
+    margin-bottom: 0.5px !important;
 }
 html body #footCard #footList {
-    margin-top: 0px !important;
+    margin-top: 6px !important;
 }
 html body #footCard .chip-tip {
-    margin-top: 0px !important;
+    margin-top: 6px !important;
 }
 </style>
-
 </body>
 </html>

@@ -216,13 +216,13 @@ html[data-theme="dark"] .tl-name{color:#A9BD9B}
 .fm input[type=date],.fm input[type=time]{min-width:0;max-width:100%;-webkit-appearance:none;appearance:none;padding:8px 8px;min-height:42px;text-align:left}
 .fm input[type=date]::-webkit-date-and-time-value,.fm input[type=time]::-webkit-date-and-time-value{text-align:left}
 .fm-seg{display:flex;gap:8px}
-.fm-seg button{flex:1;border:1.5px dashed #D4B896;background:var(--primary-light);color:var(--text-secondary);border-radius:15px;padding:6px;font-size:14px;font-family:inherit;cursor:pointer}
+.fm-seg button{flex:1;border:1.5px dashed #D4B896;background:var(--primary-light);color:var(--text-secondary);border-radius:20px;padding:6px;font-size:14px;font-family:inherit;cursor:pointer}
 .fm-seg button.on{background:var(--matcha);border-color:var(--matcha-dark);color:#fff;font-weight:600}
 .fm-loc{font-size:12px;color:var(--text-muted);margin-top:-4px}
 .fm-near{display:flex;flex-wrap:wrap;gap:6px}
 .mini.pick{font-size:13px;padding:4px 10px;background:var(--bg-input);color:var(--text-primary)}
 .mini.pick small{color:var(--text-muted);margin-left:4px}
-.mini.locate{align-self:flex-start;font-size:13px;padding:5px 12px;background:var(--matcha);border-color:var(--matcha-dark);color:#fff}
+.mini.locate{align-self:flex-start;border-radius:20px;font-size:13px;padding:5px 12px;background:var(--matcha);border-color:var(--matcha-dark);color:#fff}
 .fm-stars{display:flex;gap:2px}
 .fm-stars button{background:none;border:0;font-size:28px;line-height:1;color:#cdb592;cursor:pointer;padding:0 2px}
 .fm-stars button.on{color:#D9A441}
@@ -1465,7 +1465,7 @@ function footHint(){
 function renderFoot(){ renderStats(); renderList(); renderFootMap(); footHint(); }
 
 /* ---- 新增／編輯表單 ---- */
-let formId = null, formKind = 'been', formRating = 0, formLoc = null;
+let formId = null, formKind = 'been', formRating = 0, formLoc = null, formNameInit = '';
 function paintStars(){ $('fmStars').querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.v <= formRating)); }
 function setKind(k){
     formKind = k;
@@ -1490,7 +1490,7 @@ function openFootForm(id){
         $('fmStart').value = t.start; $('fmEnd').value = t.end; $('fmStartT').value = t.startTime || ''; $('fmEndT').value = t.endTime || ''; $('fmTag').value = t.tag; formRating = t.rating; $('fmNote').value = t.note;
     } else {
         formLoc = {lat:cur.lat, lon:cur.lon, cc:cur.cc || null, country:cur.country || (cur.cc ? regionZh(cur.cc) : ''), manual:true};
-        $('fmName').value = cur.name || ''; setKind('been');
+        $('fmName').value = cur.name || ''; formNameInit = $('fmName').value; setKind('been');
         $('fmStart').value = todayStr(); $('fmEnd').value = ''; { const d = new Date(); $('fmStartT').value = pad(d.getHours()) + ':' + pad(d.getMinutes()); $('fmEndT').value = ''; } $('fmTag').value = 'travel'; formRating = 0; $('fmNote').value = '';
     }
     updLoc(); paintStars();
@@ -1519,17 +1519,32 @@ function poiEmoji(tg){
     if (tg.healthcare || /^(hospital|clinic|pharmacy|dentist|doctors)$/.test(tg.amenity || '')) return '🏥';
     return '📍';
 }
+const OVERPASS = ['https://overpass-api.de/api/interpreter?data=', 'https://overpass.kumi.systems/api/interpreter?data=', 'https://overpass.private.coffee/api/interpreter?data=', 'https://overpass.openstreetmap.fr/api/interpreter?data='];
+function errWhy(e){
+    const l = (e && e.errors) || [e];
+    return [...new Set(l.map(x => x && x.name === 'AbortError' ? '逾時' : (x && x.message) || '連線錯誤'))].join('、');
+}
 async function nearbyPOIs(lat, lon, r){
-    const q = `[out:json][timeout:12];nwr(around:${r},${lat},${lon})[name][~"^(amenity|shop|office|craft|tourism|leisure|industrial|healthcare|man_made|historic|building)$"~"."];out center tags 80;`;
-    const hosts = ['https://overpass-api.de/api/interpreter?data=', 'https://overpass.kumi.systems/api/interpreter?data='];
-    const j = await Promise.any(hosts.map(u => getJSON(u + encodeURIComponent(q), 14000)));
+    const q = `[out:json][timeout:15];nwr(around:${r},${lat},${lon})[name][~"^(amenity|shop|office|craft|tourism|leisure|industrial|healthcare|man_made|historic|building)$"~"."];out center tags 80;`;
+    const j = await Promise.any(OVERPASS.map(u => getJSON(u + encodeURIComponent(q), 16000)));
     const seen = new Set(), out = [];
     (j.elements || []).map(e => {
         const tg = e.tags || {}, la = e.lat != null ? e.lat : e.center && e.center.lat, lo = e.lon != null ? e.lon : e.center && e.center.lon;
         const name = tg['name:zh-TW'] || tg['name:zh'] || tg.name;
         return (name && la != null && lo != null) ? {name, lat:la, lon:lo, d:hav({lat, lon}, {lat:la, lon:lo}) * 1000, emoji:poiEmoji(tg)} : null;
     }).filter(Boolean).sort((a, b) => a.d - b.d).forEach(p => { if (!seen.has(p.name)) { seen.add(p.name); out.push(p); } });
-    return out.slice(0, 8);
+    return out.slice(0, 10);
+}
+/* 備援：用座標反查最近的店名／地址（Nominatim），至少能給你一個「路名＋門牌」可以選 */
+async function nearbyAddr(lat, lon){
+    const j = await getJSON(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&addressdetails=1&accept-language=zh-TW&lat=${lat.toFixed(6)}&lon=${lon.toFixed(6)}`, 10000);
+    const a = j.address || {}, items = [];
+    const la = +j.lat, lo = +j.lon;
+    if (j.name && j.category && !/^(highway|boundary|place|landuse)$/.test(j.category) && isFinite(la) && isFinite(lo))
+        items.push({name:j.name, lat:la, lon:lo, d:hav({lat, lon}, {lat:la, lon:lo}) * 1000, emoji:'📍'});
+    const road = a.road || a.pedestrian || a.neighbourhood || '', addr = (road + (a.house_number ? a.house_number + '號' : '')).trim();
+    if (addr) items.push({name:addr, lat, lon, d:0, emoji:'🏠'});
+    return items;
 }
 function locateMe(){
     const msg = t => { $('fmGeo').textContent = t; };
@@ -1539,28 +1554,32 @@ function locateMe(){
     navigator.geolocation.getCurrentPosition(async pos => {
         if (my !== geoSeq) return;
         const lat = pos.coords.latitude, lon = pos.coords.longitude, acc = pos.coords.accuracy;
+        const r = Math.round(Math.min(300, Math.max(120, acc * 1.2)));      // 定位越不準，搜尋範圍越大（最多 300 公尺）
         formLoc = {lat, lon, cc:null, country:'', acc}; updLoc();
-        msg(`✅ 已定位（誤差約 ${Math.round(acc)} 公尺），正在找附近的店家…`);
+        if (!formId && $('fmName').value === formNameInit) $('fmName').value = '';   // 名稱欄還是預設的城市名就清空，等你選店家
+        msg(`✅ 已定位（誤差約 ${Math.round(acc)} 公尺），正在找附近 ${r} 公尺內的店家…`);
         getJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&localityLanguage=zh`).then(j => {
             if (my !== geoSeq || !formLoc) return;
             const cc = (j.countryCode || '').toUpperCase();
             formLoc.cc = cc || null; formLoc.country = cc ? regionZh(cc) : ''; updLoc();
         }).catch(() => {});
-        let list = [], failed = false;
-        try { list = await nearbyPOIs(lat, lon, 100); } catch(e) { failed = true; }
+        const [pr, ar] = await Promise.allSettled([nearbyPOIs(lat, lon, r), nearbyAddr(lat, lon)]);
         if (my !== geoSeq) return;
-        const seen = new Set(), items = [];
-        trips.filter(t => hav(t, {lat, lon}) < 0.1).forEach(t => { if (!seen.has(t.name)) { seen.add(t.name); items.push({name:t.name, lat:t.lat, lon:t.lon, d:hav(t, {lat, lon}) * 1000, emoji:'🕘'}); } });   // 以前記過的優先
-        list.forEach(p => { if (!seen.has(p.name)) { seen.add(p.name); items.push(p); } });
+        const seen = new Set(), items = [], add = p => { if (!seen.has(p.name)) { seen.add(p.name); items.push(p); } };
+        trips.filter(t => hav(t, {lat, lon}) < 0.15).forEach(t => add({name:t.name, lat:t.lat, lon:t.lon, d:hav(t, {lat, lon}) * 1000, emoji:'🕘'}));   // 以前記過的優先
+        if (pr.status === 'fulfilled') pr.value.forEach(add);
+        if (ar.status === 'fulfilled') ar.value.forEach(add);
         const box = $('fmNearby'); box.textContent = '';
         items.forEach(p => {
             const b = mk('button', 'mini pick', p.emoji + ' ' + p.name); b.type = 'button';
-            b.appendChild(mk('small', '', Math.round(p.d) + ' m'));
+            if (p.d > 0) b.appendChild(mk('small', '', Math.round(p.d) + ' m'));
             b.onclick = () => { $('fmName').value = p.name; formLoc = {lat:p.lat, lon:p.lon, cc:formLoc ? formLoc.cc : null, country:formLoc ? formLoc.country : '', acc:acc}; updLoc(); };
             box.appendChild(b);
         });
-        const warn = acc > 150 ? `（定位誤差較大，約 ${Math.round(acc)} 公尺，清單可能不準）` : '';
-        msg(items.length ? '👇 點選你所在的店家；找不到就直接在上面輸入名稱 ' + warn : (failed ? '店家資料庫連不上，直接輸入名稱就可以了。' : '附近查不到登記的店家，直接輸入名稱就可以了（輸入過一次，下次在這裡就會自動出現）。'));
+        const warn = acc > 150 ? `　⚠️ 定位誤差約 ${Math.round(acc)} 公尺（電腦的定位通常不準，用手機會準很多），清單可能對不上。` : '';
+        if (items.length) msg('👇 點選你所在的店家；找不到就直接在上面輸入名稱。' + warn);
+        else if (pr.status === 'rejected' && ar.status === 'rejected') msg(`店家資料庫連不上（${errWhy(pr.reason)}），請稍後再按一次「偵測」，或直接輸入名稱。` + warn);
+        else msg('這附近查不到登記的店家，直接輸入名稱就可以了（輸入過一次，下次在這裡就會自動出現）。' + warn);
     }, err => {
         if (my !== geoSeq) return;
         msg(err.code === 1 ? '沒有定位權限：請在瀏覽器／手機設定裡允許這個網頁使用位置，或直接輸入名稱。' : '定位失敗，請到訊號好一點的地方再試一次，或直接輸入名稱。');

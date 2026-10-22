@@ -194,7 +194,7 @@ html[data-theme="dark"] .foot{stroke:#41342A}
 .tl-item::before{content:"";position:absolute;left:-20px;top:13px;width:12px;height:12px;border-radius:50%;background:#C8745A;border:2px solid var(--bg-card)}
 .tl-item.wish{border-style:dotted}
 .tl-item.wish::before{background:var(--bg-card);border:2px dashed #C8745A}
-.tl-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tl-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tl-flag{font-size:20px;line-height:1}
 .tl-name{font-size:15px;font-weight:700;color:#617553}
 html[data-theme="dark"] .tl-name{color:#A9BD9B}
@@ -204,17 +204,24 @@ html[data-theme="dark"] .tl-name{color:#A9BD9B}
 .tl-note{font-size:13px;margin-top:5px;white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
 .tl-note.open{display:block}
 .tl-act{display:flex;gap:6px;margin-top:6px;justify-content:flex-end}
-.fm{position:fixed;inset:0;z-index:50;background:rgba(40,28,20,.55);display:flex;align-items:flex-end;justify-content:center}
-.fm-box{width:100%;max-width:560px;max-height:92vh;overflow:auto;background:var(--bg-card);border:1px solid var(--border-color);border-radius:20px 20px 0 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+.fm{position:fixed;inset:0;z-index:50;background:rgba(40,28,20,.55);display:flex;align-items:flex-end;justify-content:center;padding:0 10px calc(10px + env(safe-area-inset-bottom,0px))}
+.fm-box{width:100%;max-width:560px;max-height:90vh;overflow:auto;background:var(--bg-card);border:1px solid var(--border-color);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px}
 @media(min-width:600px){.fm{align-items:center}.fm-box{border-radius:20px}}
 .fm h3{margin:0;font-size:16px;color:var(--primary-dark)}
 .fm label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--text-secondary)}
 .fm textarea{resize:vertical;min-height:90px;line-height:1.5}
-.fm-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fm-2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.fm-2 label{min-width:0}
+.fm input[type=date]{min-width:0;max-width:100%;-webkit-appearance:none;appearance:none;padding:8px 8px;min-height:42px;text-align:left}
+.fm input[type=date]::-webkit-date-and-time-value{text-align:left}
 .fm-seg{display:flex;gap:8px}
 .fm-seg button{flex:1;border:1.5px dashed #D4B896;background:var(--primary-light);color:var(--text-secondary);border-radius:15px;padding:6px;font-size:14px;font-family:inherit;cursor:pointer}
 .fm-seg button.on{background:var(--matcha);border-color:var(--matcha-dark);color:#fff;font-weight:600}
 .fm-loc{font-size:12px;color:var(--text-muted);margin-top:-4px}
+.fm-near{display:flex;flex-wrap:wrap;gap:6px}
+.mini.pick{font-size:13px;padding:4px 10px;background:var(--bg-input);color:var(--text-primary)}
+.mini.pick small{color:var(--text-muted);margin-left:4px}
+.mini.locate{align-self:flex-start;font-size:13px;padding:5px 12px;background:var(--matcha);border-color:var(--matcha-dark);color:#fff}
 .fm-stars{display:flex;gap:2px}
 .fm-stars button{background:none;border:0;font-size:28px;line-height:1;color:#cdb592;cursor:pointer;padding:0 2px}
 .fm-stars button.on{color:#D9A441}
@@ -324,6 +331,9 @@ html[data-theme="dark"] .tl-name{color:#A9BD9B}
         <h3 id="fmTitle">記錄足跡</h3>
         <div class="fm-seg" id="fmSeg"><button type="button" data-k="been" class="on">👣 去過</button><button type="button" data-k="wish" data-w="1">🌠 想去</button></div>
         <label><span>地點名稱</span><input id="fmName" list="cityList" maxlength="40" autocomplete="off" placeholder="例如：東京、阿里山…"></label>
+        <button id="fmLocate" class="mini locate" type="button">📍 偵測我現在的位置與店家</button>
+        <div class="fm-loc" id="fmGeo"></div>
+        <div class="fm-near" id="fmNearby"></div>
         <div class="fm-loc" id="fmLoc"></div>
         <div class="fm-2">
             <label><span id="fmL1">出發／到達日</span><input type="date" id="fmStart"></label>
@@ -1451,7 +1461,8 @@ function setKind(k){
 }
 function updLoc(){
     const l = formLoc;
-    $('fmLoc').textContent = l ? `📍 ${flagOf(l.cc)} ${Math.abs(l.lat).toFixed(2)}°${l.lat >= 0 ? 'N' : 'S'}　${Math.abs(l.lon).toFixed(2)}°${l.lon >= 0 ? 'E' : 'W'}　（座標取自地圖目前的位置；輸入常用城市名稱會自動對應）` : '尚未選擇地點';
+    $('fmLoc').textContent = l ? `📍 ${flagOf(l.cc)} ${Math.abs(l.lat).toFixed(4)}°${l.lat >= 0 ? 'N' : 'S'}　${Math.abs(l.lon).toFixed(4)}°${l.lon >= 0 ? 'E' : 'W'}　${l.acc ? '（GPS 定位，誤差約 ' + Math.round(l.acc) + ' 公尺）' : l.manual ? '⚠️ 這是地圖上最後選的位置' + (l.cc ? '（' + regionZh(l.cc) + '）' : '') + '，不一定是你現在的位置，請按上面的按鈕偵測' : '（已儲存的位置；按上面的按鈕可改用你現在的位置）'}` : '尚未選擇地點';
+    $('fmLoc').style.color = l && l.manual && !l.acc ? '#B5523F' : '';
 }
 function openFootForm(id){
     const t = id ? trips.find(x => x.id === id) : null;
@@ -1464,15 +1475,83 @@ function openFootForm(id){
         $('fmName').value = t.name; setKind(t.wish ? 'wish' : 'been');
         $('fmStart').value = t.start; $('fmEnd').value = t.end; $('fmTag').value = t.tag; formRating = t.rating; $('fmNote').value = t.note;
     } else {
-        formLoc = {lat:cur.lat, lon:cur.lon, cc:cur.cc || null, country:cur.country || (cur.cc ? regionZh(cur.cc) : '')};
+        formLoc = {lat:cur.lat, lon:cur.lon, cc:cur.cc || null, country:cur.country || (cur.cc ? regionZh(cur.cc) : ''), manual:true};
         $('fmName').value = cur.name || ''; setKind('been');
         $('fmStart').value = todayStr(); $('fmEnd').value = ''; $('fmTag').value = 'travel'; formRating = 0; $('fmNote').value = '';
     }
     updLoc(); paintStars();
+    geoSeq++; $('fmGeo').textContent = ''; $('fmNearby').textContent = '';
+    if (!t) {      // 新增時自動偵測目前位置（沒被拒絕過的話）
+        const go = () => { if (!formId && !$('footModal').classList.contains('hidden')) locateMe(); };
+        if (navigator.permissions && navigator.permissions.query) navigator.permissions.query({name:'geolocation'}).then(r => { if (r.state !== 'denied') go(); }).catch(go);
+        else setTimeout(go, 0);
+    }
     $('footModal').classList.remove('hidden'); document.body.style.overflow = 'hidden';
     setTimeout(() => { if (!$('fmName').value) $('fmName').focus(); }, 60);
 }
 function closeFootForm(){ $('footModal').classList.add('hidden'); document.body.style.overflow = ''; }
+
+
+/* ---- 偵測目前位置與附近店家（GPS + OpenStreetMap） ---- */
+let geoSeq = 0;
+function poiEmoji(tg){
+    if (tg.shop) return '🛍️';
+    if (/^(restaurant|fast_food|food_court|bar|pub|ice_cream)$/.test(tg.amenity || '')) return '🍜';
+    if (tg.amenity === 'cafe') return '☕';
+    if (tg.office) return '🏢';
+    if (tg.industrial || tg.craft || /^(industrial|factory|warehouse)$/.test(tg.building || '')) return '🏭';
+    if (tg.tourism || tg.historic) return '🏞️';
+    if (tg.leisure) return '🎯';
+    if (tg.healthcare || /^(hospital|clinic|pharmacy|dentist|doctors)$/.test(tg.amenity || '')) return '🏥';
+    return '📍';
+}
+async function nearbyPOIs(lat, lon, r){
+    const q = `[out:json][timeout:12];nwr(around:${r},${lat},${lon})[name][~"^(amenity|shop|office|craft|tourism|leisure|industrial|healthcare|man_made|historic|building)$"~"."];out center tags 80;`;
+    const hosts = ['https://overpass-api.de/api/interpreter?data=', 'https://overpass.kumi.systems/api/interpreter?data='];
+    const j = await Promise.any(hosts.map(u => getJSON(u + encodeURIComponent(q), 14000)));
+    const seen = new Set(), out = [];
+    (j.elements || []).map(e => {
+        const tg = e.tags || {}, la = e.lat != null ? e.lat : e.center && e.center.lat, lo = e.lon != null ? e.lon : e.center && e.center.lon;
+        const name = tg['name:zh-TW'] || tg['name:zh'] || tg.name;
+        return (name && la != null && lo != null) ? {name, lat:la, lon:lo, d:hav({lat, lon}, {lat:la, lon:lo}) * 1000, emoji:poiEmoji(tg)} : null;
+    }).filter(Boolean).sort((a, b) => a.d - b.d).forEach(p => { if (!seen.has(p.name)) { seen.add(p.name); out.push(p); } });
+    return out.slice(0, 8);
+}
+function locateMe(){
+    const msg = t => { $('fmGeo').textContent = t; };
+    if (!navigator.geolocation) { msg('這個瀏覽器不支援定位，請直接輸入名稱。'); return; }
+    const my = ++geoSeq; $('fmNearby').textContent = '';
+    msg('📡 定位中…（如果跳出詢問，請選「允許」）');
+    navigator.geolocation.getCurrentPosition(async pos => {
+        if (my !== geoSeq) return;
+        const lat = pos.coords.latitude, lon = pos.coords.longitude, acc = pos.coords.accuracy;
+        formLoc = {lat, lon, cc:null, country:'', acc}; updLoc();
+        msg(`✅ 已定位（誤差約 ${Math.round(acc)} 公尺），正在找附近的店家…`);
+        getJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&localityLanguage=zh`).then(j => {
+            if (my !== geoSeq || !formLoc) return;
+            const cc = (j.countryCode || '').toUpperCase();
+            formLoc.cc = cc || null; formLoc.country = cc ? regionZh(cc) : ''; updLoc();
+        }).catch(() => {});
+        let list = [], failed = false;
+        try { list = await nearbyPOIs(lat, lon, 100); } catch(e) { failed = true; }
+        if (my !== geoSeq) return;
+        const seen = new Set(), items = [];
+        trips.filter(t => hav(t, {lat, lon}) < 0.1).forEach(t => { if (!seen.has(t.name)) { seen.add(t.name); items.push({name:t.name, lat:t.lat, lon:t.lon, d:hav(t, {lat, lon}) * 1000, emoji:'🕘'}); } });   // 以前記過的優先
+        list.forEach(p => { if (!seen.has(p.name)) { seen.add(p.name); items.push(p); } });
+        const box = $('fmNearby'); box.textContent = '';
+        items.forEach(p => {
+            const b = mk('button', 'mini pick', p.emoji + ' ' + p.name); b.type = 'button';
+            b.appendChild(mk('small', '', Math.round(p.d) + ' m'));
+            b.onclick = () => { $('fmName').value = p.name; formLoc = {lat:p.lat, lon:p.lon, cc:formLoc ? formLoc.cc : null, country:formLoc ? formLoc.country : '', acc:acc}; updLoc(); };
+            box.appendChild(b);
+        });
+        const warn = acc > 150 ? `（定位誤差較大，約 ${Math.round(acc)} 公尺，清單可能不準）` : '';
+        msg(items.length ? '👇 點選你所在的店家；找不到就直接在上面輸入名稱 ' + warn : (failed ? '店家資料庫連不上，直接輸入名稱就可以了。' : '附近查不到登記的店家，直接輸入名稱就可以了（輸入過一次，下次在這裡就會自動出現）。'));
+    }, err => {
+        if (my !== geoSeq) return;
+        msg(err.code === 1 ? '沒有定位權限：請在瀏覽器／手機設定裡允許這個網頁使用位置，或直接輸入名稱。' : '定位失敗，請到訊號好一點的地方再試一次，或直接輸入名稱。');
+    }, {enableHighAccuracy:true, timeout:15000, maximumAge:20000});
+}
 
 function setupFoot(){
     TAGS.forEach(t => { const o = mk('option', '', t[1]); o.value = t[0]; $('fmTag').appendChild(o); });
@@ -1485,6 +1564,7 @@ function setupFoot(){
         if (c) { formLoc = {lat:c[1], lon:c[2], cc:c[3], country:regionZh(c[3])}; updLoc(); }
     });
     $('fAdd').onclick = () => openFootForm();
+    $('fmLocate').onclick = locateMe;
     $('fmCancel').onclick = closeFootForm;
     $('footModal').addEventListener('pointerdown', e => { if (e.target === $('footModal')) closeFootForm(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('footModal').classList.contains('hidden')) closeFootForm(); });

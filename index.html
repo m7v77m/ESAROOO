@@ -60,7 +60,7 @@ body{
 .place .flag{font-size:30px;line-height:1}
 .place .nm{font-size:17px;font-weight:700;color:var(--primary-dark);line-height:1.25}
 .place .sub{font-size:12px;color:var(--text-secondary)}
-.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:0.5px dashed #69533a;border-radius:22px;padding:10px 12px}
+.clock{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:4px;background:var(--bg-input);border:0.5px dashed #69533a;border-radius:30px;padding:10px 12px}
 .clock .t{font-size:19px;font-weight:700;color:var(--primary-dark);font-variant-numeric:tabular-nums;white-space:nowrap}
 .clock .dn{font-size:15px;line-height:1}
 .date{text-align:center;font-size:14px;color:var(--text-primary);font-weight:600}
@@ -106,7 +106,7 @@ footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2p
 /* ===== v5：深淺模式、航線、匯率、盲盒 ===== */
 :root{--accent-text:#A9BD9B}
 .tbtn{margin-left:auto;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:20px;padding:3px 10px;font-size:12px;font-family:inherit;cursor:pointer}
-.roll{display:block;width:100%;margin-top:10px;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:13px;padding:6px 10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
+.roll{display:block;width:100%;margin-top:10px;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:20px;padding:6px 10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
 .roll:active{background:var(--bg-hover)}
 .roll .dice{display:inline-block}
 .roll.rolling .dice{animation:dicespin .7s ease-out}
@@ -226,9 +226,31 @@ html[data-theme="dark"] .tl-name{color:#A9BD9B}
 .fm-stars{display:flex;gap:2px}
 .fm-stars button{background:none;border:0;font-size:28px;line-height:1;color:#cdb592;cursor:pointer;padding:0 2px}
 .fm-stars button.on{color:#D9A441}
-.fm-act{display:flex;align-items:center;gap:8px;margin-top:4px}
-.fm-act .sp{flex:1}
-.fm-act .roll{width:auto;margin:0;padding:6px 22px}
+/* 🎯 寶貝老公特製：儲存與取消按鈕完美等寬、等高、20px圓角魔法 */
+.fm-act {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;            /* 讓兩顆按鈕之間保持舒服的 12px 間距 */
+    margin-top: 8px !important;
+    width: 100% !important;
+}
+.fm-act .sp {
+    display: none !important;        /* 關鍵：把原本把取消按鈕推到左邊的隱形空格變不見，這樣兩顆字才能並排 */
+}
+.fm-act .mini,
+.fm-act .roll {
+    flex: 1 !important;              /* 關鍵：啟用 1:1 彈性均分，強迫兩顆按鈕在手機上絕對一樣大！ */
+    width: 50% !important;           /* 雙重鎖死寬度 */
+    height: 38px !important;         /* 統一高度為標準的 38px，手感最好點選 */
+    line-height: 38px !important;    /* 文字垂直精準置中 */
+    padding: 0 !important;           /* 清除原本打架的內距 */
+    border-radius: 20px !important;  /* 🎯 老婆指定：四週轉角通通鎖死成 20px 完美大圓角！ */
+    font-size: 14px !important;      /* 讓儲存與取消的字體級別一樣大 */
+    text-align: center !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
 </style>
 </head>
 <body>
@@ -331,22 +353,22 @@ html[data-theme="dark"] .tl-name{color:#A9BD9B}
     <div class="fm-box">
         <h3 id="fmTitle">記錄足跡</h3>
         <div class="fm-seg" id="fmSeg"><button type="button" data-k="been" class="on">👣 去過</button><button type="button" data-k="wish" data-w="1">🌠 想去</button></div>
-        <label><span>地點名稱</span><input id="fmName" list="cityList" maxlength="40" autocomplete="off" placeholder="例如：東京、阿里山…"></label>
+        <label><span>地點名稱</span><input id="fmName" list="cityList" maxlength="40" autocomplete="off" placeholder="例如：羅馬、舊金山、哥本哈根、........."></label>
         <button id="fmLocate" class="mini locate" type="button">📍 偵測我現在的位置與店家</button>
         <div class="fm-loc" id="fmGeo"></div>
         <div class="fm-near" id="fmNearby"></div>
         <div class="fm-loc" id="fmLoc"></div>
         <div class="fm-2">
             <label><span id="fmL1">出發／到達日</span><input type="date" id="fmStart"></label>
-            <label><span id="fmL2">離開日（選填）</span><input type="date" id="fmEnd"></label>
+            <label><span id="fmL2">選填／離開日</span><input type="date" id="fmEnd"></label>
         </div>
         <div class="fm-2">
             <label><span>開始時間（選填）</span><input type="time" id="fmStartT"></label>
             <label><span>結束時間（選填）</span><input type="time" id="fmEndT"></label>
         </div>
-        <label><span>類別</span><select id="fmTag"></select></label>
+        <label><span>選擇類別</span><select id="fmTag"></select></label>
         <label><span>心情評分（再點一次可取消）</span><div class="fm-stars" id="fmStars"></div></label>
-        <label><span>註解</span><textarea id="fmNote" maxlength="2000" placeholder="吃了什麼、遇到誰、當下的心情…"></textarea></label>
+        <label><span>註解內容</span><textarea id="fmNote" maxlength="2000" placeholder="吃了什麼、遇到誰、當下的心情…"></textarea></label>
         <div class="fm-act">
             <button id="fmDel" class="mini danger hidden" type="button">🗑️ 刪除</button>
             <span class="sp"></span>
@@ -1542,7 +1564,7 @@ async function nearbyAddr(lat, lon){
     const la = +j.lat, lo = +j.lon;
     if (j.name && j.category && !/^(highway|boundary|place|landuse)$/.test(j.category) && isFinite(la) && isFinite(lo))
         items.push({name:j.name, lat:la, lon:lo, d:hav({lat, lon}, {lat:la, lon:lo}) * 1000, emoji:'📍'});
-    const road = a.road || a.pedestrian || a.neighbourhood || '', addr = (road + (a.house_number ? a.house_number + '號' : '')).trim();
+    const road = a.road || a.pedestrian || a.neighbourhood || '', addr = (road + (a.house_number ? a.house_number : '')).trim();
     if (addr) items.push({name:addr, lat, lon, d:0, emoji:'🏠'});
     return items;
 }
@@ -1652,5 +1674,21 @@ setupFoot();
 
 init();
 </script>
+<!-- 終極完美大團圓：將足跡表單內所有輸入框、虛線標籤，通通統一成 20px 圓角 -->
+<style>
+/* 🎯 強制表單內部所有輸入框、下拉選單、文字框一律改為 20px 完美圓角 */
+html body .fm-box input,
+html body .fm-box select,
+html body .fm-box textarea {
+    border-radius: 20px !important; /* 讓格子邊緣也跟著一起圓潤起來 */
+}
+
+/* 🎯 精準降伏：把老婆用紅框圈起來的這個虛線小標籤，也同步改成 20px 大圓角 */
+html body .fm-box .mini.pick {
+    border-radius: 20px !important; /* 徹底消除不對稱，黃金比例拉滿 */
+    padding: 5px 12px !important;    /* 稍微加寬一點點內距，圓角才不會吃字，更好看 */
+}
+</style>
+
 </body>
 </html>

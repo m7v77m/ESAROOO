@@ -1689,6 +1689,34 @@ html body .fm-box .mini.pick {
     padding: 5px 12px !important;    /* 稍微加寬一點點內距，圓角才不會吃字，更好看 */
 }
 </style>
+<!-- 終極完美進化：強制足跡表單日期時間文字絕對置中，並把底部按鈕的上下肥肉徹底壓扁扁 -->
+<style>
+/* 🎯 1. 降伏日期與時間文字：強制讓出發/離開日期、開始/結束時間框框內的文字通通絕對居中對齊！ */
+html body .fm-box input[type="date"],
+html body .fm-box input[type="time"] {
+    text-align: center !important;               /* 電腦與大部分手機一秒置中 */
+    display: flex !important;                    /* 密技：用彈性佈局確保 iPhone 上也能完美垂直置中 */
+    justify-content: center !important;          /* 水平居中 */
+    align-items: center !important;              /* 垂直居中 */
+    padding-left: 12px !important;               /* 微調左右內距，讓文字安穩待在正中央 */
+    padding-right: 12px !important;
+}
+
+/* 🎯 2. iPhone 特效全面破防：強迫 iOS 系統的預設值乖乖向老婆指定的居中法術臣服 */
+html body .fm-box input[type="date"]::-webkit-date-and-time-value,
+html body .fm-box input[type="time"]::-webkit-date-and-time-value {
+    text-align: center !important;               /* 強制消滅蘋果手機靠左站的壞毛病 */
+    margin: 0 auto !important;
+}
+
+/* 🎯 3. 降伏底部大橫條肥肉：把最下方水紅色框框的按鈕橫條上下空間，狠狠壓縮壓扁扁！ */
+html body .fm-box .fm-act {
+    margin-top: 2px !important;                  /* 關鍵：把原本 8px 的頂部空隙攔腰砍斷，只留 2px！ */
+    padding-top: 0px !important;                 /* 頂部內距徹底抽乾歸零 */
+    padding-bottom: 0px !important;              /* 底部內距徹底抽乾歸零 */
+    height: auto !important;                     /* 解除固定高度，讓卡片按鈕自然貼合不留多餘大肥肉 */
+}
+</style>
 
 </body>
 </html>

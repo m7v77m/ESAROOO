@@ -199,7 +199,7 @@ html[data-theme="dark"] .foot{stroke:#41342A}
 .tl-name{font-size:15px;font-weight:700;color:#617553}
 html[data-theme="dark"] .tl-name{color:#A9BD9B}
 .tl-tag{font-size:11px;border:1px dashed var(--border-color);border-radius:10px;padding:0 7px;color:var(--text-secondary)}
-.tl-date{font-size:12px;color:var(--text-secondary);margin-top:2px}
+.tl-date{font-size:13px;font-weight:600;color:var(--text-secondary);margin-top:2px}
 .tl-stars{color:#D9A441;font-size:13px;letter-spacing:1px;margin-top:2px}
 .tl-note{font-size:13px;margin-top:5px;white-space:pre-wrap;word-break:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
 .tl-note.open{display:block}
@@ -212,8 +212,8 @@ html[data-theme="dark"] .tl-name{color:#A9BD9B}
 .fm textarea{resize:vertical;min-height:90px;line-height:1.5}
 .fm-2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .fm-2 label{min-width:0}
-.fm input[type=date]{min-width:0;max-width:100%;-webkit-appearance:none;appearance:none;padding:8px 8px;min-height:42px;text-align:left}
-.fm input[type=date]::-webkit-date-and-time-value{text-align:left}
+.fm input[type=date],.fm input[type=time]{min-width:0;max-width:100%;-webkit-appearance:none;appearance:none;padding:8px 8px;min-height:42px;text-align:left}
+.fm input[type=date]::-webkit-date-and-time-value,.fm input[type=time]::-webkit-date-and-time-value{text-align:left}
 .fm-seg{display:flex;gap:8px}
 .fm-seg button{flex:1;border:1.5px dashed #D4B896;background:var(--primary-light);color:var(--text-secondary);border-radius:15px;padding:6px;font-size:14px;font-family:inherit;cursor:pointer}
 .fm-seg button.on{background:var(--matcha);border-color:var(--matcha-dark);color:#fff;font-weight:600}
@@ -338,6 +338,10 @@ html[data-theme="dark"] .tl-name{color:#A9BD9B}
         <div class="fm-2">
             <label><span id="fmL1">出發／到達日</span><input type="date" id="fmStart"></label>
             <label><span id="fmL2">離開日（選填）</span><input type="date" id="fmEnd"></label>
+        </div>
+        <div class="fm-2">
+            <label><span>開始時間（選填）</span><input type="time" id="fmStartT"></label>
+            <label><span>結束時間（選填）</span><input type="time" id="fmEndT"></label>
         </div>
         <label><span>類別</span><select id="fmTag"></select></label>
         <label><span>心情評分（再點一次可取消）</span><div class="fm-stars" id="fmStars"></div></label>
@@ -1297,6 +1301,8 @@ const tagLabel = k => (TAGS.find(t => t[0] === k) || TAGS[TAGS.length - 1])[1];
 const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
 const newId = () => 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 const isDate = s => /^\d{4}-\d\d-\d\d$/.test(s || '');
+const isTime = s => /^([01]\d|2[0-3]):[0-5]\d$/.test(s || '');
+const tkey = t => (t.start || '0000-00-00') + ' ' + (t.startTime || '00:00');
 function cleanTrip(t){
     if (!t || typeof t.name !== 'string' || !isFinite(t.lat) || !isFinite(t.lon)) return null;
     return {
@@ -1304,6 +1310,7 @@ function cleanTrip(t){
         lat: Math.max(-90, Math.min(90, +t.lat)), lon: Math.max(-180, Math.min(180, +t.lon)),
         cc: /^[A-Za-z]{2}$/.test(t.cc || '') ? t.cc.toUpperCase() : null, country: String(t.country || '').slice(0, 40),
         wish: !!t.wish, start: isDate(t.start) ? t.start : '', end: isDate(t.end) ? t.end : '',
+        startTime: isTime(t.startTime) ? t.startTime : '', endTime: isTime(t.endTime) ? t.endTime : '',
         tag: TAGS.some(x => x[0] === t.tag) ? t.tag : 'other', rating: Math.max(0, Math.min(5, Math.round(+t.rating || 0))),
         note: String(t.note || '').slice(0, 2000), created: +t.created || Date.now()
     };
@@ -1320,18 +1327,23 @@ function tripDays(t){
     const e = t.end && t.end >= t.start ? t.end : t.start, n = dayNum(e) - dayNum(t.start) + 1;
     return isFinite(n) ? n : 0;
 }
+function durText(m){ const h = Math.floor(m / 60), r = m % 60; return (h ? h + ' 小時' : '') + (h && r ? ' ' : '') + (r ? r + ' 分鐘' : ''); }
 function dateText(t){
     if (!t.start) return t.wish ? '時間未定' : '未填日期';
-    let s = fmtD(t.start);
-    if (t.end && t.end !== t.start) s += ' – ' + (t.end.slice(0, 4) === t.start.slice(0, 4) ? fmtD(t.end).slice(5) : fmtD(t.end));
-    return t.wish ? s : s + '　·　' + tripDays(t) + ' 天';
+    const st = t.startTime || '', et = t.endTime || '', multi = t.end && t.end !== t.start;
+    let s = fmtD(t.start) + (st ? ' ' + st : '');
+    if (multi) s += ' – ' + (t.end.slice(0, 4) === t.start.slice(0, 4) ? fmtD(t.end).slice(5) : fmtD(t.end)) + (et ? ' ' + et : '');
+    else if (et) s += ' – ' + et;
+    if (t.wish) return s;
+    if (!multi && st && et) { const m = (+et.slice(0, 2) * 60 + +et.slice(3)) - (+st.slice(0, 2) * 60 + +st.slice(3)); if (m > 0) return s + '　·　' + durText(m); }
+    return s + '　·　' + tripDays(t) + ' 天';
 }
 function hav(a, b){
     const R = 6371, r = Math.PI / 180, dLat = (b.lat - a.lat) * r, dLon = (b.lon - a.lon) * r;
     const x = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLon / 2) ** 2;
     return 2 * R * Math.asin(Math.min(1, Math.sqrt(x)));
 }
-const beenSeq = () => trips.filter(t => !t.wish && t.start).sort((a, b) => a.start.localeCompare(b.start));
+const beenSeq = () => trips.filter(t => !t.wish && t.start).sort((a, b) => tkey(a).localeCompare(tkey(b)));
 
 /* ---- 統計 ---- */
 function statCell(l, r, u){ const d = mk('div', 'cell'); d.appendChild(mk('div', 'l', l)); d.appendChild(mk('div', 'r', r)); d.appendChild(mk('div', 'u', u)); return d; }
@@ -1342,7 +1354,8 @@ function renderStats(){
     const g = mk('div', 'grid3');
     g.appendChild(statCell('🌍 國家', String(new Set(been.map(t => t.cc || t.country || t.name)).size), '個'));
     g.appendChild(statCell('📍 地點', String(new Set(been.map(t => t.name)).size), '處'));
-    g.appendChild(statCell('🗓️ 旅居', String(been.reduce((s, t) => s + tripDays(t), 0)), '天'));
+    const dset = new Set(); been.forEach(t => { const n = tripDays(t), d0 = dayNum(t.start); for (let i = 0; i < n; i++) dset.add(d0 + i); });   // 同一天多筆只算一天
+    g.appendChild(statCell('🗓️ 足跡天數', String(dset.size), '天'));
     b.appendChild(g);
     const seq = beenSeq(); let km = 0;
     for (let i = 1; i < seq.length; i++) km += hav(seq[i - 1], seq[i]);
@@ -1390,7 +1403,7 @@ function renderList(){
     if (!trips.length) return;
     const vis = visibleTrips();
     if (!vis.length) { box.appendChild(mk('div', 'state', '沒有符合條件的足跡。')); return; }
-    const been = vis.filter(t => !t.wish).sort((a, b) => { const k = (a.start || '0000').localeCompare(b.start || '0000'); return fView.asc ? k : -k; });
+    const been = vis.filter(t => !t.wish).sort((a, b) => { const k = tkey(a).localeCompare(tkey(b)); return fView.asc ? k : -k; });
     const wish = vis.filter(t => t.wish).sort((a, b) => (a.start || '9999').localeCompare(b.start || '9999'));
     const tl = mk('div', 'tl'); let yr = null;
     been.forEach(t => {
@@ -1441,7 +1454,7 @@ function nearestFoot(sx, sy, snap){
 function footHint(){
     const b = $('footHint'); if (!b || !cur) return;
     b.textContent = '';
-    const near = trips.filter(t => !t.wish && hav(t, cur) < 60).sort((a, c) => (c.start || '').localeCompare(a.start || ''));
+    const near = trips.filter(t => !t.wish && hav(t, cur) < 60).sort((a, c) => tkey(c).localeCompare(tkey(a)));
     const wish = trips.some(t => t.wish && hav(t, cur) < 60);
     b.appendChild(mk('span', '', near.length ? `👣 你來過這裡 ${near.length} 次${near[0].start ? '（最近：' + fmtD(near[0].start) + '）' : ''}` : wish ? '🌠 這裡在你的想去清單裡' : '👣 還沒在這裡留下足跡'));
     const btn = mk('button', 'mini', '＋ 記錄'); btn.type = 'button'; btn.onclick = () => openFootForm();
@@ -1473,11 +1486,11 @@ function openFootForm(id){
     if (t) {
         formLoc = {lat:t.lat, lon:t.lon, cc:t.cc, country:t.country};
         $('fmName').value = t.name; setKind(t.wish ? 'wish' : 'been');
-        $('fmStart').value = t.start; $('fmEnd').value = t.end; $('fmTag').value = t.tag; formRating = t.rating; $('fmNote').value = t.note;
+        $('fmStart').value = t.start; $('fmEnd').value = t.end; $('fmStartT').value = t.startTime || ''; $('fmEndT').value = t.endTime || ''; $('fmTag').value = t.tag; formRating = t.rating; $('fmNote').value = t.note;
     } else {
         formLoc = {lat:cur.lat, lon:cur.lon, cc:cur.cc || null, country:cur.country || (cur.cc ? regionZh(cur.cc) : ''), manual:true};
         $('fmName').value = cur.name || ''; setKind('been');
-        $('fmStart').value = todayStr(); $('fmEnd').value = ''; $('fmTag').value = 'travel'; formRating = 0; $('fmNote').value = '';
+        $('fmStart').value = todayStr(); $('fmEnd').value = ''; { const d = new Date(); $('fmStartT').value = pad(d.getHours()) + ':' + pad(d.getMinutes()); $('fmEndT').value = ''; } $('fmTag').value = 'travel'; formRating = 0; $('fmNote').value = '';
     }
     updLoc(); paintStars();
     geoSeq++; $('fmGeo').textContent = ''; $('fmNearby').textContent = '';
@@ -1575,7 +1588,10 @@ function setupFoot(){
         let start = $('fmStart').value, end = $('fmEnd').value;
         if (end && !start) { start = end; end = ''; }
         if (end && end < start) end = '';
-        const rec = {name, lat:formLoc.lat, lon:formLoc.lon, cc:formLoc.cc, country:formLoc.country, wish:formKind === 'wish', start, end, tag:$('fmTag').value, rating:formRating, note:$('fmNote').value.trim()};
+        let st = $('fmStartT').value, et = $('fmEndT').value;
+        if (!start) { st = ''; et = ''; }
+        if (et && st && (!end || end === start) && et <= st) et = '';   // 同一天結束時間不能早於開始
+        const rec = {name, lat:formLoc.lat, lon:formLoc.lon, cc:formLoc.cc, country:formLoc.country, wish:formKind === 'wish', start, end, startTime:st, endTime:et, tag:$('fmTag').value, rating:formRating, note:$('fmNote').value.trim()};
         if (formId) { const i = trips.findIndex(x => x.id === formId); if (i >= 0) trips[i] = Object.assign(trips[i], rec); }
         else { rec.id = newId(); rec.created = Date.now(); trips.push(rec); }
         saveTrips(); closeFootForm(); renderFoot();

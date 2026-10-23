@@ -176,16 +176,16 @@ html[data-theme="dark"] .country.visited.sel{fill:#6F8463}
 .footline{fill:none;stroke:#C8745A;stroke-width:1.4;stroke-dasharray:3 4;vector-effect:non-scaling-stroke;pointer-events:none;opacity:.85}
 html[data-theme="dark"] .foot{stroke:#41342A}
 .foot-hint{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:12.5px;color:var(--text-secondary)}
-.mini{border:1px dashed #7A5F4B;background:var(--bg-card);color:var(--text-secondary);border-radius:12px;padding:2px 10px;font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap}
+.mini{border:1px dashed #7A5F4B;background:var(--bg-card);color:var(--text-secondary);border-radius:15px;padding:5px 10px;font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap}
 .mini:active{background:var(--bg-hover)}
 .mini.danger{color:#B5523F}
 .ft-tools{display:flex;flex-direction:column;gap:10px;margin:10px 0 8px}
 .ft-row{display:flex;gap:10px}
 #footCard{padding-left:9px;padding-right:9px}   /* 卡片邊框 1px + 9px = 虛線框離邊緣 10px，和框框之間的間隙一致 */
 .ft-row select{flex:1;min-width:0}
-.ft-tools input,.ft-tools select,.fm input,.fm select,.fm textarea{width:100%;font-size:16px;font-family:inherit;color:var(--text-primary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px;padding:8px 12px;outline:none}
+.ft-tools input,.ft-tools select,.fm input,.fm select,.fm textarea{font-size:14px;font-family:inherit;background:var(--bg-input);padding:4px 12px;color:#7A5F4B;border:1.5px dashed var(--border-color);border-radius:20px;outline:none;font-weight:450;}
 .ft-tools input:focus,.ft-tools select:focus,.fm input:focus,.fm select:focus,.fm textarea:focus{border-color:var(--matcha)}
-.ft-row .tbtn{margin-left:0;font-size:13px;padding:0 12px;border-radius:20px;border:1.5px dashed var(--border-color);}
+.ft-row .tbtn{margin-left:0;font-size:15px;padding:0 12px;border-radius:20px;border:1.5px dashed var(--border-color);}
 .ft-bar{display:flex;gap:8px;justify-content:center;margin-top:10px}
 .tl{position:relative;margin:6px 0 0 6px;padding-left:20px}
 .tl::before{content:"";position:absolute;left:5px;top:4px;bottom:4px;border-left:2px dashed var(--border-color)}
@@ -1778,11 +1778,12 @@ html body .map-wrap {
         grid-template-columns: 1fr 1fr 1fr !important; /* 強制分成三等分格子 */
         gap: 8px !important;          /* 欄位之間保持 8px 精緻小空隙 */
         width: 100% !important;
-        box-sizing: border-box !important;
+        box-sizing: border-box !important; 
     }
     html body #footCard .ft-row select {
         width: 100% !important;
         box-sizing: border-box !important;
+        align-items: center !important;
     }
 }
 

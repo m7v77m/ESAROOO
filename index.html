@@ -187,14 +187,14 @@ html[data-theme="dark"] .foot{stroke:#41342A}
 .ft-tools input:focus,.ft-tools select:focus,.fm input:focus,.fm select:focus,.fm textarea:focus{border-color:var(--matcha)}
 .ft-row .tbtn{margin-left:0;font-size:14.2px;padding:0 12px;border-radius:20px;border:1.5px dashed var(--border-color);}
 .ft-bar{display:flex;gap:8px;justify-content:center;margin-top:10px}
-.tl{position:relative;margin:6px 0 0 6px;padding-left:20px}
-.tl::before{content:"";position:absolute;left:5px;top:4px;bottom:4px;border-left:2px dashed var(--border-color)}
+.tl{--tl-shift:6px;position:relative;margin:6px 0 0 6px;padding-left:20px}   /* --tl-shift：虛線和圓點一起往左移的距離，想再左移就調大 */
+.tl::before{content:"";position:absolute;left:calc(5px - var(--tl-shift));top:4px;bottom:4px;border-left:2px dashed var(--border-color)}
 .tl-year{font-size:14px;font-weight:700;color:var(--primary-dark);margin:10px 0 6px}
 .tl-year:first-child{margin-top:0}
 .tl-item{position:relative;background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:15px;padding:8px 12px;margin-bottom:10px}
-.tl-item::before{content:"";position:absolute;left:-20px;top:13px;width:12px;height:12px;border-radius:50%;background:#C8745A;border:2px solid var(--bg-card)}
+.tl-item::before{content:"";position:absolute;left:calc(-20px - var(--tl-shift));top:13px;width:12px;height:12px;border-radius:50%;background:var(--matcha);border:2px solid var(--bg-card)}
 .tl-item.wish{border-style:dotted}
-.tl-item.wish::before{background:var(--bg-card);border:2px dashed #C8745A}
+.tl-item.wish::before{background:var(--bg-card);border:2px dashed var(--matcha-dark)}
 .tl-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .tl-flag{font-size:20px;line-height:1}
 .tl-name{font-size:15px;font-weight:700;color:#617553}
@@ -251,6 +251,39 @@ html[data-theme="dark"] .tl-name{color:#A9BD9B}
     margin: 0 !important;
 }
 
+
+/* ===== 🎲 機會命運 ===== */
+.fate-stage{position:relative;width:min(100%,300px);margin:16px auto 4px}
+.fate-ptr{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:20px solid #7A5F4B;z-index:2;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+html[data-theme="dark"] .fate-ptr{border-top-color:#D9B98F}
+.fate-wheel{width:100%;aspect-ratio:1/1;transition:transform 4.2s cubic-bezier(.12,.6,.1,1);will-change:transform;pointer-events:none}   /* 轉盤轉動時方形外框的角會轉出去，不讓它擋住下面的按鈕 */
+.fate-wheel svg{display:block;width:100%;height:100%}
+.fw-s{stroke:var(--bg-card);stroke-width:1.5}
+.fw-c{fill:#8FA382}
+.fw-f{fill:#C8745A}
+.fw-t{fill:#fff;font-size:10px;font-weight:700}
+.fw-e{font-size:15px}
+.fw-ring{fill:none;stroke:#7A5F4B;stroke-width:1.5;stroke-dasharray:4 3}
+.fw-hub{fill:var(--bg-card);stroke:#7A5F4B;stroke-width:1.2;stroke-dasharray:3 2}
+.roll:disabled{opacity:.6;cursor:default}
+.fate-result{margin-top:10px;padding:10px 12px;text-align:center;font-size:14px;color:var(--text-secondary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px}
+.fate-result.on{color:var(--text-primary)}
+.fr-e{font-size:34px;line-height:1.2}
+.fr-k{font-size:12px;color:var(--text-muted)}
+.fr-t{font-size:17px;font-weight:700;color:#617553;margin:2px 0 8px;word-break:break-word}
+html[data-theme="dark"] .fr-t{color:#A9BD9B}
+.fate-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 8px;font-size:12px;color:var(--text-secondary)}
+.fe-row{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.fe-row input{min-width:0;font-size:16px;font-family:inherit;color:var(--text-primary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px;padding:6px 10px;outline:none}
+.fe-row input:focus{border-color:var(--matcha)}
+.fe-emo{width:52px;flex:0 0 52px;text-align:center}
+.fe-txt{flex:1}
+.fe-row .mini{flex:0 0 auto;padding:7px 10px}
+.fe-act{display:flex;gap:8px;justify-content:center;margin-top:6px}
+.mini:disabled{opacity:.45;cursor:not-allowed}
+.fh-head{display:flex;align-items:center;justify-content:space-between;margin:14px 0 4px;font-size:13px;font-weight:600;color:var(--text-secondary)}
+.fh-row{font-size:12.5px;color:var(--text-secondary);padding:4px 0;border-top:1px dashed var(--border-color)}
+.foot-hint:empty{display:none}
 </style>
 </head>
 <body>
@@ -295,6 +328,22 @@ html[data-theme="dark"] .tl-name{color:#A9BD9B}
             <input id="fFile" type="file" accept="application/json,.json" class="hidden">
         </div>
         <div class="chip-tip" style="text-align:center">地圖上的橘點是你的足跡，點一下就能回顧；資料存在這台裝置的瀏覽器裡，記得偶爾匯出備份。</div>
+    </div>
+
+    <div class="card" id="fateCard">
+        <h2>🎲 機會命運<button id="fateEditBtn" class="tbtn" type="button">✏️ 編輯選項</button></h2>
+        <div class="fate-stage">
+            <div class="fate-ptr"></div>
+            <div class="fate-wheel" id="fateWheel"><svg id="fateSvg" viewBox="-104 -104 208 208" aria-hidden="true"></svg></div>
+        </div>
+        <button id="fateSpin" class="roll" type="button">🎲 轉動命運</button>
+        <div class="fate-result" id="fateResult" aria-live="polite">按下「轉動命運」，看看今天抽到什麼 🍀</div>
+        <div id="fateEditor" class="hidden">
+            <div class="fate-bar"><span id="fateCount"></span><span>🍀 機會 ・ ⚡ 命運（點一下可切換）</span></div>
+            <div id="fateList"></div>
+            <div class="fe-act"><button id="fateAdd" class="mini" type="button">＋ 新增選項</button><button id="fateReset" class="mini" type="button">↺ 還原預設</button></div>
+        </div>
+        <div id="fateHist"></div>
     </div>
 
     <div class="card hidden" id="boxCard">
@@ -1479,9 +1528,8 @@ function footHint(){
     b.textContent = '';
     const near = trips.filter(t => !t.wish && hav(t, cur) < 60).sort((a, c) => tkey(c).localeCompare(tkey(a)));
     const wish = trips.some(t => t.wish && hav(t, cur) < 60);
-    b.appendChild(mk('span', '', near.length ? `👣 你來過這裡 ${near.length} 次${near[0].start ? '（最近：' + fmtD(near[0].start) + '）' : ''}` : wish ? '🌠 這裡在你的想去清單裡' : '👣 還沒在這裡留下足跡'));
-    const btn = mk('button', 'mini', '＋ 新增記錄'); btn.type = 'button'; btn.onclick = () => openFootForm();
-    b.appendChild(btn);
+    if (!near.length && !wish) return;      // 沒來過就不顯示（新增記錄請用上面「我的足跡」卡片的按鈕）
+    b.appendChild(mk('span', '', near.length ? `👣 你來過這裡 ${near.length} 次${near[0].start ? '（最近：' + fmtD(near[0].start) + '）' : ''}` : '🌠 這裡在你的想去清單裡'));
 }
 
 function renderFoot(){ renderStats(); renderList(); renderFootMap(); footHint(); }
@@ -1649,12 +1697,33 @@ function setupFoot(){
     $('fKind').onchange = e => { fView.kind = e.target.value; renderList(); };
     $('fTag').onchange = e => { fView.tag = e.target.value; renderList(); };
     $('fSort').onclick = () => { fView.asc = !fView.asc; $('fSort').textContent = fView.asc ? '舊 → 新' : '新 → 舊'; renderList(); };
-    $('fExport').onclick = () => {
+    $('fExport').onclick = async () => {
         if (!trips.length) { alert('目前沒有足跡可以匯出。'); return; }
+        const text = JSON.stringify({app:'全球時光', version:1, trips}, null, 1), name = 'footprints-' + todayStr() + '.json';
+        const btn = $('fExport'), old = btn.textContent, done = m => { btn.textContent = m; setTimeout(() => { btn.textContent = old; }, 2500); };
+        // ① 電腦版 Chrome／Edge：跳出「另存新檔」視窗，自己選要存在哪個資料夾
+        if (window.showSaveFilePicker) {
+            try {
+                const h = await window.showSaveFilePicker({suggestedName:name, types:[{description:'足跡備份（JSON）', accept:{'application/json':['.json']}}]});
+                const w = await h.createWritable(); await w.write(text); await w.close();
+                done('✅ 已儲存'); return;
+            } catch(e) { if (e && e.name === 'AbortError') return; }      // 按取消就結束；其他錯誤才改用下面的備援
+        }
+        // ② 手機：開啟系統分享選單，選「儲存到檔案」就能自己挑資料夾
+        if (navigator.share && navigator.canShare) {
+            for (const type of ['application/json', 'text/plain']) {
+                const f = new File([text], name, {type});
+                if (!navigator.canShare({files:[f]})) continue;
+                try { await navigator.share({files:[f], title:'足跡備份'}); done('✅ 已送出'); return; }
+                catch(e) { if (e && e.name === 'AbortError') return; }
+            }
+        }
+        // ③ 備援：一般下載（存到瀏覽器預設的下載資料夾）
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([JSON.stringify({app:'全球時光', version:1, trips}, null, 1)], {type:'application/json'}));
-        a.download = 'footprints-' + todayStr() + '.json'; document.body.appendChild(a); a.click(); a.remove();
+        a.href = URL.createObjectURL(new Blob([text], {type:'application/json'}));
+        a.download = name; document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 3000);
+        done('✅ 已下載');
     };
     $('fImport').onclick = () => $('fFile').click();
     $('fFile').onchange = async e => {
@@ -1671,6 +1740,134 @@ function setupFoot(){
     };
 }
 setupFoot();
+
+/* =====================================================================
+   🎲 機會命運（轉盤・最多 10 個選項・資料存在 localStorage：tm_fate / tm_fate_hist）
+   ===================================================================== */
+const FATE_MAX = 10, FATE_MIN = 2;
+const fateKinds = {chance:'🍀 機會', fate:'⚡ 命運'}, fateIcon = {chance:'🍀', fate:'⚡'};
+const FATE_DEFAULT = [
+    {emoji:'🍜', text:'去吃一間沒吃過的店', kind:'chance'},
+    {emoji:'🚶', text:'走一條沒走過的路', kind:'fate'},
+    {emoji:'🧋', text:'請自己喝一杯手搖', kind:'chance'},
+    {emoji:'📸', text:'拍下今天最美的畫面', kind:'fate'},
+    {emoji:'💌', text:'傳訊息給好久沒聯絡的人', kind:'chance'},
+    {emoji:'🎁', text:'送一個小禮物給身邊的人', kind:'fate'},
+    {emoji:'🌅', text:'找個地方看夕陽', kind:'chance'},
+    {emoji:'📖', text:'進書店逛 30 分鐘', kind:'fate'},
+    {emoji:'🍀', text:'把拖很久的事做掉', kind:'chance'},
+    {emoji:'🛋️', text:'什麼都不做，休息 15 分鐘', kind:'fate'}
+];
+const cleanFate = o => (o && typeof o.text === 'string') ? {emoji:String(o.emoji || '✨').slice(0, 4), text:o.text.slice(0, 30), kind:o.kind === 'fate' ? 'fate' : 'chance'} : null;
+let fate = {opts:FATE_DEFAULT.map(o => Object.assign({}, o))}, fateHist = [], fateRot = 0, fateBusy = false;
+try { const a = JSON.parse(load('tm_fate') || 'null'); if (a && Array.isArray(a.opts)) { const c = a.opts.map(cleanFate).filter(Boolean).slice(0, FATE_MAX); if (c.length >= FATE_MIN) fate.opts = c; } } catch(e) {}
+try { const h = JSON.parse(load('tm_fate_hist') || '[]'); if (Array.isArray(h)) fateHist = h.filter(x => x && typeof x.text === 'string').slice(0, 10).map(x => ({t:+x.t || 0, emoji:String(x.emoji || '').slice(0, 4), text:x.text.slice(0, 30), kind:x.kind === 'fate' ? 'fate' : 'chance'})); } catch(e) {}
+const saveFate = () => save('tm_fate', JSON.stringify(fate)), saveFateHist = () => save('tm_fate_hist', JSON.stringify(fateHist));
+function randInt(n){
+    if (window.crypto && crypto.getRandomValues) { const b = new Uint32Array(1), lim = Math.floor(4294967296 / n) * n; let x; do { crypto.getRandomValues(b); x = b[0]; } while (x >= lim); return x % n; }
+    return Math.floor(Math.random() * n);
+}
+const shortTxt = s => { const a = [...(s || '').trim()]; return a.length > 5 ? a.slice(0, 5).join('') + '…' : (a.join('') || '…'); };
+
+/* ---- 畫轉盤 ---- */
+function drawFateWheel(){
+    const g = $('fateSvg'); g.textContent = '';
+    const o = fate.opts, n = o.length, a = 360 / n, R = 100, rad = Math.PI / 180;
+    const pt = (deg, r) => [(r * Math.sin(deg * rad)).toFixed(2), (-r * Math.cos(deg * rad)).toFixed(2)];
+    o.forEach((p, i) => {
+        const [x0, y0] = pt(i * a, R), [x1, y1] = pt((i + 1) * a, R);
+        el('path', {class:'fw-s ' + (p.kind === 'fate' ? 'fw-f' : 'fw-c'), d:`M0 0L${x0} ${y0}A${R} ${R} 0 0 1 ${x1} ${y1}Z`}, g);
+        const grp = el('g', {transform:`rotate(${((i + .5) * a).toFixed(2)})`}, g);
+        const t = el('text', {class:'fw-t', transform:'translate(0,-19) rotate(-90)', dy:'.35em'}, grp); t.textContent = shortTxt(p.text);
+        const e = el('text', {class:'fw-e', x:0, y:-90, 'text-anchor':'middle', dy:'.35em'}, grp); e.textContent = p.emoji;
+    });
+    el('circle', {r:R, class:'fw-ring'}, g);
+    el('circle', {r:14, class:'fw-hub'}, g);
+}
+
+/* ---- 轉動 ---- */
+function spinFate(){
+    if (fateBusy) return;
+    const o = fate.opts, box = $('fateResult');
+    if (o.length < FATE_MIN || o.some(p => !p.text.trim())) {
+        box.classList.remove('on'); box.textContent = '有選項還是空白，請先到「編輯選項」填寫內容，或把它刪除。';
+        openFateEditor(true); return;
+    }
+    fateBusy = true; $('fateSpin').disabled = true; $('fateEditBtn').disabled = true;
+    box.classList.remove('on'); box.textContent = '🌀 命運轉動中…';
+    const n = o.length, a = 360 / n, idx = randInt(n), jitter = (Math.random() - .5) * a * .7;   // 停在切片裡的哪個位置也是隨機的
+    const target = (((-(idx + .5) * a - jitter) % 360) + 360) % 360, cur = ((fateRot % 360) + 360) % 360;
+    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, ms = reduce ? 700 : 4200;
+    fateRot += (reduce ? 1 : 5) * 360 + (((target - cur) % 360) + 360) % 360;
+    const w = $('fateWheel'); w.style.transitionDuration = ms + 'ms'; w.style.transform = `rotate(${fateRot}deg)`;
+    let done = false;
+    const fin = () => {
+        if (done) return; done = true; fateBusy = false;
+        $('fateSpin').disabled = false; $('fateEditBtn').disabled = false;
+        const p = o[idx]; showFate(p);
+        fateHist.unshift({t:Date.now(), emoji:p.emoji, text:p.text, kind:p.kind}); fateHist = fateHist.slice(0, 10); saveFateHist(); renderFateHist();
+        if (navigator.vibrate) { try { navigator.vibrate(40); } catch(e) {} }
+    };
+    w.addEventListener('transitionend', fin, {once:true}); setTimeout(fin, ms + 150);
+}
+function showFate(p){
+    const r = $('fateResult'); r.textContent = ''; r.classList.add('on');
+    r.appendChild(mk('div', 'fr-e', p.emoji)); r.appendChild(mk('div', 'fr-k', fateKinds[p.kind])); r.appendChild(mk('div', 'fr-t', p.text));
+    const b = mk('button', 'mini', '📝 記進足跡'); b.type = 'button';
+    b.onclick = () => { openFootForm(); $('fmNote').value = `🎲 機會命運｜${fateKinds[p.kind]}：${p.emoji} ${p.text}`; $('fmTag').value = 'other'; };
+    r.appendChild(b);
+}
+function renderFateHist(){
+    const b = $('fateHist'); b.textContent = '';
+    if (!fateHist.length) return;
+    const h = mk('div', 'fh-head'); h.appendChild(mk('span', '', '🕘 最近抽到的'));
+    const c = mk('button', 'mini', '清除'); c.type = 'button'; c.onclick = () => { fateHist = []; saveFateHist(); renderFateHist(); };
+    h.appendChild(c); b.appendChild(h);
+    fateHist.forEach(x => { const d = new Date(x.t); b.appendChild(mk('div', 'fh-row', `${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}　${fateIcon[x.kind]} ${x.emoji} ${x.text}`)); });
+}
+
+/* ---- 編輯選項（新增／修改／刪除） ---- */
+function fateCount(){ $('fateCount').textContent = `目前 ${fate.opts.length}／${FATE_MAX} 個選項${fate.opts.length >= FATE_MAX ? '（已滿）' : ''}`; $('fateAdd').disabled = fate.opts.length >= FATE_MAX; }
+function buildFateList(){
+    const box = $('fateList'); box.textContent = '';
+    fate.opts.forEach((p, i) => {
+        const row = mk('div', 'fe-row');
+        const e = mk('input', 'fe-emo'); e.value = p.emoji; e.maxLength = 4; e.setAttribute('aria-label', '圖示');
+        const t = mk('input', 'fe-txt'); t.value = p.text; t.maxLength = 30; t.placeholder = '輸入內容…'; t.setAttribute('aria-label', '內容');
+        const k = mk('button', 'mini', fateKinds[p.kind]); k.type = 'button';
+        const d = mk('button', 'mini danger', '🗑️'); d.type = 'button'; d.setAttribute('aria-label', '刪除');
+        e.oninput = () => { p.emoji = e.value.trim() || '✨'; saveFate(); drawFateWheel(); };
+        t.oninput = () => { p.text = t.value; saveFate(); drawFateWheel(); };
+        k.onclick = () => { p.kind = p.kind === 'fate' ? 'chance' : 'fate'; k.textContent = fateKinds[p.kind]; saveFate(); drawFateWheel(); };
+        d.onclick = () => {
+            if (fate.opts.length <= FATE_MIN) { alert('至少要留 2 個選項，轉盤才轉得起來喔。'); return; }
+            if (!confirm('刪除這個選項？')) return;
+            fate.opts.splice(i, 1); saveFate(); buildFateList(); drawFateWheel();
+        };
+        [e, t, k, d].forEach(x => row.appendChild(x)); box.appendChild(row);
+    });
+    fateCount();
+}
+function openFateEditor(open){
+    $('fateEditor').classList.toggle('hidden', !open);
+    $('fateEditBtn').textContent = open ? '✔ 完成' : '✏️ 編輯選項';
+    if (open) buildFateList();
+}
+function setupFate(){
+    $('fateSpin').onclick = spinFate;
+    $('fateEditBtn').onclick = () => openFateEditor($('fateEditor').classList.contains('hidden'));
+    $('fateAdd').onclick = () => {
+        if (fate.opts.length >= FATE_MAX) return;
+        fate.opts.push({emoji:'✨', text:'', kind:'chance'}); saveFate(); buildFateList(); drawFateWheel();
+        const ins = $('fateList').querySelectorAll('.fe-txt'); ins[ins.length - 1].focus();
+    };
+    $('fateReset').onclick = () => {
+        if (!confirm('要還原成預設的 10 個選項嗎？你自己改過的內容會被取代。')) return;
+        fate.opts = FATE_DEFAULT.map(o => Object.assign({}, o)); saveFate(); buildFateList(); drawFateWheel();
+    };
+    drawFateWheel(); renderFateHist(); fateCount();
+}
+setupFate();
 
 init();
 </script>

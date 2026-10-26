@@ -187,12 +187,12 @@ html[data-theme="dark"] .foot{stroke:#41342A}
 .ft-tools input:focus,.ft-tools select:focus,.fm input:focus,.fm select:focus,.fm textarea:focus{border-color:var(--matcha)}
 .ft-row .tbtn{margin-left:0;font-size:14.2px;padding:0 12px;border-radius:20px;border:1.5px dashed var(--border-color);}
 .ft-bar{display:flex;gap:8px;justify-content:center;margin-top:10px}
-.tl{--tl-shift:6px;position:relative;margin:6px 0 0 6px;padding-left:20px}   /* --tl-shift：虛線和圓點一起往左移的距離，想再左移就調大 */
-.tl::before{content:"";position:absolute;left:calc(5px - var(--tl-shift));top:4px;bottom:4px;border-left:2px dashed var(--border-color)}
+.tl{--tl-x:1px;position:relative;margin:6px 0 0 6px;padding-left:20px}   /* --tl-x：虛線與圓點的「中心線」離時間軸左緣多遠；數字越小越靠左（可以是負數） */
+.tl::before{content:"";position:absolute;left:calc(var(--tl-x) - 1px);top:4px;bottom:4px;border-left:2px dashed var(--border-color)}
 .tl-year{font-size:14px;font-weight:700;color:var(--primary-dark);margin:10px 0 6px}
 .tl-year:first-child{margin-top:0}
 .tl-item{position:relative;background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:15px;padding:8px 12px;margin-bottom:10px}
-.tl-item::before{content:"";position:absolute;left:calc(-20px - var(--tl-shift));top:13px;width:12px;height:12px;border-radius:50%;background:var(--matcha);border:2px solid var(--bg-card)}
+.tl-item::before{content:"";position:absolute;left:calc(var(--tl-x) - 29.5px);top:13px;width:12px;height:12px;box-sizing:content-box;border-radius:50%;background:var(--matcha);border:2px solid var(--bg-card)}   /* 29.5 = 時間軸左內距 20 + 卡片虛線框 1.5 + 圓點半徑 8 */
 .tl-item.wish{border-style:dotted}
 .tl-item.wish::before{background:var(--bg-card);border:2px dashed var(--matcha-dark)}
 .tl-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}

@@ -176,7 +176,7 @@ html[data-theme="dark"] .country.visited.sel{fill:#6F8463}
 .footline{fill:none;stroke:#C8745A;stroke-width:1.4;stroke-dasharray:3 4;vector-effect:non-scaling-stroke;pointer-events:none;opacity:.85}
 html[data-theme="dark"] .foot{stroke:#41342A}
 .foot-hint{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:12.5px;color:var(--text-secondary)}
-.mini{border:1px dashed #7A5F4B;background:var(--bg-card);color:var(--text-secondary);border-radius:15px;padding:5px 10px;font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap}
+.mini{border:1px dashed #7A5F4B;background:var(--bg-card);color:var(--text-secondary);border-radius:15px;padding:2px 10px;font-size:12px;font-family:inherit;cursor:pointer;white-space:nowrap;}
 .mini:active{background:var(--bg-hover)}
 .mini.danger{color:#B5523F}
 .ft-tools{display:flex;flex-direction:column;gap:10px;margin:10px 0 8px}
@@ -185,7 +185,7 @@ html[data-theme="dark"] .foot{stroke:#41342A}
 .ft-row select{flex:1;min-width:0}
 .ft-tools input,.ft-tools select,.fm input,.fm select,.fm textarea{font-size:14px;font-family:inherit;background:var(--bg-input);padding:4px 12px;color:#7A5F4B;border:1.5px dashed var(--border-color);border-radius:20px;outline:none;font-weight:450;}
 .ft-tools input:focus,.ft-tools select:focus,.fm input:focus,.fm select:focus,.fm textarea:focus{border-color:var(--matcha)}
-.ft-row .tbtn{margin-left:0;font-size:14.2px;padding:0 12px;border-radius:20px;border:1.5px dashed var(--border-color);}
+.ft-row .tbtn{margin-left:0;font-size:14.2px;padding:0 12px;border-radius:20px;border:1.5px dashed #D4B896;}
 .ft-bar{display:flex;gap:8px;justify-content:center;margin-top:10px}
 .tl{--tl-x:1px;position:relative;margin:6px 0 0 6px;padding-left:20px}   /* --tl-x：虛線與圓點的「中心線」離時間軸左緣多遠；數字越小越靠左（可以是負數） */
 .tl::before{content:"";position:absolute;left:calc(var(--tl-x) - 1px);top:4px;bottom:4px;border-left:2px dashed var(--border-color)}
@@ -266,7 +266,7 @@ html[data-theme="dark"] .fate-ptr{border-top-color:#D9B98F}
 .fw-ring{fill:none;stroke:#7A5F4B;stroke-width:1.5;stroke-dasharray:4 3}
 .fw-hub{fill:var(--bg-card);stroke:#7A5F4B;stroke-width:1.2;stroke-dasharray:3 2}
 .roll:disabled{opacity:.6;cursor:default}
-.fate-result{margin-top:10px;padding:10px 12px;text-align:center;font-size:14px;color:var(--text-secondary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px}
+.fate-result{margin-top:10px;padding:6px 12px;text-align:center;font-size:14px;color:var(--text-secondary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px}
 .fate-result.on{color:var(--text-primary)}
 .fr-e{font-size:34px;line-height:1.2}
 .fr-k{font-size:12px;color:var(--text-muted)}
@@ -282,7 +282,7 @@ html[data-theme="dark"] .fr-t{color:#A9BD9B}
 .fe-act{display:flex;gap:8px;justify-content:center;margin-top:6px}
 .mini:disabled{opacity:.45;cursor:not-allowed}
 .fh-head{display:flex;align-items:center;justify-content:space-between;margin:14px 0 4px;font-size:13px;font-weight:600;color:var(--text-secondary)}
-.fh-row{font-size:12.5px;color:var(--text-secondary);padding:4px 0;border-top:1px dashed var(--border-color)}
+.fh-row{font-size:12.5px;color:var(--text-secondary);padding:4px 0;border-top:1px dashed var(--border-color);margin-top:12px;}
 .foot-hint:empty{display:none}
 </style>
 </head>
@@ -327,7 +327,7 @@ html[data-theme="dark"] .fr-t{color:#A9BD9B}
             <button id="fImport" class="mini" type="button">📥 匯入備份</button>
             <input id="fFile" type="file" accept="application/json,.json" class="hidden">
         </div>
-        <div class="chip-tip" style="text-align:center">地圖上的橘點是你的足跡，點一下就能回顧；資料存在這台裝置的瀏覽器裡，記得偶爾匯出備份。</div>
+        <div class="chip-tip" style="text-align:center">地圖上的「綠點」代表您的足跡，點一下就能回顧；資料存在這台裝置的瀏覽器裡，記得偶爾匯出備份。</div>
     </div>
 
     <div class="card" id="fateCard">
@@ -336,8 +336,8 @@ html[data-theme="dark"] .fr-t{color:#A9BD9B}
             <div class="fate-ptr"></div>
             <div class="fate-wheel" id="fateWheel"><svg id="fateSvg" viewBox="-104 -104 208 208" aria-hidden="true"></svg></div>
         </div>
-        <button id="fateSpin" class="roll" type="button">🎲 轉動命運</button>
-        <div class="fate-result" id="fateResult" aria-live="polite">按下「轉動命運」，看看今天抽到什麼 🍀</div>
+        <button id="fateSpin" class="roll" type="button">🎲 翻轉命運 🎲</button>
+        <div class="fate-result" id="fateResult" aria-live="polite">按下「翻轉命運」，看看今天抽到什麼 🍀</div>
         <div id="fateEditor" class="hidden">
             <div class="fate-bar"><span id="fateCount"></span><span>🍀 機會 ・ ⚡ 命運（點一下可切換）</span></div>
             <div id="fateList"></div>
@@ -1422,7 +1422,7 @@ function statCell(l, r, u){ const d = mk('div', 'cell'); d.appendChild(mk('div',
 function renderStats(){
     const b = $('footStats'); b.textContent = '';
     const been = trips.filter(t => !t.wish), wish = trips.length - been.length;
-    if (!been.length) { b.appendChild(mk('div', 'state', wish ? `已有 ${wish} 個想去的地方。去過之後，編輯它改成「去過」就會變成足跡！` : '還沒有足跡。在地圖上點一個地方，按右上角「＋ 新增記錄」留下第一筆吧！')); return; }
+    if (!been.length) { b.appendChild(mk('div', 'state', wish ? `已有 ${wish} 個想去的地方。去過之後，編輯它改成「去過」就會變成足跡！` : '您目前還沒有任何的足跡紀錄，在地圖上點一個地方，按右上角「＋ 新增記錄」留下第一筆吧！')); return; }
     const g = mk('div', 'grid3');
     g.appendChild(statCell('🌍 國家', String(new Set(been.map(t => t.cc || t.country || t.name)).size), '個'));
     g.appendChild(statCell('📍 地點', String(new Set(been.map(t => t.name)).size), '處'));

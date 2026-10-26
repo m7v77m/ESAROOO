@@ -106,7 +106,7 @@ footer{font-size:11.5px;color:var(--text-secondary);text-align:center;padding:2p
 /* ===== v5：深淺模式、航線、匯率、盲盒 ===== */
 :root{--accent-text:#A9BD9B}
 .tbtn{margin-left:auto;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:20px;padding:4px 10px;font-size:12px;font-family:inherit;cursor:pointer}
-.roll{display:block;width:100%;margin-top:10px;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:15px;padding:6px 10px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
+.roll{display:block;width:100%;margin-top:10px;border:1.0px dashed #7A5F4B;background:var(--bg-input);color:#7A5F4B;border-radius:25px;padding:6px 10px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer}
 .roll:active{background:var(--bg-hover)}
 .roll .dice{display:inline-block}
 .roll.rolling .dice{animation:dicespin .7s ease-out}
@@ -266,7 +266,7 @@ html[data-theme="dark"] .fate-ptr{border-top-color:#D9B98F}
 .fw-ring{fill:none;stroke:#7A5F4B;stroke-width:1.5;stroke-dasharray:4 3}
 .fw-hub{fill:var(--bg-card);stroke:#7A5F4B;stroke-width:1.2;stroke-dasharray:3 2}
 .roll:disabled{opacity:.6;cursor:default}
-.fate-result{margin-top:10px;padding:5px 12px;text-align:center;font-size:13.5px;color:var(--text-secondary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px}
+.fate-result{margin-top:10px;padding:5px 12px;text-align:center;font-size:14.5px;color:var(--text-secondary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px}
 .fate-result.on{color:var(--text-primary)}
 .fr-e{font-size:34px;line-height:1.2}
 .fr-k{font-size:12px;color:var(--text-muted)}
@@ -278,7 +278,7 @@ html[data-theme="dark"] .fr-t{color:#A9BD9B}
 .fe-row input:focus{border-color:var(--matcha)}
 .fe-emo{width:52px;flex:0 0 52px;text-align:center}
 .fe-txt{flex:1}
-.fe-row .mini{flex:0 0 auto;padding:7px 10px}
+.fe-row .mini{flex:0 0 auto;padding:7px 10px;}
 .fe-act{display:flex;gap:8px;justify-content:center;margin-top:6px}
 .mini:disabled{opacity:.45;cursor:not-allowed}
 .fh-head{display:flex;align-items:center;justify-content:space-between;margin:14px 0 4px;font-size:14.5px;font-weight:600;color:var(--text-secondary)}
@@ -336,8 +336,8 @@ html[data-theme="dark"] .fr-t{color:#A9BD9B}
             <div class="fate-ptr"></div>
             <div class="fate-wheel" id="fateWheel"><svg id="fateSvg" viewBox="-104 -104 208 208" aria-hidden="true"></svg></div>
         </div>
-        <button id="fateSpin" class="roll" type="button">翻 🎲 轉 🎲 命 🎲 運</button>
-        <div class="fate-result" id="fateResult" aria-live="polite">按下「翻轉命運」，看看今天抽到什麼 🍀</div>
+        <button id="fateSpin" class="roll" type="button">？&nbsp;&nbsp;翻 🎲 轉 🎲 命 🎲 運&nbsp;&nbsp;！</button>
+        <div class="fate-result" id="fateResult" aria-live="polite">按下「翻轉命運」，看看今天抽到什麼？！🍀</div>
         <div id="fateEditor" class="hidden">
             <div class="fate-bar"><span id="fateCount"></span><span>🍀 機會 ・ ⚡ 命運（點一下可切換）</span></div>
             <div id="fateList"></div>

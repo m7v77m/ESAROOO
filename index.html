@@ -64,8 +64,8 @@ body{
 .clock .t{font-size:19px;font-weight:700;color:var(--primary-dark);font-variant-numeric:tabular-nums;white-space:nowrap}
 .clock .dn{font-size:15px;line-height:1}
 .date{text-align:center;font-size:14px;color:var(--text-primary);font-weight:600}
-.rows{display:flex;flex-direction:column;gap:11px;margin-top:11px}
-.row{display:flex;justify-content:space-between;gap:10px;font-size:13px;background:var(--bg-input);border:1.5px dashed #D4B896;border-radius:15px;padding:6px 12px}
+.rows{display:flex;flex-direction:column;gap:7px;margin-top:11px;}
+.row{display:flex;justify-content:space-between;gap:10px;font-size:13px;background:var(--bg-input);border:1.5px dashed #D4B896;border-radius:15px;padding:6px 12px;margin-bottom:4px;}
 .row .k{color:var(--text-secondary);white-space:nowrap}
 .row .v{font-weight:600;text-align:right}
 .row .v.big{color:var(--expense-color)}
@@ -371,7 +371,7 @@ html[data-theme="dark"] .fr-t{color:#A9BD9B}
             <div class="clock"><div class="t" id="clk">--:--:--</div><div class="dn" id="dn"></div></div>
         </div>
         <!-- 修改後（增加了間距） -->
-        <div class="date" id="dateTxt" style="font-size: 20px; font-weight: bold; margin-bottom: 12px;"></div>
+        <div class="date" id="dateTxt" style="font-size: 20px; font-weight: bold; margin-bottom: -2px;"></div>
         <div class="rows">
             <div class="row"><span class="k">時區</span><span class="v" id="tzTxt">—</span></div>
             <div class="row"><span class="k">與台灣時差</span><span class="v" id="diffTxt">—</span></div>

@@ -69,7 +69,7 @@ body{
 .row .k{color:var(--text-secondary);white-space:nowrap}
 .row .v{font-weight:600;text-align:right}
 .row .v.big{color:var(--expense-color)}
-.note{font-size:12px;color:var(--text-muted);margin-top:6px}
+.note{font-size:12px;color:var(--text-muted);margin-top:7px}
 
 /* ---------- 天氣 ---------- */
 .now{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px}
@@ -1434,8 +1434,8 @@ function renderStats(){
     const been = trips.filter(t => !t.wish), wish = trips.length - been.length;
     if (!been.length) { b.appendChild(mk('div', 'state', wish ? `已有 ${wish} 個想去的地方。去過之後，編輯它改成「去過」就會變成足跡！` : '您目前還沒有任何的足跡紀錄，在地圖上點一個地方，按右上角「＋ 新增記錄」留下第一筆吧！')); return; }
     const g = mk('div', 'grid3');
-    g.appendChild(statCell('🌍 國家', String(new Set(been.map(t => t.cc || t.country || t.name)).size), '個'));
-    g.appendChild(statCell('📍 地點', String(new Set(been.map(t => t.name)).size), '處'));
+    g.appendChild(statCell('🌍 造訪國家', String(new Set(been.map(t => t.cc || t.country || t.name)).size), '個'));
+    g.appendChild(statCell('📍 造訪地點', String(new Set(been.map(t => t.name)).size), '處'));
     const dset = new Set(); been.forEach(t => { const n = tripDays(t), d0 = dayNum(t.start); for (let i = 0; i < n; i++) dset.add(d0 + i); });   // 同一天多筆只算一天
     g.appendChild(statCell('🗓️ 足跡天數', String(dset.size), '天'));
     b.appendChild(g);
@@ -2137,7 +2137,7 @@ html body button.roll#rollBtn {
 
 /* 🎯 2. 降伏第二處大空白：強迫「🔍 搜尋地點或註解」輸入框與上方的「還沒有足跡...」文字徹底貼合！ */
 html body #footCard .ft-tools {
-    margin-top: 9px !important;       /* 核心致命一擊：把搜尋框大卡片頭頂的空白從 10px 狠狠擠壓只剩 2px！ */
+    margin-top: 6px !important;       /* 核心致命一擊：把搜尋框大卡片頭頂的空白從 10px 狠狠擠壓只剩 2px！ */
     margin-bottom: 10px !important;    /* 保持搜尋框屁股底下也精實俐落 */
     gap: 10px !important;
 }

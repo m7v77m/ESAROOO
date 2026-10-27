@@ -271,24 +271,24 @@ html[data-theme="dark"] .fate-ptr{border-top-color:#D9B98F}
 .roll:disabled{opacity:.6;cursor:default}
 .fate-result{margin-top:10px;padding:5px 12px;text-align:center;font-size:14.0px;color:var(--text-secondary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px}
 .fate-result.on{color:var(--text-primary)}
-.fate-result .mini{margin-bottom:6.5px}   /* 「記進足跡」離下方虛線框：5px 內距 + 6.5px = 11.5px */
+.fate-result .mini{margin-bottom:5.5px}   /* 「記進足跡」離下方虛線框：5px 內距 + 5.5px = 10.5x */
 .fr-e{font-size:34px;line-height:1.2}
 .fr-k{font-size:12px;color:var(--text-muted)}
 .fr-t{font-size:17px;font-weight:700;color:#617553;margin:2px 0 8px;word-break:break-word}
 html[data-theme="dark"] .fr-t{color:#A9BD9B}
-.fate-bar{margin:12px 0 8px;font-size:12px;line-height:1.6;color:var(--text-secondary)}
+.fate-bar{margin:6px 0 8px;font-size:12px;line-height:1.6;color:var(--text-secondary)}
 .fate-bar .nb{white-space:nowrap}
 .fe-row{display:flex;gap:6px;align-items:center;margin-bottom:8px}
 .fe-row input{min-width:0;font-size:16px;font-family:inherit;color:var(--text-primary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px;padding:6px 10px;outline:none}
 .fe-row input:focus{border-color:var(--matcha)}
-.fe-emo{width:52px;flex:0 0 52px;text-align:center}
+.fe-emo{width:40px;flex:0 0 40px;text-align:center}
 .fe-txt{flex:1}
 .fe-row .mini{flex:0 0 auto;padding:7px 10px;}
 .fe-act{display:flex;gap:8px;justify-content:center;margin-top:6px}
 .mini:disabled{opacity:.45;cursor:not-allowed}
 .fh-head{display:flex;align-items:center;justify-content:space-between;margin:14px 0 4px;font-size:14.5px;font-weight:600;color:var(--text-secondary)}
 .fh-row{display:flex;align-items:center;font-size:14px;color:var(--text-secondary);padding:10px 0;border-top:1px dashed var(--border-color);margin-top:0}   /* 上下內距相同，文字就會在兩條虛線正中間 */
-.fh-head + .fh-row{margin-top:12px}   /* 標題和第一列的距離維持你原本的設定 */
+.fh-head + .fh-row{margin-top:12px;}   /* 標題和第一列的距離維持你原本的設定 */
 .foot-hint:empty{display:none}
 </style>
 </head>
@@ -327,12 +327,15 @@ html[data-theme="dark"] .fr-t{color:#A9BD9B}
                 <button id="fSort" class="tbtn" type="button">新 → 舊</button>
             </div>
         </div>
+        <div id="stayPending"></div>
         <div id="footList"></div>
         <div class="ft-bar">
             <button id="fExport" class="mini" type="button">📤 匯出備份</button>
             <button id="fImport" class="mini" type="button">📥 匯入備份</button>
             <input id="fFile" type="file" accept="application/json,.json" class="hidden">
         </div>
+        <div class="stay-row"><button id="stayToggle" class="mini" type="button">📡 自動偵測停留：關</button></div>
+        <div class="stay-status" id="stayStatus"></div>
         <div class="chip-tip" style="text-align:center">地圖上的「綠點」代表您的足跡，點一下就能回顧；資料存在這台裝置的瀏覽器裡，記得偶爾匯出備份。</div>
     </div>
 
@@ -403,6 +406,7 @@ html[data-theme="dark"] .fr-t{color:#A9BD9B}
     <footer>資料來源：Open-Meteo（天氣）、BigDataCloud（地名）、維基百科（景點與國家介紹）、Google 新聞（新聞）、ExchangeRate-API 與 currency-api（匯率）、Nager.Date（公共假日）。換日線以東西經 180° 簡化繪製。</footer>
 </div>
 
+<div class="stay-toast hidden" id="stayToast" role="alert"></div>
 <datalist id="cityList"></datalist>
 <div class="fm hidden" id="footModal" role="dialog" aria-modal="true" aria-labelledby="fmTitle">
     <div class="fm-box">
@@ -1541,7 +1545,7 @@ function footHint(){
 function renderFoot(){ renderStats(); renderList(); renderFootMap(); footHint(); }
 
 /* ---- 新增／編輯表單 ---- */
-let formId = null, formKind = 'been', formRating = 0, formLoc = null, formNameInit = '';
+let formId = null, formKind = 'been', formRating = 0, formLoc = null, formNameInit = '', formStayId = null;
 function paintStars(){ $('fmStars').querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.v <= formRating)); }
 function setKind(k){
     formKind = k;
@@ -1554,8 +1558,9 @@ function updLoc(){
     $('fmLoc').textContent = l ? `📍 ${flagOf(l.cc)} ${Math.abs(l.lat).toFixed(4)}°${l.lat >= 0 ? 'N' : 'S'}　${Math.abs(l.lon).toFixed(4)}°${l.lon >= 0 ? 'E' : 'W'}　${l.acc ? '（GPS 定位，誤差約 ' + Math.round(l.acc) + ' 公尺）' : l.manual ? '⚠️ 這是地圖上最後選的位置' + (l.cc ? '（' + regionZh(l.cc) + '）' : '') + '，不一定是你現在的位置，請按上面的按鈕偵測' : '（已儲存的位置；按上面的按鈕可改用你現在的位置）'}` : '尚未選擇地點';
     $('fmLoc').style.color = l && l.manual && !l.acc ? '#B5523F' : '';
 }
-function openFootForm(id){
+function openFootForm(id, preset){
     const t = id ? trips.find(x => x.id === id) : null;
+    formStayId = (preset && preset.stay) ? preset.stay.id : null;
     if (!t && !cur) return;
     formId = t ? t.id : null;
     $('fmTitle').textContent = t ? '編輯足跡' : '記錄足跡';
@@ -1564,6 +1569,13 @@ function openFootForm(id){
         formLoc = {lat:t.lat, lon:t.lon, cc:t.cc, country:t.country};
         $('fmName').value = t.name; setKind(t.wish ? 'wish' : 'been');
         $('fmStart').value = t.start; $('fmEnd').value = t.end; $('fmStartT').value = t.startTime || ''; $('fmEndT').value = t.endTime || ''; $('fmTag').value = t.tag; formRating = t.rating; $('fmNote').value = t.note;
+    } else if (preset && preset.stay) {      // 從「偵測到的停留」開啟：帶入當時的位置、開始與結束時間
+        const st = preset.stay, longEnough = st.until - st.since >= 60000;
+        formLoc = {lat:st.lat, lon:st.lon, cc:null, country:'', acc:st.acc || STAY_RADIUS_M};
+        $('fmName').value = ''; formNameInit = ''; setKind('been');
+        $('fmStart').value = ymd(st.since); $('fmStartT').value = hhmm(st.since);
+        $('fmEnd').value = longEnough && ymd(st.until) !== ymd(st.since) ? ymd(st.until) : ''; $('fmEndT').value = longEnough ? hhmm(st.until) : '';
+        $('fmTag').value = 'travel'; formRating = 0; $('fmNote').value = '';
     } else {
         formLoc = {lat:cur.lat, lon:cur.lon, cc:cur.cc || null, country:cur.country || (cur.cc ? regionZh(cur.cc) : ''), manual:true};
         $('fmName').value = cur.name || ''; formNameInit = $('fmName').value; setKind('been');
@@ -1571,7 +1583,8 @@ function openFootForm(id){
     }
     updLoc(); paintStars();
     geoSeq++; $('fmGeo').textContent = ''; $('fmNearby').textContent = '';
-    if (!t) {      // 新增時自動偵測目前位置（沒被拒絕過的話）
+    if (preset && preset.stay) { fillNearby(geoSeq, formLoc.lat, formLoc.lon, formLoc.acc); }
+    else if (!t) {      // 新增時自動偵測目前位置（沒被拒絕過的話）
         const go = () => { if (!formId && !$('footModal').classList.contains('hidden')) locateMe(); };
         if (navigator.permissions && navigator.permissions.query) navigator.permissions.query({name:'geolocation'}).then(r => { if (r.state !== 'denied') go(); }).catch(go);
         else setTimeout(go, 0);
@@ -1622,6 +1635,33 @@ async function nearbyAddr(lat, lon){
     if (addr) items.push({name:addr, lat, lon, d:0, emoji:'🏠'});
     return items;
 }
+async function fillNearby(my, lat, lon, acc){      // 依座標找附近店家／路名，列成可點選的清單（定位和「偵測到的停留」共用）
+    const msg = t => { $('fmGeo').textContent = t; };
+    const r = Math.round(Math.min(300, Math.max(120, acc * 1.2)));      // 定位越不準，搜尋範圍越大（最多 300 公尺）
+    msg(`✅ 已定位（誤差約 ${Math.round(acc)} 公尺），正在找附近 ${r} 公尺內的店家…`);
+    getJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&localityLanguage=zh`).then(j => {
+        if (my !== geoSeq || !formLoc) return;
+        const cc = (j.countryCode || '').toUpperCase();
+        formLoc.cc = cc || null; formLoc.country = cc ? regionZh(cc) : ''; updLoc();
+    }).catch(() => {});
+    const [pr, ar] = await Promise.allSettled([nearbyPOIs(lat, lon, r), nearbyAddr(lat, lon)]);
+    if (my !== geoSeq) return;
+    const seen = new Set(), items = [], add = p => { if (!seen.has(p.name)) { seen.add(p.name); items.push(p); } };
+    trips.filter(t => hav(t, {lat, lon}) < 0.15).forEach(t => add({name:t.name, lat:t.lat, lon:t.lon, d:hav(t, {lat, lon}) * 1000, emoji:'🕘'}));   // 以前記過的優先
+    if (pr.status === 'fulfilled') pr.value.forEach(add);
+    if (ar.status === 'fulfilled') ar.value.forEach(add);
+    const box = $('fmNearby'); box.textContent = '';
+    items.forEach(p => {
+        const b = mk('button', 'mini pick', p.emoji + ' ' + p.name); b.type = 'button';
+        if (p.d > 0) b.appendChild(mk('small', '', Math.round(p.d) + ' m'));
+        b.onclick = () => { $('fmName').value = p.name; formLoc = {lat:p.lat, lon:p.lon, cc:formLoc ? formLoc.cc : null, country:formLoc ? formLoc.country : '', acc:acc}; updLoc(); };
+        box.appendChild(b);
+    });
+    const warn = acc > 150 ? `　⚠️ 定位誤差約 ${Math.round(acc)} 公尺（電腦的定位通常不準，用手機會準很多），清單可能對不上。` : '';
+    if (items.length) msg('👇 點選你所在的店家；找不到就直接在上面輸入名稱。' + warn);
+    else if (pr.status === 'rejected' && ar.status === 'rejected') msg(`店家資料庫連不上（${errWhy(pr.reason)}），請稍後再按一次「偵測」，或直接輸入名稱。` + warn);
+    else msg('這附近查不到登記的店家，直接輸入名稱就可以了（輸入過一次，下次在這裡就會自動出現）。' + warn);
+}
 function locateMe(){
     const msg = t => { $('fmGeo').textContent = t; };
     if (!navigator.geolocation) { msg('這個瀏覽器不支援定位，請直接輸入名稱。'); return; }
@@ -1630,32 +1670,9 @@ function locateMe(){
     navigator.geolocation.getCurrentPosition(async pos => {
         if (my !== geoSeq) return;
         const lat = pos.coords.latitude, lon = pos.coords.longitude, acc = pos.coords.accuracy;
-        const r = Math.round(Math.min(300, Math.max(120, acc * 1.2)));      // 定位越不準，搜尋範圍越大（最多 300 公尺）
         formLoc = {lat, lon, cc:null, country:'', acc}; updLoc();
         if (!formId && $('fmName').value === formNameInit) $('fmName').value = '';   // 名稱欄還是預設的城市名就清空，等你選店家
-        msg(`✅ 已定位（誤差約 ${Math.round(acc)} 公尺），正在找附近 ${r} 公尺內的店家…`);
-        getJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat.toFixed(4)}&longitude=${lon.toFixed(4)}&localityLanguage=zh`).then(j => {
-            if (my !== geoSeq || !formLoc) return;
-            const cc = (j.countryCode || '').toUpperCase();
-            formLoc.cc = cc || null; formLoc.country = cc ? regionZh(cc) : ''; updLoc();
-        }).catch(() => {});
-        const [pr, ar] = await Promise.allSettled([nearbyPOIs(lat, lon, r), nearbyAddr(lat, lon)]);
-        if (my !== geoSeq) return;
-        const seen = new Set(), items = [], add = p => { if (!seen.has(p.name)) { seen.add(p.name); items.push(p); } };
-        trips.filter(t => hav(t, {lat, lon}) < 0.15).forEach(t => add({name:t.name, lat:t.lat, lon:t.lon, d:hav(t, {lat, lon}) * 1000, emoji:'🕘'}));   // 以前記過的優先
-        if (pr.status === 'fulfilled') pr.value.forEach(add);
-        if (ar.status === 'fulfilled') ar.value.forEach(add);
-        const box = $('fmNearby'); box.textContent = '';
-        items.forEach(p => {
-            const b = mk('button', 'mini pick', p.emoji + ' ' + p.name); b.type = 'button';
-            if (p.d > 0) b.appendChild(mk('small', '', Math.round(p.d) + ' m'));
-            b.onclick = () => { $('fmName').value = p.name; formLoc = {lat:p.lat, lon:p.lon, cc:formLoc ? formLoc.cc : null, country:formLoc ? formLoc.country : '', acc:acc}; updLoc(); };
-            box.appendChild(b);
-        });
-        const warn = acc > 150 ? `　⚠️ 定位誤差約 ${Math.round(acc)} 公尺（電腦的定位通常不準，用手機會準很多），清單可能對不上。` : '';
-        if (items.length) msg('👇 點選你所在的店家；找不到就直接在上面輸入名稱。' + warn);
-        else if (pr.status === 'rejected' && ar.status === 'rejected') msg(`店家資料庫連不上（${errWhy(pr.reason)}），請稍後再按一次「偵測」，或直接輸入名稱。` + warn);
-        else msg('這附近查不到登記的店家，直接輸入名稱就可以了（輸入過一次，下次在這裡就會自動出現）。' + warn);
+        await fillNearby(my, lat, lon, acc);
     }, err => {
         if (my !== geoSeq) return;
         msg(err.code === 1 ? '沒有定位權限：請在瀏覽器／手機設定裡允許這個網頁使用位置，或直接輸入名稱。' : '定位失敗，請到訊號好一點的地方再試一次，或直接輸入名稱。');
@@ -1690,6 +1707,7 @@ function setupFoot(){
         const rec = {name, lat:formLoc.lat, lon:formLoc.lon, cc:formLoc.cc, country:formLoc.country, wish:formKind === 'wish', start, end, startTime:st, endTime:et, tag:$('fmTag').value, rating:formRating, note:$('fmNote').value.trim()};
         if (formId) { const i = trips.findIndex(x => x.id === formId); if (i >= 0) trips[i] = Object.assign(trips[i], rec); }
         else { rec.id = newId(); rec.created = Date.now(); trips.push(rec); }
+        if (formStayId) { dropStay(formStayId); formStayId = null; }      // 從偵測到的停留記錄的：存好後就從待確認清單拿掉
         saveTrips(); closeFootForm(); renderFoot();
     };
     $('fmDel').onclick = () => {
@@ -1753,16 +1771,16 @@ setupFoot();
 const FATE_MAX = 10, FATE_MIN = 2;
 const fateKinds = {chance:'🍀 機會', fate:'⚡ 命運'}, fateIcon = {chance:'🍀', fate:'⚡'};
 const FATE_DEFAULT = [
-    {emoji:'🍜', text:'去吃一間沒吃過的店', kind:'chance'},
+    {emoji:'🍜', text:'吃一間沒吃過的店', kind:'chance'},
     {emoji:'🚶', text:'走一條沒走過的路', kind:'fate'},
     {emoji:'🧋', text:'請自己喝一杯手搖', kind:'chance'},
-    {emoji:'📸', text:'拍下今天最美的畫面', kind:'fate'},
+    {emoji:'📸', text:'拍下今天最美畫面', kind:'fate'},
     {emoji:'💌', text:'傳訊息給好久沒聯絡的人', kind:'chance'},
     {emoji:'🎁', text:'送一個小禮物給身邊的人', kind:'fate'},
-    {emoji:'🌅', text:'找個地方看夕陽', kind:'chance'},
-    {emoji:'📖', text:'進書店逛 30 分鐘', kind:'fate'},
-    {emoji:'🍀', text:'把拖很久的事做掉', kind:'chance'},
-    {emoji:'🛋️', text:'什麼都不做，休息 15 分鐘', kind:'fate'}
+    {emoji:'🌅', text:'找個地方觀看夕陽', kind:'chance'},
+    {emoji:'📖', text:'進書店閒逛30分鐘', kind:'fate'},
+    {emoji:'🍀', text:'把拖很久的事完成', kind:'chance'},
+    {emoji:'🛋', text:'什麼都不做，休息15分鐘', kind:'fate'}
 ];
 const cleanFate = o => (o && typeof o.text === 'string') ? {emoji:String(o.emoji || '✨').slice(0, 4), text:o.text.slice(0, 30), kind:o.kind === 'fate' ? 'fate' : 'chance'} : null;
 let fate = {opts:FATE_DEFAULT.map(o => Object.assign({}, o))}, fateHist = [], fateRot = 0, fateBusy = false;
@@ -1881,6 +1899,107 @@ function setupFate(){
     drawFateWheel(); renderFateHist(); fateCount();
 }
 setupFate();
+
+/* =====================================================================
+   📡 自動偵測停留（網頁開著、螢幕亮著時才會運作；在同一個地方待滿 10 分鐘就提醒你記錄）
+   ===================================================================== */
+const STAY_MIN_MS = 10 * 60 * 1000, STAY_RADIUS_M = 75, STAY_ACC_MAX = 150, STAY_GAP_MS = 12 * 60 * 1000, STAY_THROTTLE_MS = 15 * 1000;
+let stayOn = load('tm_stay_on') === '1', stayWatch = null, stayAnchor = null, stayLastProc = 0, stays = [], stayIgnore = [];
+try { const a = JSON.parse(load('tm_stays') || '[]'); if (Array.isArray(a)) stays = a.filter(x => x && typeof x.id === 'string' && isFinite(x.lat) && isFinite(x.lon) && isFinite(x.since)).slice(0, 8); } catch(e) {}
+try { const a = JSON.parse(load('tm_stay_ignore') || '[]'); if (Array.isArray(a)) stayIgnore = a.filter(x => x && isFinite(x.lat) && isFinite(x.lon)).slice(0, 50); } catch(e) {}
+const saveStays = () => save('tm_stays', JSON.stringify(stays)), saveIgnore = () => save('tm_stay_ignore', JSON.stringify(stayIgnore));
+const hhmm = t => { const d = new Date(t); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+const ymd = t => { const d = new Date(t); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+const toMin = s => +s.slice(0, 2) * 60 + +s.slice(3);
+const distM = (a, b) => hav(a, b) * 1000;
+const stayStatus = t => { $('stayStatus').textContent = t; };
+const updStayBtn = () => { $('stayToggle').textContent = stayOn ? '📡 自動偵測停留：開' : '📡 自動偵測停留：關'; };
+
+function stayStatusUpdate(now){
+    if (!stayOn) { stayStatus(''); return; }
+    if (!stayAnchor) { stayStatus('📡 偵測中…（請保持這個網頁開著、螢幕亮著）'); return; }
+    stayStatus(`📡 偵測中：在這附近已待約 ${Math.floor((now - stayAnchor.since) / 60000)} 分鐘（滿 10 分鐘會提醒你）。請保持網頁開著、螢幕亮著。`);
+}
+function onStayFix(pos, now){
+    now = now || Date.now();
+    const c = pos && pos.coords; if (!c || !isFinite(c.latitude) || !isFinite(c.longitude)) return;
+    if (stayAnchor && now - stayLastProc < STAY_THROTTLE_MS) return;          // 每 15 秒最多判斷一次，省電
+    stayLastProc = now;
+    const fix = {lat:c.latitude, lon:c.longitude, acc:c.accuracy || 0};
+    if (fix.acc > STAY_ACC_MAX) { stayStatus(`📡 目前定位誤差約 ${Math.round(fix.acc)} 公尺，先不判斷停留（到訊號好一點的地方會更準）`); return; }
+    if (stayAnchor && now - stayAnchor.last > STAY_GAP_MS) stayAnchor = null;   // 中間隔太久（螢幕鎖住、切去別的 App），不能當作一直待在那裡
+    if (!stayAnchor || distM(stayAnchor, fix) > Math.max(STAY_RADIUS_M, fix.acc)) {
+        stayAnchor = {lat:fix.lat, lon:fix.lon, acc:fix.acc, n:1, since:now, last:now, flagged:false, stayId:null};
+    } else {
+        const a = stayAnchor, k = Math.min(a.n, 20);
+        a.lat = (a.lat * k + fix.lat) / (k + 1); a.lon = (a.lon * k + fix.lon) / (k + 1); a.n++; a.last = now;      // 取平均，減少定位飄移
+        const s = a.stayId && stays.find(x => x.id === a.stayId); if (s) { s.until = now; saveStays(); renderStays(); }
+        if (!a.flagged && now - a.since >= STAY_MIN_MS) { a.flagged = true; createStay(a); }
+    }
+    stayStatusUpdate(now);
+}
+function createStay(a){
+    const here = {lat:a.lat, lon:a.lon};
+    if (stayIgnore.some(p => distM(p, here) < 120)) return;                                                   // 你說過不用提醒的地方（家、公司…）
+    if (trips.some(t => !t.wish && distM(t, here) < 100 && t.start === ymd(a.since) && (!t.startTime || Math.abs(toMin(t.startTime) - toMin(hhmm(a.since))) <= 90))) return;   // 這段時間在這裡已經記過了
+    if (stays.some(s => distM(s, here) < 100 && Math.abs(s.since - a.since) < 60 * 60000)) return;           // 已經有一筆待確認的
+    const s = {id:'s' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), lat:a.lat, lon:a.lon, acc:a.acc, since:a.since, until:a.last, label:'', notified:false};
+    stays.unshift(s); stays = stays.slice(0, 8); a.stayId = s.id; saveStays(); renderStays(); showStayToast(s);
+    nearbyAddr(s.lat, s.lon).then(items => { const x = items && items[0]; if (x && stays.includes(s)) { s.label = x.name; saveStays(); renderStays(); } }).catch(() => {});   // 順便查個路名／店名當標題
+}
+function showStayToast(s){
+    if (document.hidden) return;                      // 網頁不在前景就先不跳，回來後會補跳
+    s.notified = true; saveStays();
+    const t = $('stayToast'); t.textContent = '';
+    t.appendChild(mk('div', '', `📍 你在這附近待了約 ${Math.max(10, Math.round((s.until - s.since) / 60000))} 分鐘（${hhmm(s.since)} 起），要記錄嗎？`));
+    const a = mk('div', 'st-a'), b1 = mk('button', 'mini', '📝 記錄'), b2 = mk('button', 'mini', '稍後');
+    b1.type = b2.type = 'button';
+    b1.onclick = () => { t.classList.add('hidden'); useStay(s.id); };
+    b2.onclick = () => t.classList.add('hidden');
+    a.appendChild(b1); a.appendChild(b2); t.appendChild(a); t.classList.remove('hidden');
+}
+function renderStays(){
+    const box = $('stayPending'); box.textContent = '';
+    stays.forEach(s => {
+        const it = mk('div', 'stay-item');
+        it.appendChild(mk('div', 'st-t', '📍 ' + (s.label || '待確認的停留')));
+        it.appendChild(mk('div', 'st-s', `${fmtD(ymd(s.since))}　${hhmm(s.since)} 起，約 ${durText(Math.max(1, Math.round((s.until - s.since) / 60000)))}`));
+        const a = mk('div', 'st-a'), b1 = mk('button', 'mini', '📝 記錄'), b2 = mk('button', 'mini', '略過'), b3 = mk('button', 'mini', '🔕 不再提醒這裡');
+        [b1, b2, b3].forEach(b => b.type = 'button');
+        b1.onclick = () => useStay(s.id);
+        b2.onclick = () => dropStay(s.id);
+        b3.onclick = () => { stayIgnore.push({lat:s.lat, lon:s.lon}); saveIgnore(); dropStay(s.id); };
+        a.appendChild(b1); a.appendChild(b2); a.appendChild(b3); it.appendChild(a); box.appendChild(it);
+    });
+}
+function dropStay(id){ stays = stays.filter(x => x.id !== id); if (stayAnchor && stayAnchor.stayId === id) stayAnchor.stayId = null; saveStays(); renderStays(); }
+function useStay(id){ const s = stays.find(x => x.id === id); if (s) openFootForm(null, {stay:s}); }
+
+function stopStayWatch(){ if (stayWatch != null && navigator.geolocation) { try { navigator.geolocation.clearWatch(stayWatch); } catch(e) {} } stayWatch = null; }
+function startStay(){
+    if (!navigator.geolocation) { stayOn = false; save('tm_stay_on', '0'); stayStatus('這個瀏覽器不支援定位，沒辦法自動偵測。'); updStayBtn(); return; }
+    stopStayWatch(); stayAnchor = null; stayLastProc = 0;
+    stayWatch = navigator.geolocation.watchPosition(p => onStayFix(p), err => {
+        if (err.code === 1) { stayOn = false; save('tm_stay_on', '0'); stopStayWatch(); stayStatus('沒有定位權限：請在瀏覽器／手機設定裡允許這個網頁使用位置，再重新開啟。'); updStayBtn(); }
+        else stayStatus('📡 暫時抓不到位置，會繼續嘗試…');
+    }, {enableHighAccuracy:false, maximumAge:30000, timeout:30000});
+    stayStatusUpdate(Date.now()); updStayBtn();
+}
+function setupStay(){
+    updStayBtn(); renderStays();
+    $('stayToggle').onclick = () => {
+        stayOn = !stayOn; save('tm_stay_on', stayOn ? '1' : '0');
+        if (stayOn) startStay(); else { stopStayWatch(); stayAnchor = null; stayStatus(''); updStayBtn(); }
+    };
+    document.addEventListener('visibilitychange', () => {       // 回到網頁時，把還沒跳過的提醒補跳一次
+        if (!document.hidden) { const s = stays.find(x => !x.notified); if (s) showStayToast(s); }
+    });
+    if (stayOn) {      // 上次是開著的：已經允許過定位才自動接著偵測，不然等你再點一下
+        if (navigator.permissions && navigator.permissions.query) navigator.permissions.query({name:'geolocation'}).then(r => { if (r.state === 'granted') startStay(); else { stayOn = false; save('tm_stay_on', '0'); updStayBtn(); stayStatus('上次開著自動偵測，請再點一下按鈕重新開啟。'); } }).catch(() => { stayOn = false; updStayBtn(); });
+        else { stayOn = false; updStayBtn(); }
+    }
+}
+setupStay();
 
 init();
 </script>
@@ -2037,6 +2156,41 @@ html body #footCard #footList {
 html body #footCard .chip-tip {
     margin-top: 7px !important;
 }
+</style>
+<style id="v5-card-gap-stay">
+/* ============================================================
+   ① 卡片上下間隙統一：卡片邊緣 → 最上面的標題、最下面的內容 = 10px
+      （10px = 卡片邊框 1px + 內距 9px；想改成別的數字，只要改下面 --card-gap-y）
+   ============================================================ */
+:root { --card-gap-y: 10px; }
+html body .card {
+    padding-top: calc(var(--card-gap-y) - 1px) !important;
+    padding-bottom: calc(var(--card-gap-y) - 1px) !important;
+}
+html body #tzNote:empty { display: none; }                                  /* 當地時間：空的說明列不要佔位（原本多出 6px） */
+html body #fxCard #fxBody > div.state:last-child { margin-bottom: 0 !important; padding-bottom: 0 !important; }   /* 匯率：提示文字在最底下時，不要再多推 5.5px */
+html body .fh-row:last-child { padding-bottom: 0; }                         /* 翻轉紀錄：最後一列下面沒有虛線，不要多留內距 */
+
+/* ============================================================
+   ② 即時匯率：白天模式下，台幣／外幣兩個金額輸入框的字色 = 上面「1 台幣 ≈ …」那排的深綠色
+   ============================================================ */
+.fx-cv input { color: #617553; }
+html[data-theme="dark"] .fx-cv input { color: var(--accent-text); }
+
+/* ============================================================
+   ③ 自動偵測停留
+   ============================================================ */
+.stay-row { display: flex; justify-content: center; margin-top: 8px; }
+.stay-status { margin-top: 6px; font-size: 12px; line-height: 1.6; color: var(--text-secondary); text-align: center; }
+.stay-status:empty { display: none; }
+#stayPending { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 10px; }
+#stayPending:empty { display: none; }
+.stay-item { background: var(--bg-input); border: 1.5px dashed #D4B896; border-radius: 15px; padding: 8px 12px; font-size: 13px; }
+.stay-item .st-t { font-weight: 600; color: #617553; word-break: break-word; }
+html[data-theme="dark"] .stay-item .st-t { color: #A9BD9B; }
+.stay-item .st-s { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.st-a { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; justify-content: flex-end; }
+.stay-toast { position: fixed; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 40; max-width: 560px; margin: 0 auto; background: var(--bg-card); border: 1.5px dashed #7A5F4B; border-radius: 20px; padding: 10px 12px; box-shadow: 0 4px 14px rgba(60,40,30,.25); font-size: 14px; color: var(--text-primary); }
 </style>
 </body>
 </html>

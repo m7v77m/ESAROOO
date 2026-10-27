@@ -253,26 +253,31 @@ html[data-theme="dark"] .tl-name{color:#A9BD9B}
 
 
 /* ===== 🎲 機會命運 ===== */
-.fate-stage{position:relative;width:min(100%,300px);margin:16px auto 4px}
+.fate-stage{position:relative;width:min(100%,332px);margin:16px auto 4px}
 .fate-ptr{position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:20px solid #7A5F4B;z-index:2;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
 html[data-theme="dark"] .fate-ptr{border-top-color:#D9B98F}
 .fate-wheel{width:100%;aspect-ratio:1/1;transition:transform 4.2s cubic-bezier(.12,.6,.1,1);will-change:transform;pointer-events:none}   /* 轉盤轉動時方形外框的角會轉出去，不讓它擋住下面的按鈕 */
 .fate-wheel svg{display:block;width:100%;height:100%}
 .fw-s{stroke:var(--bg-card);stroke-width:1.5}
-.fw-c{fill:#8FA382}
-.fw-f{fill:#C8745A}
-.fw-t{fill:#fff;font-size:10px;font-weight:700}
-.fw-e{font-size:15px}
-.fw-ring{fill:none;stroke:#7A5F4B;stroke-width:1.5;stroke-dasharray:4 3}
-.fw-hub{fill:var(--bg-card);stroke:#7A5F4B;stroke-width:1.2;stroke-dasharray:3 2}
+.fw-c0{fill:#8FA382}   /* 抹茶綠 */
+.fw-c1{fill:#C8745A}   /* 陶土橘 */
+.fw-c2{fill:#DDB05B}   /* 蜂蜜金（新增的第三色） */
+.fw-rim{fill:#DDB05B}  /* 底圈：蜂蜜金，想換色就改這裡 */
+.fw-dot{fill:var(--bg-card)}
+.fw-t{fill:#fff;font-size:8.6px;font-weight:580;letter-spacing:.2px}
+.fw-t.dk{fill:#5B4636}   /* 蜂蜜金底色上的字改用深咖啡，比較看得清楚 */
+.fw-e{font-size:12.5px}
+.fw-star{fill:#7A5F4B;stroke:var(--bg-card);stroke-width:2;stroke-linejoin:round}
 .roll:disabled{opacity:.6;cursor:default}
 .fate-result{margin-top:10px;padding:5px 12px;text-align:center;font-size:14.0px;color:var(--text-secondary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px}
 .fate-result.on{color:var(--text-primary)}
+.fate-result .mini{margin-bottom:6.5px}   /* 「記進足跡」離下方虛線框：5px 內距 + 6.5px = 11.5px */
 .fr-e{font-size:34px;line-height:1.2}
 .fr-k{font-size:12px;color:var(--text-muted)}
 .fr-t{font-size:17px;font-weight:700;color:#617553;margin:2px 0 8px;word-break:break-word}
 html[data-theme="dark"] .fr-t{color:#A9BD9B}
-.fate-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 8px;font-size:12px;color:var(--text-secondary)}
+.fate-bar{margin:12px 0 8px;font-size:12px;line-height:1.6;color:var(--text-secondary)}
+.fate-bar .nb{white-space:nowrap}
 .fe-row{display:flex;gap:6px;align-items:center;margin-bottom:8px}
 .fe-row input{min-width:0;font-size:16px;font-family:inherit;color:var(--text-primary);background:var(--bg-input);border:1.5px dashed var(--border-color);border-radius:20px;padding:6px 10px;outline:none}
 .fe-row input:focus{border-color:var(--matcha)}
@@ -282,7 +287,8 @@ html[data-theme="dark"] .fr-t{color:#A9BD9B}
 .fe-act{display:flex;gap:8px;justify-content:center;margin-top:6px}
 .mini:disabled{opacity:.45;cursor:not-allowed}
 .fh-head{display:flex;align-items:center;justify-content:space-between;margin:14px 0 4px;font-size:14.5px;font-weight:600;color:var(--text-secondary)}
-.fh-row{font-size:14px;color:var(--text-secondary);padding:4px 0;border-top:1px dashed var(--border-color);margin-top:12px;}
+.fh-row{display:flex;align-items:center;font-size:14px;color:var(--text-secondary);padding:10px 0;border-top:1px dashed var(--border-color);margin-top:0}   /* 上下內距相同，文字就會在兩條虛線正中間 */
+.fh-head + .fh-row{margin-top:12px}   /* 標題和第一列的距離維持你原本的設定 */
 .foot-hint:empty{display:none}
 </style>
 </head>
@@ -334,12 +340,12 @@ html[data-theme="dark"] .fr-t{color:#A9BD9B}
         <h2>🎲 機會命運<button id="fateEditBtn" class="tbtn" type="button">✏️ 編輯選項</button></h2>
         <div class="fate-stage">
             <div class="fate-ptr"></div>
-            <div class="fate-wheel" id="fateWheel"><svg id="fateSvg" viewBox="-104 -104 208 208" aria-hidden="true"></svg></div>
+            <div class="fate-wheel" id="fateWheel"><svg id="fateSvg" viewBox="-110 -110 220 220" aria-hidden="true"></svg></div>
         </div>
         <button id="fateSpin" class="roll" type="button">🎲&nbsp;...&nbsp;&nbsp;翻&nbsp;？&nbsp;轉&nbsp;！&nbsp;命&nbsp;？&nbsp;運&nbsp;！&nbsp;...&nbsp;</button>
         <div class="fate-result" id="fateResult" aria-live="polite">按下「翻轉命運」，看看今天抽到什麼？！🍀</div>
         <div id="fateEditor" class="hidden">
-            <div class="fate-bar"><span id="fateCount"></span><span>🍀 機會 ・ ⚡ 命運（點一下可切換）</span></div>
+            <div class="fate-bar"><span id="fateCount"></span></div>
             <div id="fateList"></div>
             <div class="fe-act"><button id="fateAdd" class="mini" type="button">＋ 新增選項</button><button id="fateReset" class="mini" type="button">↺ 還原預設</button></div>
         </div>
@@ -1770,19 +1776,22 @@ function randInt(n){
 const shortTxt = s => { const a = [...(s || '').trim()]; return a.length > 5 ? a.slice(0, 5).join('') + '…' : (a.join('') || '…'); };
 
 /* ---- 畫轉盤 ---- */
+const starPath = (ro, ri) => { let d = ''; for (let i = 0; i < 10; i++) { const r = i % 2 ? ri : ro, ang = (-90 + i * 36) * Math.PI / 180; d += (i ? 'L' : 'M') + (r * Math.cos(ang)).toFixed(2) + ' ' + (r * Math.sin(ang)).toFixed(2); } return d + 'Z'; };
 function drawFateWheel(){
     const g = $('fateSvg'); g.textContent = '';
-    const o = fate.opts, n = o.length, a = 360 / n, R = 100, rad = Math.PI / 180;
+    const o = fate.opts, n = o.length, a = 360 / n, R = 96, rad = Math.PI / 180;
     const pt = (deg, r) => [(r * Math.sin(deg * rad)).toFixed(2), (-r * Math.cos(deg * rad)).toFixed(2)];
+    const colorOf = i => (n > 1 && n % 3 === 1 && i === n - 1) ? 1 : i % 3;      // 三色輪流；最後一格避免和第一格同色
+    el('circle', {r:106, class:'fw-rim'}, g);                                      // 底圈
     o.forEach((p, i) => {
-        const [x0, y0] = pt(i * a, R), [x1, y1] = pt((i + 1) * a, R);
-        el('path', {class:'fw-s ' + (p.kind === 'fate' ? 'fw-f' : 'fw-c'), d:`M0 0L${x0} ${y0}A${R} ${R} 0 0 1 ${x1} ${y1}Z`}, g);
+        const c = colorOf(i), [x0, y0] = pt(i * a, R), [x1, y1] = pt((i + 1) * a, R);
+        el('path', {class:'fw-s fw-c' + c, d:`M0 0L${x0} ${y0}A${R} ${R} 0 0 1 ${x1} ${y1}Z`}, g);
         const grp = el('g', {transform:`rotate(${((i + .5) * a).toFixed(2)})`}, g);
-        const t = el('text', {class:'fw-t', transform:'translate(0,-19) rotate(-90)', dy:'.35em'}, grp); t.textContent = shortTxt(p.text);
-        const e = el('text', {class:'fw-e', x:0, y:-90, 'text-anchor':'middle', dy:'.35em'}, grp); e.textContent = p.emoji;
+        const t = el('text', {class:'fw-t' + (c === 2 ? ' dk' : ''), transform:'translate(0,-27) rotate(-90)', dy:'.35em'}, grp); t.textContent = shortTxt(p.text);
+        const e = el('text', {class:'fw-e', x:0, y:-89, 'text-anchor':'middle', dy:'.35em'}, grp); e.textContent = p.emoji;
     });
-    el('circle', {r:R, class:'fw-ring'}, g);
-    el('circle', {r:14, class:'fw-hub'}, g);
+    o.forEach((p, i) => { const [x, y] = pt(i * a, 101); el('circle', {cx:x, cy:y, r:2.3, class:'fw-dot'}, g); });   // 底圈上的小圓點
+    el('path', {d:starPath(17, 7.6), class:'fw-star'}, g);                         // 中心星星
 }
 
 /* ---- 轉動 ---- */
@@ -1827,7 +1836,11 @@ function renderFateHist(){
 }
 
 /* ---- 編輯選項（新增／修改／刪除） ---- */
-function fateCount(){ $('fateCount').textContent = `目前 ${fate.opts.length}／${FATE_MAX} 個選項${fate.opts.length >= FATE_MAX ? '（已滿）' : ''}`; $('fateAdd').disabled = fate.opts.length >= FATE_MAX; }
+function fateCount(){
+    const box = $('fateCount'), full = fate.opts.length >= FATE_MAX; box.textContent = '';
+    [`目前 ${fate.opts.length} / ${FATE_MAX} 個選項${full ? '（已滿）' : ''}，`, '🍀 機會 • ⚡ 命運（點一下可切換）。'].forEach(t => box.appendChild(mk('span', 'nb', t)));   // 兩段各自不斷行，要換行只會換在中間
+    $('fateAdd').disabled = full;
+}
 function buildFateList(){
     const box = $('fateList'); box.textContent = '';
     fate.opts.forEach((p, i) => {

@@ -186,7 +186,8 @@ html[data-theme="dark"] .foot{stroke:#41342A}
 .ft-tools input,.ft-tools select,.fm input,.fm select,.fm textarea{font-size:14px;font-family:inherit;background:var(--bg-input);padding:4px 12px;color:#7A5F4B;border:1.5px dashed var(--border-color);border-radius:20px;outline:none;font-weight:450;}
 .ft-tools input:focus,.ft-tools select:focus,.fm input:focus,.fm select:focus,.fm textarea:focus{border-color:var(--matcha)}
 .ft-row .tbtn{margin-left:0;font-size:14.2px;padding:0 12px;border-radius:20px;border:1.5px dashed #D4B896;}
-.ft-bar{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.ft-bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px;margin-bottom:5px}
+.ft-bar .mini{flex:1 1 auto;text-align:center}   /* 三顆按鈕左右撐滿，邊緣跟上面搜尋框、下拉選單對齊 */
 .tl{--tl-x:1px;position:relative;margin:6px 0 0 6px;padding-left:20px}   /* --tl-x：虛線與圓點的「中心線」離時間軸左緣多遠；數字越小越靠左（可以是負數） */
 .tl::before{content:"";position:absolute;left:calc(var(--tl-x) - 1px);top:4px;bottom:4px;border-left:2px dashed var(--border-color)}
 .tl-year{font-size:14px;font-weight:700;color:var(--primary-dark);margin:10px 0 6px}
@@ -332,9 +333,9 @@ html[data-theme="dark"] .fr-t{color:#A9BD9B}
         <div class="ft-bar">
             <button id="fExport" class="mini" type="button">📤 匯出備份</button>
             <button id="fImport" class="mini" type="button">📥 匯入備份</button>
+            <button id="stayToggle" class="mini" type="button">📡 自動偵測：關</button>
             <input id="fFile" type="file" accept="application/json,.json" class="hidden">
         </div>
-        <div class="stay-row"><button id="stayToggle" class="mini" type="button">📡 自動偵測停留：關</button></div>
         <div class="stay-status" id="stayStatus"></div>
         <div class="chip-tip" style="text-align:center">地圖上的「綠點」代表您的足跡，點一下就能回顧；資料存在這台裝置的瀏覽器裡，記得偶爾匯出備份。</div>
     </div>
@@ -1913,7 +1914,7 @@ const ymd = t => { const d = new Date(t); return d.getFullYear() + '-' + pad(d.g
 const toMin = s => +s.slice(0, 2) * 60 + +s.slice(3);
 const distM = (a, b) => hav(a, b) * 1000;
 const stayStatus = t => { $('stayStatus').textContent = t; };
-const updStayBtn = () => { $('stayToggle').textContent = stayOn ? '📡 自動偵測停留：開' : '📡 自動偵測停留：關'; };
+const updStayBtn = () => { $('stayToggle').textContent = stayOn ? '📡 自動偵測：開' : '📡 自動偵測：關'; };
 
 function stayStatusUpdate(now){
     if (!stayOn) { stayStatus(''); return; }
